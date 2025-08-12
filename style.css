@@ -1,0 +1,96 @@
+body {
+  background: #111;
+  color: #f6f6f6;
+  font-family: 'Fira Mono', 'Consolas', monospace;
+  margin: 0;
+  min-height: 100vh;
+}
+header {
+  text-align: center;
+  padding: 2em 0 1em 0;
+  background: #181818;
+  border-bottom: 2px solid #222;
+}
+h1 {
+  margin: 0;
+  font-size: 2.5em;
+  letter-spacing: 0.05em;
+  color: #29fc9e;
+  text-shadow: 0 0 8px #29fc9e55;
+}
+.subtitle {
+  color: #aaa;
+  font-size: 1.1em;
+  margin-top: 0.25em;
+  font-style: italic;
+}
+main {
+  max-width: 760px;
+  margin: 2em auto;
+  background: #181818;
+  padding: 1.5em 2em;
+  border-radius: 10px;
+  box-shadow: 0 0 24px #000b;
+}
+section {
+  margin-bottom: 2em;
+}
+input[type="file"] {
+  background: #191919;
+  color: #29fc9e;
+  border: 1px solid #29fc9e55;
+  padding: 0.4em;
+  font-size: 1em;
+  border-radius: 5px;
+  margin-right: 1em;
+}
+button {
+  background: #29fc9e;
+  color: #111;
+  border: none;
+  padding: 0.6em 1.3em;
+  border-radius: 7px;
+  font-size: 1em;
+  font-family: inherit;
+  cursor: pointer;
+  margin: 0.4em 0.4em 0.4em 0;
+  transition: background 0.18s;
+}
+button:disabled {
+  background: #333;
+  color: #666;
+  cursor: not-allowed;
+}
+table {
+  width: 100%;
+  background: #191919;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+th, td {
+  border: 1px solid #222;
+  padding: 0.5em 0.7em;
+  text-align: left;
+}
+th {
+  background: #222;
+  color: #29fc9e;
+}
+tr:nth-child(even) td {
+  background: #151515;
+}
+#reportStats {
+  margin-bottom: 0.7em;
+  color: #29fc9e;
+}
+#historyList {
+  font-size: 0.95em;
+  color: #ccc;
+}
+footer {
+  text-align: center;
+  padding: 1.5em 0 0.7em 0;
+  color: #444;
+  font-size: 0.95em;
+  border-top: 1px solid #191919;
+}

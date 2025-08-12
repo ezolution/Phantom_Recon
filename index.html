@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Phantom Recon | OSINT IOC Analyzer</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Phantom Recon</h1>
+    <p class="subtitle">Mysterious OSINT & Threat Intelligence IOC Analyzer</p>
+  </header>
+  <main>
+    <section id="upload">
+      <h2>1. Upload IOC CSV</h2>
+      <input type="file" id="csvInput" accept=".csv" />
+      <p>Accepted types: IP, domain, hash (one IOC per line or as a column)</p>
+      <button id="demoBtn">Demo Data</button>
+    </section>
+    <section id="analyze">
+      <h2>2. Analyze</h2>
+      <button id="analyzeBtn" disabled>Analyze IOCs</button>
+    </section>
+    <section id="report" style="display:none;">
+      <h2>3. Report</h2>
+      <div id="reportStats"></div>
+      <table id="resultsTable"></table>
+      <button id="downloadBtn">Download CSV</button>
+      <button id="clearBtn">Clear All</button>
+    </section>
+    <section id="history">
+      <h2>Analysis History</h2>
+      <ul id="historyList"></ul>
+    </section>
+  </main>
+  <footer>
+    <p>Made with 🕵️ by Phantom Recon</p>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>
