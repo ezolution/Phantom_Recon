@@ -5,6 +5,8 @@
   <title>Phantom Recon | OSINT IOC Analyzer</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <link rel="stylesheet" href="style.css">
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <header>
@@ -30,8 +32,9 @@
       <button id="clearBtn">Clear All</button>
     </section>
     <section id="history">
-      <h2>Analysis History</h2>
-      <ul id="historyList"></ul>
+      <h2>Persistent IOC Tracker (Supabase)</h2>
+      <table id="supabaseIocTable"></table>
+      <button id="refreshIocBtn">Refresh IOC List</button>
     </section>
   </main>
   <footer>
