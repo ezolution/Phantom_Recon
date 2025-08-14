@@ -27,12 +27,12 @@ const SUPABASE_URL = "https://hpjnvtfzpesmmofgmcnz.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhwam52dGZ6cGVzbW1vZmdtY256Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NjM1MzUsImV4cCI6MjA3MDUzOTUzNX0.6Vg3Z00xJRgxSvQRw3CpB6SVK06sXo09nzIP1bq2C-k";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Utility to generate custom ID: DDMMYYYY_ioc_value_campaignkey
-function generateIocId(ioc_value, campaignkey, dateObj) {
+// Utility to generate custom ID: DDMMYYYY_IOC_Value_CampaignKey
+function generateIocId(IOC_Value, CampaignKey, dateObj) {
   const dd = String(dateObj.getDate()).padStart(2, '0');
   const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
   const yyyy = dateObj.getFullYear();
-  return `${dd}${mm}${yyyy}_${ioc_value}_${campaignkey}`;
+  return `${dd}${mm}${yyyy}_${IOC_Value}_${CampaignKey}`;
 }
 
 // Parse CSV with header mapping to snake_case
@@ -42,13 +42,13 @@ function parseCSVText(csvText) {
   const header = rows[0].split(',').map(h => h.trim().replace(/"/g, '').toLowerCase());
   // Ensure header is snake_case
   const snakeHeader = header.map(h =>
-    h.replace(/ioc[\s_-]?type/, 'ioc_type')
-     .replace(/ioc[\s_-]?value/, 'ioc_value')
-     .replace(/source/, 'source')
-     .replace(/hits/, 'hits')
-     .replace(/first[\s_-]?seen/, 'firstseen')
-     .replace(/last[\s_-]?seen/, 'lastseen')
-     .replace(/campaign[\s_-]?key/, 'campaignkey')
+    h.replace(/ioc[\s_-]?type/, 'IOC_Typee')
+     .replace(/ioc[\s_-]?value/, 'IOC_Value')
+     .replace(/Source/, 'Source')
+     .replace(/Hits/, 'Hits')
+     .replace(/first[\s_-]?seen/, 'FirstSeen')
+     .replace(/last[\s_-]?seen/, 'LastSeen')
+     .replace(/campaign[\s_-]?key/, 'CampaignKey')
   );
   return rows.slice(1).map(line => {
     const cols = line.split(',').map(c => c.trim().replace(/"/g, ''));
@@ -90,13 +90,13 @@ function showReport(rows, readOnly = false) {
   </tr>`;
   const body = rows.map(r =>
     `<tr>
-      <td>${r.ioc_type}</td>
-      <td>${r.ioc_value}</td>
-      <td>${r.source}</td>
-      <td>${r.hits}</td>
-      <td>${r.firstseen}</td>
-      <td>${r.lastseen}</td>
-      <td>${r.campaignkey}</td>
+      <td>${r.IOC_Typee}</td>
+      <td>${r.IOC_Value}</td>
+      <td>${r.Source}</td>
+      <td>${r.Hits}</td>
+      <td>${r.FirstSeen}</td>
+      <td>${r.LastSeen}</td>
+      <td>${r.CampaignKey}</td>
     </tr>`
   ).join('');
   resultsTable.innerHTML = header + body;
@@ -110,20 +110,20 @@ function showReport(rows, readOnly = false) {
 
 // Upsert a single IOC row
 async function upsertIocRow(iocObj, uploadDate) {
-  const id = generateIocId(iocObj.ioc_value, iocObj.campaignkey, uploadDate);
+  const id = generateIocId(iocObj.IOC_Value, iocObj.CampaignKey, uploadDate);
   // Debug log
   console.log('Upserting:', { id, ...iocObj });
   const { error } = await supabase
     .from('iocs')
     .upsert([{
       id,
-      ioc_type: iocObj.ioc_type,
-      ioc_value: iocObj.ioc_value,
-      source: iocObj.source,
-      hits: parseInt(iocObj.hits || "1", 10),
-      firstseen: iocObj.firstseen || uploadDate.toISOString().substring(0, 10),
-      lastseen: iocObj.lastseen || uploadDate.toISOString().substring(0, 10),
-      campaignkey: iocObj.campaignkey
+      IOC_Typee: iocObj.IOC_Typee,
+      IOC_Value: iocObj.IOC_Value,
+      Source: iocObj.Source,
+      Hits: parseInt(iocObj.Hits || "1", 10),
+      FirstSeen: iocObj.FirstSeen || uploadDate.toISOString().substring(0, 10),
+      LastSeen: iocObj.LastSeen || uploadDate.toISOString().substring(0, 10),
+      CampaignKey: iocObj.CampaignKey
     }], { onConflict: ['id'] });
   if (error) console.error('Supabase upsert error:', error);
 }
@@ -142,7 +142,7 @@ async function fetchSupabaseIocs() {
   const { data, error } = await supabase
     .from('iocs')
     .select('*')
-    .order('lastseen', { ascending: false });
+    .order('LastSeen', { ascending: false });
   if (error) {
     supabaseIocTable.innerHTML = `<tr><td colspan="8">Error loading IOCs.</td></tr>`;
     return;
@@ -163,13 +163,13 @@ async function fetchSupabaseIocs() {
   </tr>` + data.map(row =>
     `<tr>
       <td>${row.id}</td>
-      <td>${row.ioc_type}</td>
-      <td>${row.ioc_value}</td>
-      <td>${row.source}</td>
-      <td>${row.hits}</td>
-      <td>${row.firstseen}</td>
-      <td>${row.lastseen}</td>
-      <td>${row.campaignkey}</td>
+      <td>${row.IOC_Typee}</td>
+      <td>${row.IOC_Value}</td>
+      <td>${row.Source}</td>
+      <td>${row.Hits}</td>
+      <td>${row.FirstSeen}</td>
+      <td>${row.LastSeen}</td>
+      <td>${row.CampaignKey}</td>
     </tr>`
   ).join('');
 }
@@ -185,9 +185,9 @@ function analyzeRows() {
 function downloadCSVReport() {
   if (!reportRows.length) return;
   const rows = [
-    ['ioc_type', 'ioc_value', 'source', 'hits', 'firstseen', 'lastseen', 'campaignkey'],
+    ['IOC_Typee', 'IOC_Value', 'Source', 'Hits', 'FirstSeen', 'LastSeen', 'CampaignKey'],
     ...reportRows.map(r => [
-      r.ioc_type, r.ioc_value, r.source, r.hits, r.firstseen, r.lastseen, r.campaignkey
+      r.IOC_Typee, r.IOC_Value, r.Source, r.Hits, r.FirstSeen, r.LastSeen, r.CampaignKey
     ])
   ];
   const csv = rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
