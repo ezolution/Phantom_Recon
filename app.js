@@ -1,4 +1,4 @@
-// Phantom Recon - OSINT IOC Analyzer with Supabase persistent tracking (custom CSV schema)
+// Phantom Recon - OSINT IOC Analyzer with Supabase persistent tracking (custom CSV schema, NO mock verdict, NO demo data)
 
 const SUPABASE_URL = "https://hpjnvtfzpesmmofgmcnz.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhwam52dGZ6cGVzbW1vZmdtY256Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NjM1MzUsImV4cCI6MjA3MDUzOTUzNX0.6Vg3Z00xJRgxSvQRw3CpB6SVK06sXo09nzIP1bq2C-k";
@@ -33,21 +33,11 @@ const reportStats = document.getElementById('reportStats');
 const resultsTable = document.getElementById('resultsTable');
 const downloadBtn = document.getElementById('downloadBtn');
 const clearBtn = document.getElementById('clearBtn');
-const demoBtn = document.getElementById('demoBtn');
 const supabaseIocTable = document.getElementById('supabaseIocTable');
 const refreshIocBtn = document.getElementById('refreshIocBtn');
 
 let parsedRows = [];
 let reportRows = [];
-
-// Mock vendor lookup (optional, you can remove if not needed)
-function mockVendorLookup(iocObj) {
-  const verdict = Math.random() < 0.15 ? "Malicious" : (Math.random() < 0.2 ? "Suspicious" : "Clean");
-  return {
-    ...iocObj,
-    verdict
-  };
-}
 
 function showReport(rows, readOnly = false) {
   reportSection.style.display = '';
@@ -56,7 +46,7 @@ function showReport(rows, readOnly = false) {
     reportStats.textContent = "No results to show.";
     return;
   }
-  // Table header from CSV + Verdict
+  // Table header from CSV
   const header = `<tr>
     <th>IOC_Type</th>
     <th>IOC_Value</th>
@@ -65,7 +55,6 @@ function showReport(rows, readOnly = false) {
     <th>FirstSeen</th>
     <th>LastSeen</th>
     <th>CampaignKey</th>
-    <th>Verdict</th>
   </tr>`;
   const body = rows.map(r =>
     `<tr>
@@ -76,22 +65,11 @@ function showReport(rows, readOnly = false) {
       <td>${r.FirstSeen}</td>
       <td>${r.LastSeen}</td>
       <td>${r.CampaignKey}</td>
-      <td style="font-weight:bold; color:${
-        r.verdict === 'Malicious' ? '#ff5387' : (r.verdict === 'Suspicious' ? '#f1c40f' : '#29fc9e')
-      }">${r.verdict}</td>
     </tr>`
   ).join('');
   resultsTable.innerHTML = header + body;
 
-  const verdicts = rows.map(r => r.verdict);
-  const stats = [
-    `Total: ${rows.length}`,
-    `Clean: ${verdicts.filter(v => v === 'Clean').length}`,
-    `Suspicious: ${verdicts.filter(v => v === 'Suspicious').length}`,
-    `Malicious: ${verdicts.filter(v => v === 'Malicious').length}`,
-  ];
-  reportStats.textContent = stats.join(' | ');
-
+  reportStats.textContent = `Total: ${rows.length}`;
   downloadBtn.style.display = readOnly ? 'none' : '';
   clearBtn.style.display = readOnly ? 'none' : '';
 }
@@ -165,7 +143,7 @@ async function fetchSupabaseIocs() {
 // --- CSV/analysis workflow ---
 
 function analyzeRows() {
-  reportRows = parsedRows.map(mockVendorLookup);
+  reportRows = parsedRows;
   showReport(reportRows);
   trackAllRows(parsedRows).then(fetchSupabaseIocs);
 }
@@ -173,9 +151,9 @@ function analyzeRows() {
 function downloadCSVReport() {
   if (!reportRows.length) return;
   const rows = [
-    ['IOC_Type', 'IOC_Value', 'Source', 'Hits', 'FirstSeen', 'LastSeen', 'CampaignKey', 'Verdict'],
+    ['IOC_Type', 'IOC_Value', 'Source', 'Hits', 'FirstSeen', 'LastSeen', 'CampaignKey'],
     ...reportRows.map(r => [
-      r.IOC_Type, r.IOC_Value, r.Source, r.Hits, r.FirstSeen, r.LastSeen, r.CampaignKey, r.verdict
+      r.IOC_Type, r.IOC_Value, r.Source, r.Hits, r.FirstSeen, r.LastSeen, r.CampaignKey
     ])
   ];
   const csv = rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
@@ -212,18 +190,7 @@ analyzeBtn.addEventListener('click', analyzeRows);
 downloadBtn.addEventListener('click', downloadCSVReport);
 clearBtn.addEventListener('click', clearReport);
 
-demoBtn.addEventListener('click', () => {
-  const demoCSV = `IOC_Type,IOC_Value,Source,Hits,FirstSeen,LastSeen,CampaignKey
-IPv4,8.8.8.8,Demo,2,2025-08-12,2025-08-14,DEMO1
-Domain,example.com,Demo,1,2025-08-13,2025-08-14,DEMO1
-Hash,e99a18c428cb38d5f260853678922e03,Demo,3,2025-08-11,2025-08-13,DEMO2
-`;
-  parsedRows = parseCSVText(demoCSV);
-  analyzeBtn.disabled = false;
-  csvInput.value = '';
-});
-
-refreshIocBtn.addEventListener('click', fetchSupabaseIocs);
+refreshIocBtn && refreshIocBtn.addEventListener('click', fetchSupabaseIocs);
 
 // On load, show persistent IOC table
 fetchSupabaseIocs();
