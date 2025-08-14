@@ -21,6 +21,15 @@
     .tab-btn.active { border-bottom: 2px solid #0070f3; color: #0070f3; font-weight: bold; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+    .results-table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+    .results-table th, .results-table td { border: 1px solid #eee; padding: 0.4em 0.7em; text-align: left; }
+    .results-table th { background: #f7f8fa; }
+    .results-table tr.malicious { background: #ffeeee; }
+    .results-table tr.benign { background: #eaffea; }
+    .results-table tr.suspicious { background: #fffbe6; }
+    .verdict.malicious { color: #c00; font-weight: bold; }
+    .verdict.benign { color: #090; font-weight: bold; }
+    .verdict.suspicious { color: #f90; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -45,11 +54,12 @@
     <section id="analyze">
       <h2>2. Analyze</h2>
       <button id="analyzeBtn" disabled>Analyze IOCs</button>
+      <button id="vtAnalyzeBtn" disabled>Analyze with VirusTotal</button>
     </section>
     <section id="report" style="display:none;">
       <h2>3. Report</h2>
       <div id="reportStats"></div>
-      <table id="resultsTable"></table>
+      <table id="resultsTable" class="results-table"></table>
       <button id="downloadBtn">Download CSV</button>
       <button id="clearBtn">Clear All</button>
     </section>
@@ -59,7 +69,7 @@
   <main id="trackerTab" class="tab-content">
     <section id="history">
       <h2>Persistent IOC Tracker (Supabase)</h2>
-      <table id="supabaseIocTable"></table>
+      <table id="supabaseIocTable" class="results-table"></table>
       <button id="refreshIocBtn">Refresh IOC List</button>
     </section>
   </main>
@@ -67,6 +77,7 @@
   <footer>
     <p>Made with 🕵️ by Phantom Recon</p>
   </footer>
-  <script src="app.js"></script>
+  <script type="module" src="virustotal.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
