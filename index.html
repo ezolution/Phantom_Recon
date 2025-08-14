@@ -38,13 +38,11 @@
     <p class="subtitle">Mysterious OSINT & Threat Intelligence IOC Analyzer</p>
   </header>
 
-  <!-- Tab Navigation -->
   <nav class="tab-nav">
     <button id="mainTabBtn" class="tab-btn active">IOC Analyzer</button>
     <button id="trackerTabBtn" class="tab-btn">Persistent IOC Tracker</button>
   </nav>
 
-  <!-- Main IOC Analyzer Page -->
   <main id="mainTab" class="tab-content active">
     <section id="upload">
       <h2>1. Upload IOC CSV</h2>
@@ -54,7 +52,6 @@
     <section id="analyze">
       <h2>2. Analyze</h2>
       <button id="analyzeBtn" disabled>Analyze IOCs</button>
-      <button id="vtAnalyzeBtn" disabled>Analyze with VirusTotal</button>
     </section>
     <section id="report" style="display:none;">
       <h2>3. Report</h2>
@@ -65,10 +62,9 @@
     </section>
   </main>
 
-  <!-- Persistent IOC Tracker Tab -->
   <main id="trackerTab" class="tab-content">
     <section id="history">
-      <h2>Persistent IOC Tracker (Supabase)</h2>
+      <h2>Persistent IOC Tracker (Supabase + Enrichment)</h2>
       <table id="supabaseIocTable" class="results-table"></table>
       <button id="refreshIocBtn">Refresh IOC List</button>
     </section>

@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
     mainTabBtn.classList.remove('active');
     trackerTab.classList.add('active');
     mainTab.classList.remove('active');
-    fetchSupabaseIocs(); // Refresh when switching to tracker tab
+    fetchSupabaseIocs();
   });
 });
 
@@ -27,7 +27,7 @@ const SUPABASE_URL = "https://hpjnvtfzpesmmofgmcnz.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhwam52dGZ6cGVzbW1vZmdtY256Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NjM1MzUsImV4cCI6MjA3MDUzOTUzNX0.6Vg3Z00xJRgxSvQRw3CpB6SVK06sXo09nzIP1bq2C-k";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Utility to generate custom ID: DDMMYYYY_IOC_Value_CampaignKey
+// Utility for custom ID
 function generateIocId(IOC_Value, CampaignKey, dateObj) {
   const dd = String(dateObj.getDate()).padStart(2, '0');
   const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -35,12 +35,10 @@ function generateIocId(IOC_Value, CampaignKey, dateObj) {
   return `${dd}${mm}${yyyy}_${IOC_Value}_${CampaignKey}`;
 }
 
-// Parse CSV with header mapping to correct case for Supabase columns
+// Parse CSV
 function parseCSVText(csvText) {
   const rows = csvText.split(/\r?\n/).filter(Boolean);
-  // Map header to correct case for matching Supabase columns
   const header = rows[0].split(',').map(h => h.trim().replace(/"/g, ''));
-  // Ensure header matches your schema (PascalCase)
   const fixedHeader = header.map(h =>
     h.replace(/ioc[\s_-]?type/i, 'IOC_Typee')
      .replace(/ioc[\s_-]?value/i, 'IOC_Value')
@@ -60,7 +58,6 @@ function parseCSVText(csvText) {
 
 const csvInput = document.getElementById('csvInput');
 const analyzeBtn = document.getElementById('analyzeBtn');
-const vtAnalyzeBtn = document.getElementById('vtAnalyzeBtn');
 const reportSection = document.getElementById('report');
 const reportStats = document.getElementById('reportStats');
 const resultsTable = document.getElementById('resultsTable');
@@ -73,14 +70,13 @@ let parsedRows = [];
 let reportRows = [];
 let vtResults = [];
 
-function showReport(rows, readOnly = false, vtMode = false) {
+function showReport(rows, readOnly = false, vtMode = true) {
   reportSection.style.display = '';
   resultsTable.innerHTML = '';
   if (!rows.length) {
     reportStats.textContent = "No results to show.";
     return;
   }
-  // Table header from CSV and VT columns
   let header = `<tr>
     <th>IOC Type</th>
     <th>IOC Value</th>
@@ -88,30 +84,21 @@ function showReport(rows, readOnly = false, vtMode = false) {
     <th>Hits</th>
     <th>FirstSeen</th>
     <th>LastSeen</th>
-    <th>CampaignKey</th>`;
-  if (vtMode) {
-    header += `
-      <th>VT Verdict</th>
-      <th>VT Threat Label</th>
-      <th>VT Category</th>
-      <th>VT Family</th>
-      <th>VT Tags</th>
-    `;
-  }
-  header += '</tr>';
-
+    <th>CampaignKey</th>
+    <th>VT Verdict</th>
+    <th>VT Threat Label</th>
+    <th>VT Category</th>
+    <th>VT Family</th>
+    <th>VT Tags</th>
+  </tr>`;
   const body = rows.map(r => {
     let vt = r.vt || {};
-    let verdictClass = vtMode ? (
-      vt.verdict?.malicious > 0 ? 'malicious' :
+    let verdictClass = vt.verdict?.malicious > 0 ? 'malicious' :
       vt.verdict?.harmless > 0 ? 'benign' :
-      vt.verdict?.suspicious > 0 ? 'suspicious' : ''
-    ) : '';
-    let verdictText = vtMode ? (
-      vt.verdict?.malicious > 0 ? 'Malicious' :
+      vt.verdict?.suspicious > 0 ? 'suspicious' : '';
+    let verdictText = vt.verdict?.malicious > 0 ? 'Malicious' :
       vt.verdict?.harmless > 0 ? 'Benign' :
-      vt.verdict?.suspicious > 0 ? 'Suspicious' : ''
-    ) : '';
+      vt.verdict?.suspicious > 0 ? 'Suspicious' : '';
     let tags = (vt.threat_names || []).join(', ');
     return `<tr class="${verdictClass}">
       <td>${r.IOC_Typee}</td>
@@ -121,14 +108,11 @@ function showReport(rows, readOnly = false, vtMode = false) {
       <td>${r.FirstSeen}</td>
       <td>${r.LastSeen}</td>
       <td>${r.CampaignKey}</td>
-      ${vtMode
-        ? `<td><span class="verdict ${verdictClass}">${verdictText}</span></td>
-           <td>${vt.popular_threat_label || ''}</td>
-           <td>${vt.popular_threat_category || ''}</td>
-           <td>${vt.popular_threat_family || ''}</td>
-           <td>${tags}</td>`
-        : ''
-      }
+      <td><span class="verdict ${verdictClass}">${verdictText}</span></td>
+      <td>${vt.popular_threat_label || ''}</td>
+      <td>${vt.popular_threat_category || ''}</td>
+      <td>${vt.popular_threat_family || ''}</td>
+      <td>${tags}</td>
     </tr>`;
   }).join('');
   resultsTable.innerHTML = header + body;
@@ -137,13 +121,12 @@ function showReport(rows, readOnly = false, vtMode = false) {
   clearBtn.style.display = readOnly ? 'none' : '';
 }
 
-// --- Supabase IOC functions ---
+// Supabase IOC functions ---
 
-// Upsert a single IOC row
 async function upsertIocRow(iocObj, uploadDate) {
   const id = generateIocId(iocObj.IOC_Value, iocObj.CampaignKey, uploadDate);
-  // Debug log
-  const { error } = await supabase
+  // Upsert IOC base
+  await supabase
     .from('iocs')
     .upsert([{
       id,
@@ -155,10 +138,17 @@ async function upsertIocRow(iocObj, uploadDate) {
       LastSeen: iocObj.LastSeen || uploadDate.toISOString().substring(0, 10),
       CampaignKey: iocObj.CampaignKey
     }], { onConflict: ['id'] });
-  if (error) console.error('Supabase upsert error:', error);
+  // Upsert enrichment
+  await supabase
+    .from('ioc_enrichments')
+    .upsert([{
+      ioc_id: id,
+      provider: 'VirusTotal',
+      enrichment: iocObj.vt,
+      enriched_at: uploadDate.toISOString()
+    }], { onConflict: ['ioc_id', 'provider'] });
 }
 
-// Bulk upsert all analyzed rows
 async function trackAllRows(rows) {
   const uploadDate = new Date();
   for (const iocObj of rows) {
@@ -166,21 +156,29 @@ async function trackAllRows(rows) {
   }
 }
 
-// Fetch and render persistent IOC table
 async function fetchSupabaseIocs() {
   supabaseIocTable.innerHTML = "<tr><td>Loading...</td></tr>";
-  const { data, error } = await supabase
+  // Join iocs + enrichments (VirusTotal only shown here)
+  const { data: baseIocs, error: baseError } = await supabase
     .from('iocs')
     .select('*')
     .order('LastSeen', { ascending: false });
-  if (error) {
-    supabaseIocTable.innerHTML = `<tr><td colspan="8">Error loading IOCs.</td></tr>`;
+  if (baseError || !baseIocs.length) {
+    supabaseIocTable.innerHTML = `<tr><td colspan="13">No IOCs tracked yet.</td></tr>`;
     return;
   }
-  if (!data.length) {
-    supabaseIocTable.innerHTML = "<tr><td>No IOCs tracked yet.</td></tr>";
-    return;
-  }
+  // Get enrichments
+  const ids = baseIocs.map(i => i.id);
+  const { data: enrichments } = await supabase
+    .from('ioc_enrichments')
+    .select('*')
+    .in('ioc_id', ids);
+  // Map enrichments by ioc_id and provider
+  const enrichMap = {};
+  enrichments?.forEach(e => {
+    enrichMap[`${e.ioc_id}_${e.provider}`] = e.enrichment;
+  });
+  // Table UI
   supabaseIocTable.innerHTML = `<tr>
     <th>ID</th>
     <th>IOC Type</th>
@@ -190,8 +188,21 @@ async function fetchSupabaseIocs() {
     <th>FirstSeen</th>
     <th>LastSeen</th>
     <th>CampaignKey</th>
-  </tr>` + data.map(row =>
-    `<tr>
+    <th>VT Verdict</th>
+    <th>VT Threat Label</th>
+    <th>VT Category</th>
+    <th>VT Family</th>
+    <th>VT Tags</th>
+  </tr>` + baseIocs.map(row => {
+    const vt = enrichMap[`${row.id}_VirusTotal`] || {};
+    let verdictClass = vt.verdict?.malicious > 0 ? 'malicious' :
+      vt.verdict?.harmless > 0 ? 'benign' :
+      vt.verdict?.suspicious > 0 ? 'suspicious' : '';
+    let verdictText = vt.verdict?.malicious > 0 ? 'Malicious' :
+      vt.verdict?.harmless > 0 ? 'Benign' :
+      vt.verdict?.suspicious > 0 ? 'Suspicious' : '';
+    let tags = (vt.threat_names || []).join(', ');
+    return `<tr class="${verdictClass}">
       <td>${row.id}</td>
       <td>${row.IOC_Typee}</td>
       <td>${row.IOC_Value}</td>
@@ -200,19 +211,16 @@ async function fetchSupabaseIocs() {
       <td>${row.FirstSeen}</td>
       <td>${row.LastSeen}</td>
       <td>${row.CampaignKey}</td>
-    </tr>`
-  ).join('');
+      <td><span class="verdict ${verdictClass}">${verdictText}</span></td>
+      <td>${vt.popular_threat_label || ''}</td>
+      <td>${vt.popular_threat_category || ''}</td>
+      <td>${vt.popular_threat_family || ''}</td>
+      <td>${tags}</td>
+    </tr>`;
+  }).join('');
 }
 
 // --- CSV/analysis workflow ---
-
-function analyzeRows() {
-  reportRows = parsedRows;
-  showReport(reportRows);
-  trackAllRows(parsedRows).then(fetchSupabaseIocs);
-}
-
-// --- VirusTotal integration ---
 
 function getVTType(iocType, value) {
   const type = iocType.trim().toLowerCase();
@@ -223,9 +231,10 @@ function getVTType(iocType, value) {
   return null;
 }
 
-async function analyzeWithVirusTotal() {
-  vtAnalyzeBtn.disabled = true;
-  reportStats.textContent = "Analyzing with VirusTotal...";
+async function analyzeRows() {
+  reportStats.textContent = "Analyzing, please wait...";
+  analyzeBtn.disabled = true;
+  // Prepare VT batch
   const iocArr = parsedRows.map(r => ({
     type: getVTType(r.IOC_Typee, r.IOC_Value),
     value: r.IOC_Value,
@@ -243,10 +252,12 @@ async function analyzeWithVirusTotal() {
     vt: r.vt
   }));
   showReport(reportRows, false, true);
-  vtAnalyzeBtn.disabled = false;
+  // Store all rows with enrichment in Supabase
+  await trackAllRows(reportRows);
+  fetchSupabaseIocs();
+  analyzeBtn.disabled = false;
+  reportStats.textContent = `Total: ${reportRows.length}`;
 }
-
-// --- Download/clear ---
 
 function downloadCSVReport() {
   if (!reportRows.length) return;
@@ -279,7 +290,6 @@ function clearReport() {
   vtResults = [];
   csvInput.value = '';
   analyzeBtn.disabled = true;
-  vtAnalyzeBtn.disabled = true;
 }
 
 csvInput.addEventListener('change', e => {
@@ -289,17 +299,16 @@ csvInput.addEventListener('change', e => {
   reader.onload = evt => {
     parsedRows = parseCSVText(evt.target.result);
     analyzeBtn.disabled = !parsedRows.length;
-    vtAnalyzeBtn.disabled = !parsedRows.length;
   };
   reader.readAsText(file);
 });
 
-analyzeBtn.addEventListener('click', analyzeRows);
-vtAnalyzeBtn.addEventListener('click', analyzeWithVirusTotal);
+analyzeBtn.addEventListener('click', () => {
+  analyzeRows();
+});
 downloadBtn.addEventListener('click', downloadCSVReport);
 clearBtn.addEventListener('click', clearReport);
 
 refreshIocBtn && refreshIocBtn.addEventListener('click', fetchSupabaseIocs);
 
-// On load, show persistent IOC table (default tab is Analyzer)
 fetchSupabaseIocs();
