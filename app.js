@@ -39,8 +39,9 @@ function generateIocId(IOC_Value, CampaignKey, dateObj) {
 function parseCSVText(csvText) {
   const rows = csvText.split(/\r?\n/).filter(Boolean);
   const header = rows[0].split(',').map(h => h.trim().replace(/"/g, ''));
+  // Map to your actual column names (see image2)
   const fixedHeader = header.map(h =>
-    h.replace(/ioc[\s_-]?type/i, 'IOC_Typee')
+    h.replace(/ioc[\s_-]?type/i, 'IOC_Type')
      .replace(/ioc[\s_-]?value/i, 'IOC_Value')
      .replace(/source/i, 'Source')
      .replace(/hits/i, 'Hits')
@@ -101,7 +102,7 @@ function showReport(rows, readOnly = false, vtMode = true) {
       vt.verdict?.suspicious > 0 ? 'Suspicious' : '';
     let tags = (vt.threat_names || []).join(', ');
     return `<tr class="${verdictClass}">
-      <td>${r.IOC_Typee}</td>
+      <td>${r.IOC_Type}</td>
       <td>${r.IOC_Value}</td>
       <td>${r.Source}</td>
       <td>${r.Hits}</td>
@@ -125,12 +126,12 @@ function showReport(rows, readOnly = false, vtMode = true) {
 
 async function upsertIocRow(iocObj, uploadDate) {
   const id = generateIocId(iocObj.IOC_Value, iocObj.CampaignKey, uploadDate);
-  // Upsert IOC base
+  // Upsert IOC base (matches your schema in image2)
   await supabase
     .from('iocs')
     .upsert([{
       id,
-      IOC_Typee: iocObj.IOC_Typee,
+      IOC_Type: iocObj.IOC_Type,
       IOC_Value: iocObj.IOC_Value,
       Source: iocObj.Source,
       Hits: parseInt(iocObj.Hits || "1", 10),
@@ -138,7 +139,7 @@ async function upsertIocRow(iocObj, uploadDate) {
       LastSeen: iocObj.LastSeen || uploadDate.toISOString().substring(0, 10),
       CampaignKey: iocObj.CampaignKey
     }], { onConflict: ['id'] });
-  // Upsert enrichment
+  // Upsert enrichment (matches your schema in image3)
   await supabase
     .from('ioc_enrichments')
     .upsert([{
@@ -173,12 +174,10 @@ async function fetchSupabaseIocs() {
     .from('ioc_enrichments')
     .select('*')
     .in('ioc_id', ids);
-  // Map enrichments by ioc_id and provider
   const enrichMap = {};
   enrichments?.forEach(e => {
     enrichMap[`${e.ioc_id}_${e.provider}`] = e.enrichment;
   });
-  // Table UI
   supabaseIocTable.innerHTML = `<tr>
     <th>ID</th>
     <th>IOC Type</th>
@@ -204,7 +203,7 @@ async function fetchSupabaseIocs() {
     let tags = (vt.threat_names || []).join(', ');
     return `<tr class="${verdictClass}">
       <td>${row.id}</td>
-      <td>${row.IOC_Typee}</td>
+      <td>${row.IOC_Type}</td>
       <td>${row.IOC_Value}</td>
       <td>${row.Source}</td>
       <td>${row.Hits}</td>
@@ -236,13 +235,13 @@ async function analyzeRows() {
   analyzeBtn.disabled = true;
   // Prepare VT batch
   const iocArr = parsedRows.map(r => ({
-    type: getVTType(r.IOC_Typee, r.IOC_Value),
+    type: getVTType(r.IOC_Type, r.IOC_Value),
     value: r.IOC_Value,
     ...r
   })).filter(ioc => !!ioc.type);
   vtResults = await virustotalBatchSearch(iocArr);
   reportRows = vtResults.map(r => ({
-    IOC_Typee: r.IOC_Typee,
+    IOC_Type: r.IOC_Type,
     IOC_Value: r.IOC_Value,
     Source: r.Source,
     Hits: r.Hits,
@@ -252,7 +251,6 @@ async function analyzeRows() {
     vt: r.vt
   }));
   showReport(reportRows, false, true);
-  // Store all rows with enrichment in Supabase
   await trackAllRows(reportRows);
   fetchSupabaseIocs();
   analyzeBtn.disabled = false;
@@ -262,9 +260,9 @@ async function analyzeRows() {
 function downloadCSVReport() {
   if (!reportRows.length) return;
   const rows = [
-    ['IOC_Typee', 'IOC_Value', 'Source', 'Hits', 'FirstSeen', 'LastSeen', 'CampaignKey', 'VT_Verdict', 'VT_Threat_Label', 'VT_Threat_Category', 'VT_Family_Label', 'VT_Threat_Tags'],
+    ['IOC_Type', 'IOC_Value', 'Source', 'Hits', 'FirstSeen', 'LastSeen', 'CampaignKey', 'VT_Verdict', 'VT_Threat_Label', 'VT_Threat_Category', 'VT_Family_Label', 'VT_Threat_Tags'],
     ...reportRows.map(r => [
-      r.IOC_Typee, r.IOC_Value, r.Source, r.Hits, r.FirstSeen, r.LastSeen, r.CampaignKey,
+      r.IOC_Type, r.IOC_Value, r.Source, r.Hits, r.FirstSeen, r.LastSeen, r.CampaignKey,
       r.vt ? JSON.stringify(r.vt.verdict) : '',
       r.vt ? r.vt.popular_threat_label : '',
       r.vt ? r.vt.popular_threat_category : '',
