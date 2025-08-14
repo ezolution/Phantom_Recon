@@ -42,7 +42,7 @@ function parseCSVText(csvText) {
   const header = rows[0].split(',').map(h => h.trim().replace(/"/g, '').toLowerCase());
   // Ensure header is snake_case
   const snakeHeader = header.map(h =>
-    h.replace(/ioc[\s_-]?type/, 'IOC_Typee')
+    h.replace(/ioc[\s_-]?type/, 'IOC_Type')
      .replace(/ioc[\s_-]?value/, 'IOC_Value')
      .replace(/Source/, 'Source')
      .replace(/Hits/, 'Hits')
@@ -90,7 +90,7 @@ function showReport(rows, readOnly = false) {
   </tr>`;
   const body = rows.map(r =>
     `<tr>
-      <td>${r.IOC_Typee}</td>
+      <td>${r.IOC_Type}</td>
       <td>${r.IOC_Value}</td>
       <td>${r.Source}</td>
       <td>${r.Hits}</td>
@@ -117,7 +117,7 @@ async function upsertIocRow(iocObj, uploadDate) {
     .from('iocs')
     .upsert([{
       id,
-      IOC_Typee: iocObj.IOC_Typee,
+      IOC_Type: iocObj.IOC_Type,
       IOC_Value: iocObj.IOC_Value,
       Source: iocObj.Source,
       Hits: parseInt(iocObj.Hits || "1", 10),
@@ -163,7 +163,7 @@ async function fetchSupabaseIocs() {
   </tr>` + data.map(row =>
     `<tr>
       <td>${row.id}</td>
-      <td>${row.IOC_Typee}</td>
+      <td>${row.IOC_Type}</td>
       <td>${row.IOC_Value}</td>
       <td>${row.Source}</td>
       <td>${row.Hits}</td>
@@ -185,9 +185,9 @@ function analyzeRows() {
 function downloadCSVReport() {
   if (!reportRows.length) return;
   const rows = [
-    ['IOC_Typee', 'IOC_Value', 'Source', 'Hits', 'FirstSeen', 'LastSeen', 'CampaignKey'],
+    ['IOC_Type', 'IOC_Value', 'Source', 'Hits', 'FirstSeen', 'LastSeen', 'CampaignKey'],
     ...reportRows.map(r => [
-      r.IOC_Typee, r.IOC_Value, r.Source, r.Hits, r.FirstSeen, r.LastSeen, r.CampaignKey
+      r.IOC_Type, r.IOC_Value, r.Source, r.Hits, r.FirstSeen, r.LastSeen, r.CampaignKey
     ])
   ];
   const csv = rows.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
