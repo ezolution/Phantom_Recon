@@ -1,5 +1,28 @@
-// Phantom Recon - OSINT IOC Analyzer with Supabase persistent tracking (column mapping for snake_case)
+// Phantom Recon - OSINT IOC Analyzer with Supabase persistent tracking and tab navigation
 
+// ----- Tab Navigation Logic -----
+document.addEventListener('DOMContentLoaded', function () {
+  const mainTabBtn = document.getElementById('mainTabBtn');
+  const trackerTabBtn = document.getElementById('trackerTabBtn');
+  const mainTab = document.getElementById('mainTab');
+  const trackerTab = document.getElementById('trackerTab');
+
+  mainTabBtn.addEventListener('click', function () {
+    mainTabBtn.classList.add('active');
+    trackerTabBtn.classList.remove('active');
+    mainTab.classList.add('active');
+    trackerTab.classList.remove('active');
+  });
+  trackerTabBtn.addEventListener('click', function () {
+    trackerTabBtn.classList.add('active');
+    mainTabBtn.classList.remove('active');
+    trackerTab.classList.add('active');
+    mainTab.classList.remove('active');
+    fetchSupabaseIocs(); // Refresh when switching to tracker tab
+  });
+});
+
+// ----- Supabase Setup -----
 const SUPABASE_URL = "https://hpjnvtfzpesmmofgmcnz.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhwam52dGZ6cGVzbW1vZmdtY256Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NjM1MzUsImV4cCI6MjA3MDUzOTUzNX0.6Vg3Z00xJRgxSvQRw3CpB6SVK06sXo09nzIP1bq2C-k";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -12,19 +35,21 @@ function generateIocId(ioc_value, campaignkey, dateObj) {
   return `${dd}${mm}${yyyy}_${ioc_value}_${campaignkey}`;
 }
 
-// Parse CSV with header mapping to lower_snake_case
+// Parse CSV with header mapping to snake_case
 function parseCSVText(csvText) {
   const rows = csvText.split(/\r?\n/).filter(Boolean);
   // Map header to lowercase and snake_case for matching Supabase columns
   const header = rows[0].split(',').map(h => h.trim().replace(/"/g, '').toLowerCase());
-  // If header has campaignkey as CampaignKey, convert to campaignkey
-  const snakeHeader = header.map(h => h.replace('ioc type', 'ioc_type')
-                                      .replace('ioc value', 'ioc_value')
-                                      .replace('source', 'source')
-                                      .replace('hits', 'hits')
-                                      .replace('firstseen', 'firstseen')
-                                      .replace('lastseen', 'lastseen')
-                                      .replace('campaignkey', 'campaignkey'));
+  // Ensure header is snake_case
+  const snakeHeader = header.map(h =>
+    h.replace(/ioc[\s_-]?type/, 'ioc_type')
+     .replace(/ioc[\s_-]?value/, 'ioc_value')
+     .replace(/source/, 'source')
+     .replace(/hits/, 'hits')
+     .replace(/first[\s_-]?seen/, 'firstseen')
+     .replace(/last[\s_-]?seen/, 'lastseen')
+     .replace(/campaign[\s_-]?key/, 'campaignkey')
+  );
   return rows.slice(1).map(line => {
     const cols = line.split(',').map(c => c.trim().replace(/"/g, ''));
     const obj = {};
@@ -86,7 +111,8 @@ function showReport(rows, readOnly = false) {
 // Upsert a single IOC row
 async function upsertIocRow(iocObj, uploadDate) {
   const id = generateIocId(iocObj.ioc_value, iocObj.campaignkey, uploadDate);
-  console.log('Upserting:', { id, ...iocObj }); // Debug log
+  // Debug log
+  console.log('Upserting:', { id, ...iocObj });
   const { error } = await supabase
     .from('iocs')
     .upsert([{
@@ -159,7 +185,7 @@ function analyzeRows() {
 function downloadCSVReport() {
   if (!reportRows.length) return;
   const rows = [
-    ['IOC_Type', 'IOC_Value', 'Source', 'Hits', 'FirstSeen', 'LastSeen', 'CampaignKey'],
+    ['ioc_type', 'ioc_value', 'source', 'hits', 'firstseen', 'lastseen', 'campaignkey'],
     ...reportRows.map(r => [
       r.ioc_type, r.ioc_value, r.source, r.hits, r.firstseen, r.lastseen, r.campaignkey
     ])
@@ -200,5 +226,5 @@ clearBtn.addEventListener('click', clearReport);
 
 refreshIocBtn && refreshIocBtn.addEventListener('click', fetchSupabaseIocs);
 
-// On load, show persistent IOC table
+// On load, show persistent IOC table (default tab is Analyzer)
 fetchSupabaseIocs();
