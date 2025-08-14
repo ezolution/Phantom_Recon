@@ -79,6 +79,7 @@ function showReport(rows, readOnly = false) {
 // Upsert a single IOC row
 async function upsertIocRow(iocObj, uploadDate) {
   const id = generateIocId(iocObj.IOC_Value, iocObj.CampaignKey, uploadDate);
+  console.log('Upserting:', { id, ...iocObj }); // <-- Add this line
   const { error } = await supabase
     .from('iocs')
     .upsert([{
