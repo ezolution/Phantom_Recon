@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_DB: threatforge
       POSTGRES_USER: threatforge
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-threatforge123}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -50,7 +50,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     environment:
-      - DATABASE_URL=postgresql+asyncpg://threatforge:${POSTGRES_PASSWORD}@db:5432/threatforge
+      - DATABASE_URL=postgresql+asyncpg://threatforge:${POSTGRES_PASSWORD:-threatforge123}@db:5432/threatforge
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=${SECRET_KEY}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
@@ -86,7 +86,7 @@ services:
       dockerfile: Dockerfile
     command: celery -A app.core.celery_app worker --loglevel=info --concurrency=1
     environment:
-      - DATABASE_URL=postgresql+asyncpg://threatforge:${POSTGRES_PASSWORD}@db:5432/threatforge
+      - DATABASE_URL=postgresql+asyncpg://threatforge:${POSTGRES_PASSWORD:-threatforge123}@db:5432/threatforge
       - REDIS_URL=redis://redis:6379/0
       - SECRET_KEY=${SECRET_KEY}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
