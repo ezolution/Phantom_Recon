@@ -5,13 +5,13 @@ Authentication schemas
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 
 class UserBase(BaseModel):
     """Base user schema"""
     username: str
-    email: EmailStr
+    email: str  # Simple string, no email validation
     full_name: Optional[str] = None
     role: str = "analyst"
 

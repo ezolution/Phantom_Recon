@@ -22,11 +22,8 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
-    # Database
-    DATABASE_URL: str = Field(..., env="DATABASE_URL")
-    
-    # Redis
-    REDIS_URL: str = Field(..., env="REDIS_URL")
+    # Database (SQLite)
+    DATABASE_URL: str = Field(default="sqlite+aiosqlite:///./threatforge.db", env="DATABASE_URL")
     
     # CORS
     ALLOWED_ORIGINS: List[str] = Field(default=["http://localhost:3000"], env="ALLOWED_ORIGINS")
@@ -48,9 +45,9 @@ class Settings(BaseSettings):
     FLASHPOINT_API_KEY: Optional[str] = Field(default=None, env="FLASHPOINT_API_KEY")
     RECORDED_FUTURE_API_KEY: Optional[str] = Field(default=None, env="RECORDED_FUTURE_API_KEY")
     
-    # Celery
-    CELERY_BROKER_URL: str = Field(default="redis://localhost:6379/0", env="CELERY_BROKER_URL")
-    CELERY_RESULT_BACKEND: str = Field(default="redis://localhost:6379/0", env="CELERY_RESULT_BACKEND")
+    # Celery (using SQLite as broker - simplified)
+    CELERY_BROKER_URL: str = Field(default="sqla+sqlite:///./celery.db", env="CELERY_BROKER_URL")
+    CELERY_RESULT_BACKEND: str = Field(default="db+sqlite:///./celery_results.db", env="CELERY_RESULT_BACKEND")
     
     # Logging
     LOG_LEVEL: str = Field(default="INFO", env="LOG_LEVEL")

@@ -13,7 +13,7 @@ class Base(DeclarativeBase):
     pass
 
 
-# Create async engine
+# Create async engine with SQLite
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
