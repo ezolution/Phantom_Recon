@@ -1,0 +1,118 @@
+# Threat-Forge Production Makefile
+# For DigitalOcean 1 CPU, 1GB RAM droplet
+
+.PHONY: help deploy start stop restart logs monitor backup restore clean
+
+# Default target
+help:
+	@echo "Threat-Forge Production Commands:"
+	@echo ""
+	@echo "  make deploy        - Deploy to production"
+	@echo "  make start         - Start all services"
+	@echo "  make stop          - Stop all services"
+	@echo "  make restart       - Restart all services"
+	@echo "  make logs          - View logs from all services"
+	@echo "  make monitor       - Show system status"
+	@echo "  make backup        - Backup database"
+	@echo "  make restore       - Restore database from backup"
+	@echo "  make clean         - Clean up unused resources"
+	@echo ""
+
+# Deploy to production
+deploy:
+	@echo "🚀 Deploying Threat-Forge to production..."
+	@chmod +x deploy.sh
+	@./deploy.sh
+
+# Start all services
+start:
+	@echo "▶️ Starting Threat-Forge services..."
+	docker-compose -f docker-compose.prod.yml up -d
+	@echo "✅ Services started"
+
+# Stop all services
+stop:
+	@echo "⏹️ Stopping Threat-Forge services..."
+	docker-compose -f docker-compose.prod.yml down
+	@echo "✅ Services stopped"
+
+# Restart all services
+restart: stop start
+	@echo "🔄 Services restarted"
+
+# View logs
+logs:
+	@echo "📋 Viewing Threat-Forge logs..."
+	docker-compose -f docker-compose.prod.yml logs -f
+
+# Monitor system status
+monitor:
+	@echo "📊 Threat-Forge System Status"
+	@echo "================================"
+	@echo "Memory Usage:"
+	@free -h
+	@echo ""
+	@echo "Disk Usage:"
+	@df -h
+	@echo ""
+	@echo "Docker Containers:"
+	@docker-compose -f docker-compose.prod.yml ps
+	@echo ""
+	@echo "Container Resource Usage:"
+	@docker stats --no-stream
+
+# Backup database
+backup:
+	@echo "💾 Backing up database..."
+	@mkdir -p backups
+	@docker-compose -f docker-compose.prod.yml exec -T db pg_dump -U threatforge threatforge > backups/threatforge_$(shell date +%Y%m%d_%H%M%S).sql
+	@echo "✅ Database backed up to backups/"
+
+# Restore database
+restore:
+	@echo "🔄 Restoring database..."
+	@if [ -z "$(BACKUP_FILE)" ]; then \
+		echo "❌ Please specify BACKUP_FILE=path/to/backup.sql"; \
+		exit 1; \
+	fi
+	@docker-compose -f docker-compose.prod.yml exec -T db psql -U threatforge -d threatforge < $(BACKUP_FILE)
+	@echo "✅ Database restored from $(BACKUP_FILE)"
+
+# Clean up unused resources
+clean:
+	@echo "🧹 Cleaning up unused resources..."
+	docker system prune -f
+	docker volume prune -f
+	@echo "✅ Cleanup completed"
+
+# Update application
+update:
+	@echo "🔄 Updating Threat-Forge..."
+	git pull origin main
+	docker-compose -f docker-compose.prod.yml build --no-cache
+	docker-compose -f docker-compose.prod.yml up -d
+	docker-compose -f docker-compose.prod.yml exec -T api alembic upgrade head
+	@echo "✅ Update completed"
+
+# Health check
+health:
+	@echo "🏥 Checking service health..."
+	@curl -f http://localhost/healthz || echo "❌ API health check failed"
+	@curl -f http://localhost/health || echo "❌ Frontend health check failed"
+	@echo "✅ Health checks completed"
+
+# Show resource usage
+resources:
+	@echo "📊 Resource Usage:"
+	@echo "=================="
+	@echo "Memory:"
+	@free -h
+	@echo ""
+	@echo "Disk:"
+	@df -h
+	@echo ""
+	@echo "Docker:"
+	@docker system df
+	@echo ""
+	@echo "Container Resources:"
+	@docker stats --no-stream --format "table {{.Container}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.MemPerc}}"

@@ -1,0 +1,17 @@
+ioc_value,ioc_type,email_id,source_platform,classification,campaign_id,user_reported,first_seen,last_seen,notes
+https://malicious-site.com/payload.exe,url,phish-001,EOP,malicious,campaign-001,true,2024-01-01T00:00:00Z,2024-01-01T12:00:00Z,Phishing email attachment
+https://suspicious-domain.net/login,url,susp-002,Abnormal,suspicious,campaign-002,false,2024-01-02T00:00:00Z,2024-01-02T06:00:00Z,Suspicious login page
+evil-domain.com,domain,phish-003,EOP,malicious,campaign-001,true,2024-01-01T00:00:00Z,2024-01-01T12:00:00Z,C2 domain
+legitimate-site.org,domain,benign-001,Abnormal,benign,campaign-003,false,2024-01-03T00:00:00Z,2024-01-03T00:00:00Z,Legitimate website
+192.168.1.100,ipv4,susp-004,EOP,suspicious,campaign-002,false,2024-01-02T00:00:00Z,2024-01-02T06:00:00Z,Suspicious IP
+a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456,sha256,mal-001,EOP,malicious,campaign-001,true,2024-01-01T00:00:00Z,2024-01-01T12:00:00Z,Malicious executable
+1234567890abcdef1234567890abcdef,md5,susp-005,Abnormal,suspicious,campaign-002,false,2024-01-02T00:00:00Z,2024-01-02T06:00:00Z,Suspicious file
+attacker@evil-domain.com,email,phish-006,EOP,malicious,campaign-001,true,2024-01-01T00:00:00Z,2024-01-01T12:00:00Z,Phishing sender
+urgent payment required,subject_keyword,phish-007,EOP,suspicious,campaign-001,true,2024-01-01T00:00:00Z,2024-01-01T12:00:00Z,Phishing subject line
+https://another-malicious-site.com,url,phish-008,EOP,malicious,campaign-001,true,2024-01-01T00:00:00Z,2024-01-01T12:00:00Z,Another phishing URL
+bad-domain.net,domain,susp-009,Abnormal,suspicious,campaign-002,false,2024-01-02T00:00:00Z,2024-01-02T06:00:00Z,Suspicious domain
+10.0.0.1,ipv4,benign-002,Abnormal,benign,campaign-003,false,2024-01-03T00:00:00Z,2024-01-03T00:00:00Z,Internal IP
+b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef1234567,sha256,mal-002,EOP,malicious,campaign-001,true,2024-01-01T00:00:00Z,2024-01-01T12:00:00Z,Another malicious file
+9876543210fedcba9876543210fedcba,md5,susp-010,Abnormal,suspicious,campaign-002,false,2024-01-02T00:00:00Z,2024-01-02T06:00:00Z,Suspicious MD5
+spammer@bad-domain.com,email,spam-001,EOP,suspicious,campaign-004,true,2024-01-04T00:00:00Z,2024-01-04T00:00:00Z,Spam sender
+free money click here,subject_keyword,phish-011,EOP,suspicious,campaign-001,true,2024-01-01T00:00:00Z,2024-01-01T12:00:00Z,Phishing subject

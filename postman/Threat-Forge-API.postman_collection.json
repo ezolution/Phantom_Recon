@@ -1,0 +1,237 @@
+{
+  "info": {
+    "name": "Threat-Forge API",
+    "description": "API collection for Threat-Forge threat intelligence portal",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "username",
+                  "value": "admin",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "admin123",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Upload",
+      "item": [
+        {
+          "name": "Upload CSV",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "sample_iocs.csv"
+                },
+                {
+                  "key": "campaign_id",
+                  "value": "test-campaign-001",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/upload/",
+              "host": ["{{base_url}}"],
+              "path": ["upload", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Jobs",
+      "item": [
+        {
+          "name": "Get Job Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/jobs/1",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Start Enrichment",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/jobs/1/enrich",
+              "host": ["{{base_url}}"],
+              "path": ["jobs", "1", "enrich"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "IOCs",
+      "item": [
+        {
+          "name": "Search IOCs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/iocs/?q=malicious&type=url&risk_min=50&page=1&page_size=10",
+              "host": ["{{base_url}}"],
+              "path": ["iocs", ""],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "malicious"
+                },
+                {
+                  "key": "type",
+                  "value": "url"
+                },
+                {
+                  "key": "risk_min",
+                  "value": "50"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "page_size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get IOC Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/iocs/1",
+              "host": ["{{base_url}}"],
+              "path": ["iocs", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Statistics",
+      "item": [
+        {
+          "name": "Get Overview Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/stats/overview",
+              "host": ["{{base_url}}"],
+              "path": ["stats", "overview"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/healthz",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8000",
+              "path": ["healthz"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+"""
+Job endpoints
+"""
+
+from typing import Any
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
+from app.core.auth import get_current_active_user, require_admin_role
+from app.models.user import User
+from app.core.database import get_db
+from app.models.job import Job
+from app.models.upload import Upload
+from app.schemas.job import Job as JobSchema, JobSummary
+
+router = APIRouter()
+
+
+@router.get("/{job_id}", response_model=JobSummary)
+async def get_job(
+    job_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+) -> Any:
+    """Get job status and summary"""
+    
+    result = await db.execute(
+        select(Job).where(Job.id == job_id)
+    )
+    job = result.scalar_one_or_none()
+    
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job not found"
+        )
+    
+    # Check if user has access to this job
+    result = await db.execute(
+        select(Upload).where(Upload.id == job.upload_id)
+    )
+    upload = result.scalar_one_or_none()
+    
+    if not upload or upload.uploaded_by != current_user.id:
+        if current_user.role != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not enough permissions"
+            )
+    
+    # Calculate progress
+    progress_percentage = 0.0
+    if job.total_iocs > 0:
+        progress_percentage = (job.processed_iocs / job.total_iocs) * 100
+    
+    return JobSummary(
+        job=job,
+        progress_percentage=progress_percentage
+    )
+
+
+@router.post("/{job_id}/enrich")
+async def start_enrichment(
+    job_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_admin_role),
+) -> Any:
+    """Start or force enrichment for a job (admin only)"""
+    
+    result = await db.execute(
+        select(Job).where(Job.id == job_id)
+    )
+    job = result.scalar_one_or_none()
+    
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Job not found"
+        )
+    
+    # Update job status to queued if not already running
+    if job.status not in [JobStatus.RUNNING, JobStatus.DONE]:
+        job.status = JobStatus.QUEUED
+        await db.commit()
+    
+    # TODO: Enqueue enrichment task with Celery
+    
+    return {"message": "Enrichment job queued successfully"}
