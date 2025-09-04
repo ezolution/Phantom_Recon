@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Layout } from './components/Layout'
 import { Navigation } from './components/Navigation'
 import { UploadPage } from './pages/UploadPage'
 import { SearchPage } from './pages/SearchPage'
@@ -25,15 +24,13 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      <Layout>
-        <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
-        <main className="flex-1 lg:ml-64">
-          <div className="p-6">
-            {renderContent()}
-          </div>
-        </main>
-      </Layout>
+    <div className="min-h-screen bg-slate-900 w-full">
+      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <main className="flex-1 lg:ml-64 bg-slate-900">
+        <div className="p-6 bg-slate-900">
+          {renderContent()}
+        </div>
+      </main>
     </div>
   )
 }

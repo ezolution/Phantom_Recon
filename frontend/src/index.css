@@ -5,13 +5,28 @@
 @tailwind utilities;
 
 @layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
   html {
     font-family: 'Inter', system-ui, sans-serif;
+    @apply bg-slate-900;
+    height: 100%;
   }
   
   body {
     @apply bg-slate-900 text-slate-100;
     overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  
+  #root {
+    @apply bg-slate-900;
+    min-height: 100vh;
+    height: 100%;
   }
   
   /* Custom scrollbar */
