@@ -255,10 +255,10 @@ export function UploadPage() {
                 </tr>
               </thead>
               <tbody>
-                {preview.slice(0, 10).map((row, index) => {
-                  const validation = validateRow(row, index)
+                {preview.slice(0, 10).map((row, _index) => {
+                  const validation = validateRow(row, _index)
                   return (
-                    <tr key={index} className="border-b border-blackhat-800">
+                    <tr key={_index} className="border-b border-blackhat-800">
                       <td className="py-2">
                         {validation.isValid ? (
                           <CheckCircle className="h-4 w-4 text-neon-green" />
