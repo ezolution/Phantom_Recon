@@ -133,6 +133,13 @@
   .risk-critical {
     @apply text-red-400;
   }
+
+  /* Mobile responsive adjustments */
+  @media (max-width: 1024px) {
+    .mobile-main {
+      margin-left: 0;
+    }
+  }
 }
 
 @layer utilities {

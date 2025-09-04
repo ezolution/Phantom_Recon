@@ -138,16 +138,13 @@ export function UploadPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center space-x-3">
-        <Shield className="h-6 w-6 text-emerald-400" />
-        <div>
-          <h2 className="text-xl font-mono font-bold text-slate-100">
-            Upload CSV File
-          </h2>
-          <p className="text-slate-400 font-mono text-sm mt-1">
-            Upload CSV files containing IOCs for enrichment
-          </p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-mono font-bold text-slate-100 mb-2">
+          Upload CSV File
+        </h1>
+        <p className="text-slate-400 font-mono">
+          Upload CSV files containing IOCs for enrichment
+        </p>
       </div>
 
       {/* Upload Area */}
