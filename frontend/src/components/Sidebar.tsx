@@ -25,7 +25,7 @@ export function Sidebar() {
             Upload → Enrich → Attribute
           </div>
           <div className="text-xs text-blackhat-400 font-mono">
-            <span className="animate-pulse">> enriching...</span>
+            <span className="animate-pulse">&gt; enriching...</span>
             <span className="terminal-cursor"></span>
           </div>
         </div>
