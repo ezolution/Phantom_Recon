@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { Shield, User, LogOut, BookOpen } from 'lucide-react'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 
 export function TopBar() {
   const { user, logout } = useAuth()
