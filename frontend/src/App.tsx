@@ -6,27 +6,19 @@ import { Shield, Bug, Fingerprint, Terminal } from 'lucide-react'
 
 function App() {
   return (
-    <div className="min-h-screen bg-blackhat-950 relative">
-      {/* Animated background elements */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-20 left-10 w-2 h-2 bg-neon-green rounded-full animate-pulse opacity-60"></div>
-        <div className="absolute top-40 right-20 w-1 h-1 bg-neon-cyan rounded-full animate-pulse opacity-40"></div>
-        <div className="absolute bottom-32 left-1/4 w-1.5 h-1.5 bg-neon-purple rounded-full animate-pulse opacity-50"></div>
-        <div className="absolute bottom-20 right-1/3 w-1 h-1 bg-neon-yellow rounded-full animate-pulse opacity-30"></div>
-      </div>
-
+    <div className="min-h-screen bg-slate-950">
       <Layout>
-        <div className="space-y-8 relative z-10">
+        <div className="space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between cyber-border scan-line p-6">
+          <div className="flex items-center justify-between p-6 bg-slate-900 rounded-xl border border-slate-700">
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Shield className="h-8 w-8 text-neon-green glow-text" />
-                <Bug className="h-6 w-6 text-neon-cyan" />
-                <Fingerprint className="h-6 w-6 text-neon-purple" />
+              <div className="flex items-center space-x-3">
+                <Shield className="h-8 w-8 text-emerald-400" />
+                <Bug className="h-6 w-6 text-cyan-400" />
+                <Fingerprint className="h-6 w-6 text-purple-400" />
               </div>
               <div>
-                <h1 className="text-4xl font-mono font-bold text-neon-green glow-text">
+                <h1 className="text-3xl font-mono font-bold text-slate-100">
                   Threat-Forge
                 </h1>
                 <p className="text-slate-400 font-mono text-sm mt-1">
@@ -35,11 +27,11 @@ function App() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 text-sm font-mono text-neon-green">
+              <div className="flex items-center space-x-2 text-sm font-mono text-emerald-400">
                 <Terminal className="h-4 w-4" />
                 <span className="terminal-cursor">System Online</span>
               </div>
-              <div className="w-3 h-3 bg-neon-green rounded-full animate-pulse glow-text"></div>
+              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
             </div>
           </div>
 

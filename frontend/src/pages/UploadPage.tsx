@@ -139,9 +139,9 @@ export function UploadPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-3">
-        <Shield className="h-6 w-6 text-neon-green glow-text" />
+        <Shield className="h-6 w-6 text-emerald-400" />
         <div>
-          <h2 className="text-xl font-mono font-bold text-neon-green glow-text">
+          <h2 className="text-xl font-mono font-bold text-slate-100">
             Upload CSV File
           </h2>
           <p className="text-slate-400 font-mono text-sm mt-1">
@@ -151,40 +151,38 @@ export function UploadPage() {
       </div>
 
       {/* Upload Area */}
-      <div className="card cyber-border">
+      <div className="card">
         <div
           {...getRootProps()}
-          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-300 relative overflow-hidden ${
+          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
             isDragActive
-              ? 'border-neon-green bg-neon-green/10 scan-line'
-              : 'border-slate-600 hover:border-neon-green/50 hover:bg-neon-green/5 hover:scan-line'
+              ? 'border-emerald-500 bg-emerald-500/10'
+              : 'border-slate-600 hover:border-emerald-500/50 hover:bg-emerald-500/5'
           }`}
         >
           <input {...getInputProps()} />
-          <div className="relative z-10">
-            <Upload className="h-12 w-12 text-neon-green mx-auto mb-4 glow-text" />
-            {isDragActive ? (
-              <p className="text-neon-green font-mono glow-text">Drop the CSV file here...</p>
-            ) : (
-              <div>
-                <p className="text-slate-300 font-mono mb-2 glow-text">
-                  Drag & drop a CSV file here, or click to select
-                </p>
-                <p className="text-sm text-slate-500 font-mono">
-                  Supports .csv files up to 10MB
-                </p>
-              </div>
-            )}
-          </div>
+          <Upload className="h-12 w-12 text-emerald-400 mx-auto mb-4" />
+          {isDragActive ? (
+            <p className="text-emerald-400 font-mono">Drop the CSV file here...</p>
+          ) : (
+            <div>
+              <p className="text-slate-300 font-mono mb-2">
+                Drag & drop a CSV file here, or click to select
+              </p>
+              <p className="text-sm text-slate-500 font-mono">
+                Supports .csv files up to 10MB
+              </p>
+            </div>
+          )}
         </div>
 
         {file && (
-          <div className="mt-4 p-4 bg-blackhat-800/50 rounded-lg border border-blackhat-700">
+          <div className="mt-4 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
             <div className="flex items-center space-x-3">
-              <FileText className="h-5 w-5 text-neon-green" />
+              <FileText className="h-5 w-5 text-emerald-400" />
               <div>
                 <p className="font-mono text-white">{file.name}</p>
-                <p className="text-sm text-blackhat-400 font-mono">
+                <p className="text-sm text-slate-400 font-mono">
                   {(file.size / 1024 / 1024).toFixed(2)} MB
                 </p>
               </div>
@@ -305,7 +303,7 @@ export function UploadPage() {
             >
               {uploadMutation.isPending ? (
                 <div className="flex items-center">
-                  <Terminal className="h-4 w-4 mr-2 text-neon-green" />
+                  <Terminal className="h-4 w-4 mr-2 text-emerald-400" />
                   <span className="terminal-cursor">Enriching IOCs</span>
                 </div>
               ) : (

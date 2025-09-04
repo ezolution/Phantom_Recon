@@ -104,9 +104,9 @@ export function SearchPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-3">
-        <Bug className="h-6 w-6 text-neon-cyan glow-text" />
+        <Bug className="h-6 w-6 text-cyan-400" />
         <div>
-          <h2 className="text-xl font-mono font-bold text-neon-cyan glow-text">
+          <h2 className="text-xl font-mono font-bold text-slate-100">
             IOC Results
           </h2>
           <p className="text-slate-400 font-mono text-sm mt-1">
