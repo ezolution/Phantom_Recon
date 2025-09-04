@@ -58,23 +58,23 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-blackhat-900 border-r border-blackhat-700 transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-40 w-64 bg-slate-800 border-r border-slate-700 transform transition-transform duration-300 ease-in-out
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static lg:inset-0
       `}>
         {/* Header */}
-        <div className="p-6 border-b border-blackhat-700">
+        <div className="p-6 border-b border-slate-700">
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
-              <Shield className="h-8 w-8 text-neon-green glow-text" />
-              <Bug className="h-6 w-6 text-neon-cyan glow-text" />
-              <Fingerprint className="h-6 w-6 text-neon-purple glow-text" />
+              <Shield className="h-8 w-8 text-emerald-400" />
+              <Bug className="h-6 w-6 text-cyan-400" />
+              <Fingerprint className="h-6 w-6 text-purple-400" />
             </div>
             <div>
-              <h1 className="text-xl font-mono font-bold text-slate-100 glow-text">
+              <h1 className="text-xl font-bold text-slate-100">
                 Threat-Forge
               </h1>
-              <p className="text-xs text-slate-400 font-mono">
+              <p className="text-xs text-slate-400">
                 IOC Processor
               </p>
             </div>
@@ -95,10 +95,10 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
                   setIsMobileMenuOpen(false)
                 }}
                 className={`
-                  w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-300
+                  w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all duration-200
                   ${isActive 
-                    ? 'bg-neon-green/10 border border-neon-green/20 text-neon-green glow-text' 
-                    : 'text-slate-300 hover:text-neon-green hover:bg-blackhat-800 hover:glow-text'
+                    ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' 
+                    : 'text-slate-300 hover:text-emerald-400 hover:bg-slate-700'
                   }
                 `}
               >
@@ -114,9 +114,9 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
 
         {/* Footer */}
         <div className="absolute bottom-4 left-4 right-4">
-          <div className="flex items-center space-x-2 text-xs font-mono text-neon-green">
-            <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse glow-text"></div>
-            <span className="terminal-cursor">System Online</span>
+          <div className="flex items-center space-x-2 text-xs text-emerald-400">
+            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+            <span>System Online</span>
           </div>
         </div>
       </div>

@@ -19,12 +19,12 @@ export function SettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-3">
-        <Settings className="h-6 w-6 text-neon-purple glow-text" />
+        <Settings className="h-6 w-6 text-purple-400" />
         <div>
-          <h1 className="text-2xl font-mono font-bold text-slate-100 mb-2 glow-text">
+          <h1 className="text-2xl font-bold text-slate-100 mb-2">
             Settings
           </h1>
-          <p className="text-slate-400 font-mono">
+          <p className="text-slate-400">
             Configure system preferences
           </p>
         </div>
