@@ -24,49 +24,53 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 flex">
+    <div className="min-h-screen bg-black flex">
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-gray-800 border-b border-gray-700 px-6 py-3">
-        <div className="flex items-center space-x-3">
-          <Shield className="h-6 w-6 text-green-400" />
-          <div>
-            <h1 className="text-lg font-bold text-white">PHANTOM RECON</h1>
-            <p className="text-xs text-gray-400">IOC Hub - Threat Attribution & Enrichment Console</p>
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800 px-8 py-4">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            <Shield className="h-8 w-8 text-blue-400" />
+            <div>
+              <h1 className="text-2xl font-bold text-white tracking-tight">PHANTOM RECON</h1>
+              <p className="text-sm text-gray-400 font-medium">IOC Hub - Threat Attribution & Enrichment Console</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Navigation Sidebar */}
-      <div className="w-64 bg-gray-800 border-r border-gray-700 pt-16">
-        <div className="p-4 space-y-2">
+      <div className="w-72 bg-gray-900 border-r border-gray-800 pt-20">
+        <div className="p-6 space-y-3">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+            className={`w-full text-left px-6 py-4 rounded-xl transition-all duration-300 ${
               activeTab === 'dashboard' 
-                ? 'bg-gray-700 text-gray-300' 
-                : 'text-gray-400 hover:text-gray-300 hover:bg-gray-700'
+                ? 'bg-blue-600 text-white shadow-lg' 
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'
             }`}
           >
-            <div className="font-medium">Ops Console</div>
+            <div className="font-semibold text-lg">Ops Console</div>
+            <div className="text-sm opacity-75">System Overview</div>
           </button>
           <button
             onClick={() => setActiveTab('search')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+            className={`w-full text-left px-6 py-4 rounded-xl transition-all duration-300 ${
               activeTab === 'search' 
-                ? 'bg-green-500 text-black font-bold' 
-                : 'text-gray-400 hover:text-gray-300 hover:bg-gray-700'
+                ? 'bg-blue-600 text-white shadow-lg' 
+                : 'text-gray-400 hover:text-white hover:bg-gray-800'
             }`}
           >
-            <div className="font-medium">Intel Vault</div>
+            <div className="font-semibold text-lg">Intel Vault</div>
+            <div className="text-sm opacity-75">IOC Database</div>
           </button>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 pt-16">
+      <div className="flex-1 pt-20">
         <div className="flex h-screen">
           {/* Main Content Area */}
-          <div className="flex-1 bg-gray-900 p-6">
+          <div className="flex-1 bg-black p-8">
             {renderContent()}
           </div>
         </div>

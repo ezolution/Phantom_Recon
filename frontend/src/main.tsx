@@ -16,7 +16,7 @@ const queryClient = new QueryClient({
 })
 
 const rootElement = document.getElementById('root')!
-rootElement.className = 'bg-gray-900 min-h-screen'
+rootElement.className = 'bg-black min-h-screen'
 
 createRoot(rootElement).render(
   <React.StrictMode>

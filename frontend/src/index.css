@@ -10,12 +10,12 @@
   }
   
   body {
-    @apply bg-gray-900 text-gray-300;
+    @apply bg-black text-gray-100;
     overflow-x: hidden;
   }
   
   #root {
-    @apply bg-gray-900;
+    @apply bg-black min-h-screen;
   }
   
   /* Custom scrollbar */
@@ -24,26 +24,26 @@
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-gray-900;
+    @apply bg-gray-800;
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-green-500/50 rounded-full;
+    @apply bg-gray-600 rounded-full;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-green-500/70;
+    @apply bg-gray-500;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-gray-700 text-gray-300 font-medium px-4 py-2 rounded-lg;
-    transition: all 0.2s ease;
+    @apply bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg;
+    transition: all 0.3s ease;
   }
   
   .btn-primary:hover {
-    @apply bg-gray-600;
+    @apply bg-blue-700 shadow-xl transform -translate-y-0.5;
   }
   
   .btn-primary:active {
@@ -51,60 +51,60 @@
   }
   
   .btn-secondary {
-    @apply bg-gray-700 text-gray-300 font-medium px-4 py-2 rounded-lg;
-    transition: all 0.2s ease;
+    @apply bg-gray-800 text-gray-200 border border-gray-600 font-medium px-6 py-3 rounded-lg;
+    transition: all 0.3s ease;
   }
   
   .btn-secondary:hover {
-    @apply bg-gray-600;
+    @apply bg-gray-700 border-gray-500;
   }
   
   .btn-danger {
-    @apply bg-red-600 text-white font-medium px-4 py-2 rounded-lg;
-    transition: all 0.2s ease;
+    @apply bg-red-600 text-white font-semibold px-6 py-3 rounded-lg shadow-lg;
+    transition: all 0.3s ease;
   }
   
   .btn-danger:hover {
-    @apply bg-red-500;
+    @apply bg-red-700 shadow-xl transform -translate-y-0.5;
   }
   
   .input-field {
-    @apply bg-gray-800 border border-gray-600 text-gray-300 px-3 py-2 rounded-lg;
-    transition: all 0.2s ease;
+    @apply bg-gray-900 border border-gray-700 text-gray-100 px-4 py-3 rounded-lg;
+    transition: all 0.3s ease;
   }
   
   .input-field:focus {
-    @apply border-green-400;
+    @apply border-blue-500 ring-2 ring-blue-500/20;
     outline: none;
   }
   
   .card {
-    @apply bg-gray-800 rounded-lg p-4;
-    transition: all 0.2s ease;
+    @apply bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-2xl;
+    transition: all 0.3s ease;
   }
   
   .card:hover {
-    @apply bg-gray-750;
+    @apply border-gray-700 shadow-3xl;
   }
   
   .data-table {
-    @apply w-full bg-gray-800 rounded-lg overflow-hidden;
+    @apply w-full bg-gray-900 border border-gray-800 rounded-xl overflow-hidden shadow-2xl;
   }
   
   .data-table th {
-    @apply bg-gray-700 text-green-400 font-medium px-4 py-3 text-left text-sm;
+    @apply bg-gray-800 text-blue-400 font-semibold px-6 py-4 text-left text-sm uppercase tracking-wider;
   }
   
   .data-table td {
-    @apply px-4 py-3 text-gray-300 text-sm border-t border-gray-700;
+    @apply px-6 py-4 text-gray-200 text-sm border-t border-gray-800;
   }
   
   .data-table tr:hover {
-    @apply bg-gray-700/50;
+    @apply bg-gray-800/50;
   }
   
   .data-table tr.selected {
-    @apply bg-blue-500/20 border-l-4 border-l-blue-400;
+    @apply bg-blue-500/10 border-l-4 border-l-blue-500;
   }
   
   .risk-low {

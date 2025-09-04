@@ -101,90 +101,118 @@ export function SearchPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col space-y-8">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-white mb-2">Browse Saved IOCs</h1>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">Browse Saved IOCs</h1>
+          <p className="text-gray-400 text-lg">Search and analyze threat intelligence data</p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+          <span className="text-green-400 text-sm font-medium">System Online</span>
+        </div>
       </div>
 
       {/* Search Controls */}
-      <div className="flex items-center space-x-4 mb-6">
-        <div className="flex-1">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:border-green-400"
-            placeholder="Search value..."
-          />
+      <div className="card">
+        <div className="flex items-center space-x-6">
+          <div className="flex-1">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">Search Query</label>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="input-field w-full"
+              placeholder="Enter IOC value, hash, or domain..."
+            />
+          </div>
+          <div className="w-48">
+            <label className="block text-sm font-semibold text-gray-300 mb-2">IOC Type</label>
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              className="input-field w-full"
+            >
+              <option value="">All Types</option>
+              <option value="url">URL</option>
+              <option value="domain">Domain</option>
+              <option value="ipv4">IPv4</option>
+              <option value="sha256">SHA256</option>
+              <option value="md5">MD5</option>
+              <option value="email">Email</option>
+            </select>
+          </div>
+          <div className="flex space-x-3">
+            <button className="btn-primary">
+              <Search className="h-4 w-4 mr-2" />
+              Search
+            </button>
+            <button className="btn-secondary">
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV
+            </button>
+          </div>
         </div>
-        <select
-          value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value)}
-          className="px-4 py-2 bg-gray-800 border border-gray-600 rounded-lg text-gray-300 focus:outline-none focus:border-green-400"
-        >
-          <option value="">All types</option>
-          <option value="url">URL</option>
-          <option value="domain">Domain</option>
-          <option value="ipv4">IPv4</option>
-          <option value="sha256">SHA256</option>
-          <option value="md5">MD5</option>
-          <option value="email">Email</option>
-        </select>
-        <button className="px-6 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors">
-          Search
-        </button>
-        <button className="px-6 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors">
-          Export CSV
-        </button>
       </div>
 
       {/* Results Table */}
-      <div className="flex-1 bg-gray-800 rounded-lg overflow-hidden">
+      <div className="flex-1 card">
         {isLoading ? (
-          <div className="flex items-center justify-center h-32">
+          <div className="flex items-center justify-center h-64">
             <div className="text-center">
-              <div className="w-8 h-8 border-2 border-green-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-300">Searching threat intelligence...</p>
+              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+              <h3 className="text-xl font-semibold text-white mb-2">Searching Threat Intelligence</h3>
+              <p className="text-gray-400">Please wait while we query our databases...</p>
             </div>
           </div>
         ) : (
           <div className="overflow-x-auto h-full">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-700">
+            <table className="data-table w-full">
+              <thead>
                 <tr>
-                  <th className="text-left py-3 px-4 text-green-400 font-medium">IOC</th>
-                  <th className="text-left py-3 px-4 text-green-400 font-medium">TYPE</th>
-                  <th className="text-left py-3 px-4 text-green-400 font-medium">STATUS</th>
-                  <th className="text-left py-3 px-4 text-green-400 font-medium">FIRST SEEN</th>
+                  <th>IOC Value</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>First Seen</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {iocs?.map((ioc, index) => (
                   <tr 
                     key={ioc.id} 
-                    className={`border-b border-gray-700 hover:bg-gray-700/50 cursor-pointer ${
-                      selectedIOC?.id === ioc.id ? 'bg-blue-500/20 border-l-4 border-l-blue-400' : ''
+                    className={`cursor-pointer transition-all duration-200 ${
+                      selectedIOC?.id === ioc.id ? 'selected' : ''
                     }`}
                     onClick={() => setSelectedIOC(ioc)}
                   >
-                    <td className="py-3 px-4">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-green-400 font-mono truncate max-w-xs">{ioc.value}</span>
+                    <td>
+                      <div className="flex items-center space-x-3">
+                        <span className="text-blue-400 font-mono text-sm truncate max-w-xs">{ioc.value}</span>
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
                             copyToClipboard(ioc.value)
                           }}
-                          className="text-gray-400 hover:text-green-400 transition-colors"
+                          className="text-gray-400 hover:text-blue-400 transition-colors p-1"
                         >
-                          <Copy className="h-3 w-3" />
+                          <Copy className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
-                    <td className="py-3 px-4 text-gray-300 capitalize">{ioc.type}</td>
-                    <td className="py-3 px-4 text-gray-300">enriched</td>
-                    <td className="py-3 px-4 text-gray-300">
+                    <td>
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-300 capitalize">
+                        {ioc.type}
+                      </span>
+                    </td>
+                    <td>
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
+                        <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                        Enriched
+                      </span>
+                    </td>
+                    <td className="text-gray-300 text-sm">
                       {new Date(ioc.created_at).toLocaleDateString('en-GB', {
                         day: '2-digit',
                         month: '2-digit',
@@ -195,15 +223,28 @@ export function SearchPage() {
                         hour12: true
                       })}
                     </td>
+                    <td>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSelectedIOC(ioc)
+                        }}
+                        className="btn-secondary text-xs px-3 py-1"
+                      >
+                        <Eye className="h-3 w-3 mr-1" />
+                        View Details
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
 
             {(!iocs || iocs.length === 0) && (
-              <div className="text-center py-8">
-                <Shield className="h-12 w-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400">No IOCs found matching your criteria</p>
+              <div className="text-center py-16">
+                <Shield className="h-16 w-16 text-gray-600 mx-auto mb-6" />
+                <h3 className="text-xl font-semibold text-white mb-2">No IOCs Found</h3>
+                <p className="text-gray-400">Try adjusting your search criteria or upload new data</p>
               </div>
             )}
           </div>
@@ -212,33 +253,40 @@ export function SearchPage() {
 
       {/* IOC Details Panel */}
       {selectedIOC && (
-        <div className="w-96 bg-gray-800 border-l border-gray-700 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-green-400">{selectedIOC.value}</h3>
+        <div className="w-96 bg-gray-900 border-l border-gray-800 p-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h3 className="text-2xl font-bold text-white mb-2">{selectedIOC.value}</h3>
+              <div className="flex items-center space-x-2">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-300 capitalize">
+                  {selectedIOC.type}
+                </span>
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
+                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                  Enriched
+                </span>
+              </div>
+            </div>
             <button
               onClick={() => setSelectedIOC(null)}
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-lg"
             >
-              <XCircle className="h-5 w-5" />
+              <XCircle className="h-6 w-6" />
             </button>
-          </div>
-          
-          <div className="mb-4">
-            <p className="text-sm text-gray-400">{selectedIOC.type} • enriched</p>
           </div>
 
           {/* Tabs */}
-          <div className="flex space-x-1 mb-4">
-            <button className="px-3 py-1 bg-gray-700 text-gray-300 rounded text-sm">virustotal</button>
-            <button className="px-3 py-1 bg-gray-700 text-gray-300 rounded text-sm">virustotal:comments</button>
-            <button className="px-3 py-1 bg-gray-700 text-gray-300 rounded text-sm">virustotal:relations</button>
+          <div className="flex space-x-2 mb-6">
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">virustotal</button>
+            <button className="px-4 py-2 bg-gray-800 text-gray-400 rounded-lg text-sm font-medium hover:bg-gray-700">virustotal:comments</button>
+            <button className="px-4 py-2 bg-gray-800 text-gray-400 rounded-lg text-sm font-medium hover:bg-gray-700">virustotal:relations</button>
           </div>
 
           {/* Raw Details */}
           <div>
-            <h4 className="text-sm font-medium text-gray-300 mb-2">Raw details</h4>
-            <div className="bg-gray-900 rounded p-4 font-mono text-xs overflow-auto max-h-96">
-              <pre className="text-gray-300">
+            <h4 className="text-lg font-semibold text-white mb-4">Raw Details</h4>
+            <div className="bg-black border border-gray-800 rounded-xl p-6 font-mono text-sm overflow-auto max-h-96">
+              <pre className="text-gray-300 leading-relaxed">
 {`{
   "id": ${selectedIOC.id},
   "type": "${selectedIOC.type}",
