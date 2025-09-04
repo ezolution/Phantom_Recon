@@ -74,7 +74,7 @@ export function UploadPage() {
     reader.readAsText(file)
   }
 
-  const validateRow = (row: CSVRow, index: number) => {
+  const validateRow = (row: CSVRow, _index: number) => {
     const errors: string[] = []
     
     if (!row.ioc_value) errors.push('Missing IOC value')
