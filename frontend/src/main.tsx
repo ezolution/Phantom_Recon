@@ -15,10 +15,7 @@ const queryClient = new QueryClient({
   },
 })
 
-const rootElement = document.getElementById('root')!
-rootElement.className = 'bg-black min-h-screen'
-
-createRoot(rootElement).render(
+createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <App />
@@ -27,10 +24,10 @@ createRoot(rootElement).render(
         toastOptions={{
           duration: 4000,
           style: {
-            background: '#1f2937',
-            color: '#10b981',
-            border: '1px solid #10b981',
-            fontFamily: 'Inter, sans-serif',
+            background: '#1e293b',
+            color: '#f1f5f9',
+            border: '1px solid #475569',
+            fontFamily: 'JetBrains Mono, monospace',
           },
         }}
       />

@@ -139,12 +139,12 @@ export function UploadPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-3">
-        <Shield className="h-6 w-6 text-green-400" />
+        <Shield className="h-6 w-6 text-slate-300" />
         <div>
-          <h1 className="text-2xl font-bold text-green-400 mb-2">
+          <h1 className="text-2xl font-bold text-slate-100 mb-2">
             Upload CSV File
           </h1>
-          <p className="text-green-300">
+          <p className="text-slate-400">
             Upload CSV files containing IOCs for enrichment
           </p>
         </div>
@@ -156,20 +156,20 @@ export function UploadPage() {
           {...getRootProps()}
           className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
             isDragActive
-              ? 'border-green-500 bg-green-500/20'
-              : 'border-green-500/50 hover:border-green-400 hover:bg-green-500/10'
+              ? 'border-slate-400 bg-slate-700/50'
+              : 'border-slate-600 hover:border-slate-400 hover:bg-slate-700/30'
           }`}
         >
           <input {...getInputProps()} />
-          <Upload className="h-12 w-12 text-green-400 mx-auto mb-4" />
+          <Upload className="h-12 w-12 text-slate-400 mx-auto mb-4" />
           {isDragActive ? (
-            <p className="text-green-400">Drop the CSV file here...</p>
+            <p className="text-slate-300">Drop the CSV file here...</p>
           ) : (
             <div>
-              <p className="text-green-300 mb-2">
+              <p className="text-slate-300 mb-2">
                 Drag & drop a CSV file here, or click to select
               </p>
-              <p className="text-sm text-green-500">
+              <p className="text-sm text-slate-500">
                 Supports .csv files up to 10MB
               </p>
             </div>
@@ -177,12 +177,12 @@ export function UploadPage() {
         </div>
 
         {file && (
-          <div className="mt-4 p-4 bg-gray-800/50 rounded-lg border border-green-500/30">
+          <div className="mt-4 p-4 bg-slate-700/50 rounded-lg border border-slate-600">
             <div className="flex items-center space-x-3">
-              <FileText className="h-5 w-5 text-green-400" />
+              <FileText className="h-5 w-5 text-emerald-400" />
               <div>
-                <p className="font-mono text-green-300">{file.name}</p>
-                <p className="text-sm text-green-500 font-mono">
+                <p className="font-mono text-white">{file.name}</p>
+                <p className="text-sm text-slate-400 font-mono">
                   {(file.size / 1024 / 1024).toFixed(2)} MB
                 </p>
               </div>
@@ -193,12 +193,12 @@ export function UploadPage() {
 
       {/* Campaign Settings */}
       <div className="card">
-        <h3 className="text-lg font-mono font-bold text-green-400 mb-4">
+        <h3 className="text-lg font-mono font-bold text-slate-200 mb-4">
           Campaign Settings
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-mono text-green-400 mb-2">
+            <label className="block text-sm font-mono text-slate-300 mb-2">
               Campaign ID
             </label>
             <input
@@ -210,7 +210,7 @@ export function UploadPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-mono text-green-400 mb-2">
+            <label className="block text-sm font-mono text-slate-300 mb-2">
               Default Classification
             </label>
             <select
@@ -231,7 +231,7 @@ export function UploadPage() {
       {preview.length > 0 && (
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-mono font-bold text-green-400">
+            <h3 className="text-lg font-mono font-bold text-slate-200">
               CSV Preview (First 50 rows)
             </h3>
             <div className="flex items-center space-x-4 text-sm font-mono">
@@ -249,19 +249,19 @@ export function UploadPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm font-mono">
               <thead>
-                <tr className="border-b border-green-500/30">
-                  <th className="text-left py-2 text-green-400">Status</th>
-                  <th className="text-left py-2 text-green-400">IOC Value</th>
-                  <th className="text-left py-2 text-green-400">Type</th>
-                  <th className="text-left py-2 text-green-400">Classification</th>
-                  <th className="text-left py-2 text-green-400">Source</th>
+                <tr className="border-b border-slate-700">
+                  <th className="text-left py-2 text-slate-300">Status</th>
+                  <th className="text-left py-2 text-slate-300">IOC Value</th>
+                  <th className="text-left py-2 text-slate-300">Type</th>
+                  <th className="text-left py-2 text-slate-300">Classification</th>
+                  <th className="text-left py-2 text-slate-300">Source</th>
                 </tr>
               </thead>
               <tbody>
                 {preview.slice(0, 10).map((row, _index) => {
                   const validation = validateRow(row, _index)
                   return (
-                    <tr key={_index} className="border-b border-green-500/20">
+                    <tr key={_index} className="border-b border-slate-800">
                       <td className="py-2">
                         {validation.isValid ? (
                           <CheckCircle className="h-4 w-4 text-green-400" />
@@ -269,19 +269,19 @@ export function UploadPage() {
                           <XCircle className="h-4 w-4 text-red-400" />
                         )}
                       </td>
-                      <td className="py-2 text-green-300 truncate max-w-xs">
+                      <td className="py-2 text-white truncate max-w-xs">
                         {row.ioc_value}
                       </td>
-                      <td className="py-2 text-green-300">{row.ioc_type}</td>
-                      <td className="py-2 text-green-300">{row.classification}</td>
-                      <td className="py-2 text-green-300">{row.source_platform}</td>
+                      <td className="py-2 text-white">{row.ioc_type}</td>
+                      <td className="py-2 text-white">{row.classification}</td>
+                      <td className="py-2 text-white">{row.source_platform}</td>
                     </tr>
                   )
                 })}
               </tbody>
             </table>
             {preview.length > 10 && (
-              <p className="text-center text-green-500 font-mono mt-4">
+              <p className="text-center text-slate-400 font-mono mt-4">
                 ... and {preview.length - 10} more rows
               </p>
             )}
@@ -292,7 +292,7 @@ export function UploadPage() {
       {/* Action Buttons */}
       {file && (
         <div className="flex justify-between items-center">
-          <div className="text-sm font-mono text-green-500">
+          <div className="text-sm font-mono text-slate-400">
             {validRows} valid rows ready for processing
           </div>
           <div className="flex space-x-3">
@@ -303,7 +303,7 @@ export function UploadPage() {
             >
               {uploadMutation.isPending ? (
                 <div className="flex items-center">
-                  <Terminal className="h-4 w-4 mr-2 text-green-400" />
+                  <Terminal className="h-4 w-4 mr-2 text-slate-300" />
                   <span>Enriching IOCs</span>
                 </div>
               ) : (
@@ -326,7 +326,7 @@ export function UploadPage() {
               Validation Errors
             </h3>
           </div>
-          <p className="text-sm font-mono text-green-300">
+          <p className="text-sm font-mono text-slate-300">
             Please fix the validation errors before uploading. Required fields: ioc_value, ioc_type, email_id, source_platform, classification.
           </p>
         </div>

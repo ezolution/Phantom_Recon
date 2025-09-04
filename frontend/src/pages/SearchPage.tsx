@@ -101,34 +101,45 @@ export function SearchPage() {
   }
 
   return (
-    <div className="h-full flex flex-col space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-3">
+        <Bug className="h-6 w-6 text-slate-300" />
         <div>
-          <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">Browse Saved IOCs</h1>
-          <p className="text-gray-400 text-lg">Search and analyze threat intelligence data</p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-          <span className="text-green-400 text-sm font-medium">System Online</span>
+          <h1 className="text-2xl font-bold text-slate-100 mb-2">
+            IOC Results
+          </h1>
+          <p className="text-slate-400">
+            View and search enriched IOCs
+          </p>
         </div>
       </div>
 
-      {/* Search Controls */}
+      {/* Search and Filters */}
       <div className="card">
-        <div className="flex items-center space-x-6">
-          <div className="flex-1">
-            <label className="block text-sm font-semibold text-gray-300 mb-2">Search Query</label>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="input-field w-full"
-              placeholder="Enter IOC value, hash, or domain..."
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          {/* Search */}
+          <div className="xl:col-span-2">
+            <label className="block text-sm font-mono text-slate-300 mb-2">
+              Search Query
+            </label>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input-field w-full pl-10"
+                placeholder="Search IOCs, emails, campaigns..."
+              />
+            </div>
           </div>
-          <div className="w-48">
-            <label className="block text-sm font-semibold text-gray-300 mb-2">IOC Type</label>
+
+          {/* IOC Type */}
+          <div>
+            <label className="block text-sm font-mono text-slate-300 mb-2">
+              IOC Type
+            </label>
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
@@ -141,98 +152,144 @@ export function SearchPage() {
               <option value="sha256">SHA256</option>
               <option value="md5">MD5</option>
               <option value="email">Email</option>
+              <option value="subject_keyword">Subject Keyword</option>
             </select>
           </div>
-          <div className="flex space-x-3">
-            <button className="btn-primary">
-              <Search className="h-4 w-4 mr-2" />
-              Search
-            </button>
-            <button className="btn-secondary">
-              <Download className="h-4 w-4 mr-2" />
-              Export CSV
-            </button>
+
+          {/* Risk Band */}
+          <div>
+            <label className="block text-sm font-mono text-slate-300 mb-2">
+              Risk Band
+            </label>
+            <select
+              value={selectedRisk}
+              onChange={(e) => setSelectedRisk(e.target.value)}
+              className="input-field w-full"
+            >
+              <option value="">All Risks</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
+            </select>
           </div>
+
+          {/* Classification */}
+          <div>
+            <label className="block text-sm font-mono text-slate-300 mb-2">
+              Classification
+            </label>
+            <select
+              value={selectedClassification}
+              onChange={(e) => setSelectedClassification(e.target.value)}
+              className="input-field w-full"
+            >
+              <option value="">All Classifications</option>
+              <option value="malicious">Malicious</option>
+              <option value="suspicious">Suspicious</option>
+              <option value="benign">Benign</option>
+              <option value="unknown">Unknown</option>
+            </select>
+          </div>
+
+          {/* Source Platform */}
+          <div>
+            <label className="block text-sm font-mono text-slate-300 mb-2">
+              Source Platform
+            </label>
+            <select
+              value={selectedSource}
+              onChange={(e) => setSelectedSource(e.target.value)}
+              className="input-field w-full"
+            >
+              <option value="">All Sources</option>
+              <option value="EOP">EOP</option>
+              <option value="Abnormal">Abnormal</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700">
+          <div className="flex items-center space-x-2 text-sm font-mono text-slate-400">
+            <Filter className="h-4 w-4" />
+            <span>Active filters: {[selectedType, selectedRisk, selectedClassification, selectedSource].filter(Boolean).length}</span>
+          </div>
+          <button className="btn-secondary">
+            <Download className="h-4 w-4 mr-2" />
+            Export Results
+          </button>
         </div>
       </div>
 
-      {/* Results Table */}
-      <div className="flex-1 card">
+      {/* Results */}
+      <div className="card">
         {isLoading ? (
-          <div className="flex items-center justify-center h-64">
+          <div className="flex items-center justify-center h-32">
             <div className="text-center">
-              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-              <h3 className="text-xl font-semibold text-white mb-2">Searching Threat Intelligence</h3>
-              <p className="text-gray-400">Please wait while we query our databases...</p>
+              <div className="w-8 h-8 border-2 border-slate-600 border-t-emerald-400 rounded-full mx-auto mb-4"></div>
+              <p className="text-slate-300 font-mono">Searching threat intelligence...</p>
             </div>
           </div>
         ) : (
-          <div className="overflow-x-auto h-full">
-            <table className="data-table w-full">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm font-mono">
               <thead>
-                <tr>
-                  <th>IOC Value</th>
-                  <th>Type</th>
-                  <th>Status</th>
-                  <th>First Seen</th>
-                  <th>Actions</th>
+                <tr className="border-b border-slate-700">
+                  <th className="text-left py-3 text-slate-300">IOC</th>
+                  <th className="text-left py-3 text-slate-300">Type</th>
+                  <th className="text-left py-3 text-slate-300">Risk</th>
+                  <th className="text-left py-3 text-slate-300">Verdicts</th>
+                  <th className="text-left py-3 text-slate-300">Source</th>
+                  <th className="text-left py-3 text-slate-300">Campaign</th>
+                  <th className="text-left py-3 text-slate-300">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {iocs?.map((ioc, index) => (
-                  <tr 
-                    key={ioc.id} 
-                    className={`cursor-pointer transition-all duration-200 ${
-                      selectedIOC?.id === ioc.id ? 'selected' : ''
-                    }`}
-                    onClick={() => setSelectedIOC(ioc)}
-                  >
-                    <td>
-                      <div className="flex items-center space-x-3">
-                        <span className="text-blue-400 font-mono text-sm truncate max-w-xs">{ioc.value}</span>
+                {iocs?.map((ioc) => (
+                  <tr key={ioc.id} className="border-b border-slate-800 hover:bg-slate-800/30">
+                    <td className="py-3">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-white truncate max-w-xs">{ioc.value}</span>
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            copyToClipboard(ioc.value)
-                          }}
-                          className="text-gray-400 hover:text-blue-400 transition-colors p-1"
+                          onClick={() => copyToClipboard(ioc.value)}
+                          className="text-slate-400 hover:text-slate-200 transition-colors"
                         >
-                          <Copy className="h-4 w-4" />
+                          <Copy className="h-3 w-3" />
                         </button>
                       </div>
                     </td>
-                    <td>
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-300 capitalize">
-                        {ioc.type}
-                      </span>
+                    <td className="py-3 text-white capitalize">{ioc.type}</td>
+                    <td className="py-3">
+                      {ioc.latest_score && (
+                        <span className={`px-2 py-1 rounded text-xs font-bold ${getRiskColor(ioc.latest_score.risk_band)}`}>
+                          {ioc.latest_score.risk_band}
+                        </span>
+                      )}
                     </td>
-                    <td>
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
-                        <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                        Enriched
-                      </span>
+                    <td className="py-3">
+                      <div className="flex items-center space-x-1">
+                        {ioc.enrichment_results?.slice(0, 3).map((result, index) => (
+                          <div key={index} title={`${result.provider}: ${result.verdict}`}>
+                            {getVerdictIcon(result.verdict)}
+                          </div>
+                        ))}
+                        {ioc.enrichment_results && ioc.enrichment_results.length > 3 && (
+                          <span className="text-xs text-slate-400">
+                            +{ioc.enrichment_results.length - 3}
+                          </span>
+                        )}
+                      </div>
                     </td>
-                    <td className="text-gray-300 text-sm">
-                      {new Date(ioc.created_at).toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: true
-                      })}
-                    </td>
-                    <td>
+                    <td className="py-3 text-white">{ioc.source_platform}</td>
+                    <td className="py-3 text-white">{ioc.campaign_id || '-'}</td>
+                    <td className="py-3">
                       <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setSelectedIOC(ioc)
-                        }}
-                        className="btn-secondary text-xs px-3 py-1"
+                        onClick={() => setSelectedIOC(ioc)}
+                        className="btn-secondary text-xs"
                       >
                         <Eye className="h-3 w-3 mr-1" />
-                        View Details
+                        View
                       </button>
                     </td>
                   </tr>
@@ -241,122 +298,132 @@ export function SearchPage() {
             </table>
 
             {(!iocs || iocs.length === 0) && (
-              <div className="text-center py-16">
-                <Shield className="h-16 w-16 text-gray-600 mx-auto mb-6" />
-                <h3 className="text-xl font-semibold text-white mb-2">No IOCs Found</h3>
-                <p className="text-gray-400">Try adjusting your search criteria or upload new data</p>
+              <div className="text-center py-8">
+                <Shield className="h-12 w-12 text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-400 font-mono">No IOCs found matching your criteria</p>
               </div>
             )}
           </div>
         )}
       </div>
 
-      {/* IOC Details Panel */}
+      {/* IOC Details Drawer */}
       {selectedIOC && (
-        <div className="w-96 bg-gray-900 border-l border-gray-800 p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className="text-2xl font-bold text-white mb-2">{selectedIOC.value}</h3>
-              <div className="flex items-center space-x-2">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-800 text-gray-300 capitalize">
-                  {selectedIOC.type}
-                </span>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
-                  <div className="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                  Enriched
-                </span>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 border border-emerald-500/30 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-mono font-bold text-emerald-400">
+                  IOC Details
+                </h3>
+                <button
+                  onClick={() => setSelectedIOC(null)}
+                  className="text-slate-400 hover:text-emerald-400 transition-colors"
+                >
+                  <XCircle className="h-6 w-6" />
+                </button>
               </div>
-            </div>
-            <button
-              onClick={() => setSelectedIOC(null)}
-              className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-gray-800 rounded-lg"
-            >
-              <XCircle className="h-6 w-6" />
-            </button>
-          </div>
 
-          {/* Tabs */}
-          <div className="flex space-x-2 mb-6">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">virustotal</button>
-            <button className="px-4 py-2 bg-gray-800 text-gray-400 rounded-lg text-sm font-medium hover:bg-gray-700">virustotal:comments</button>
-            <button className="px-4 py-2 bg-gray-800 text-gray-400 rounded-lg text-sm font-medium hover:bg-gray-700">virustotal:relations</button>
-          </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Overview */}
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-mono font-bold text-emerald-400 mb-2">Overview</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Value:</span>
+                        <span className="text-white font-mono">{selectedIOC.value}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Type:</span>
+                        <span className="text-white capitalize">{selectedIOC.type}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Classification:</span>
+                        <span className="text-white capitalize">{selectedIOC.classification}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Source:</span>
+                        <span className="text-white">{selectedIOC.source_platform}</span>
+                      </div>
+                      {selectedIOC.campaign_id && (
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Campaign:</span>
+                          <span className="text-white">{selectedIOC.campaign_id}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-          {/* Raw Details */}
-          <div>
-            <h4 className="text-lg font-semibold text-white mb-4">Raw Details</h4>
-            <div className="bg-black border border-gray-800 rounded-xl p-6 font-mono text-sm overflow-auto max-h-96">
-              <pre className="text-gray-300 leading-relaxed">
-{`{
-  "id": ${selectedIOC.id},
-  "type": "${selectedIOC.type}",
-  "value": "${selectedIOC.value}",
-  "status": "enriched",
-  "enrichments": [
-    {
-      "provider": "virustotal",
-      "score": 2,
-      "summary": "AV 2/94",
-      "last_analysis_results": {
-        "Acronis": {
-          "method": "blacklist",
-          "engine_name": "Acronis",
-          "category": "harmless",
-          "result": "clean"
-        },
-        "0xSI_f33d": {
-          "method": "blacklist",
-          "engine_name": "0xSI_f33d",
-          "category": "harmless",
-          "result": "clean"
-        },
-        "Abusix": {
-          "method": "blacklist",
-          "engine_name": "Abusix",
-          "category": "harmless",
-          "result": "clean"
-        },
-        "ADMINUSLabs": {
-          "method": "blacklist",
-          "engine_name": "ADMINUSLabs",
-          "category": "harmless",
-          "result": "clean"
-        },
-        "Axur": {
-          "method": "blacklist",
-          "engine_name": "Axur",
-          "category": "harmless",
-          "result": "clean"
-        },
-        "Criminal IP": {
-          "method": "blacklist",
-          "engine_name": "Criminal IP",
-          "category": "harmless",
-          "result": "clean"
-        },
-        "AILabs": {
-          "method": "blacklist",
-          "engine_name": "AILabs",
-          "category": "harmless",
-          "result": "clean"
-        },
-        "AlienVault": {
-          "method": "blacklist",
-          "engine_name": "AlienVault",
-          "category": "harmless",
-          "result": "clean"
-        },
-        "alphaMountain.ai": {
-          "method": "blacklist",
-          "engine_name": "alphaMountain.ai",
-          "category": "harmless",
-          "result": "clean"
-        }
-      }
-    }
-  ]
-}`}
-              </pre>
+                  {/* Risk Score */}
+                  {selectedIOC.latest_score && (
+                    <div>
+                      <h4 className="font-mono font-bold text-emerald-400 mb-2">Risk Assessment</h4>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Risk Score:</span>
+                          <span className="text-white font-mono">{selectedIOC.latest_score.risk_score}/100</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Attribution Score:</span>
+                          <span className="text-white font-mono">{selectedIOC.latest_score.attribution_score}/100</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-400">Risk Band:</span>
+                          <span className={`px-2 py-1 rounded text-xs font-bold ${getRiskColor(selectedIOC.latest_score.risk_band)}`}>
+                            {selectedIOC.latest_score.risk_band}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Provider Results */}
+                <div>
+                  <h4 className="font-mono font-bold text-emerald-400 mb-2">Provider Analysis</h4>
+                  <div className="space-y-3">
+                    {selectedIOC.enrichment_results?.map((result, index) => (
+                      <div key={index} className="bg-slate-700/50 rounded p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-mono text-sm text-emerald-400 capitalize">{result.provider}</span>
+                          <div className="flex items-center space-x-2">
+                            {getVerdictIcon(result.verdict)}
+                            <span className="text-xs text-white capitalize">{result.verdict}</span>
+                          </div>
+                        </div>
+                        {result.confidence && (
+                          <div className="text-xs text-slate-400 mb-1">
+                            Confidence: {result.confidence}%
+                          </div>
+                        )}
+                        {result.evidence && (
+                          <div className="text-xs text-slate-300">
+                            {result.evidence}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Tags */}
+              {selectedIOC.tags && selectedIOC.tags.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="font-mono font-bold text-emerald-400 mb-2">Tags</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedIOC.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-emerald-400/20 text-emerald-400 text-xs font-mono rounded"
+                      >
+                        {tag.name} ({tag.kind})
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
