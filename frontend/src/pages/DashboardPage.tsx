@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Shield, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react'
+import { Shield, TrendingUp, AlertTriangle, CheckCircle, Terminal, Bug, Fingerprint, Activity, Clock, Database } from 'lucide-react'
 import { api } from '../lib/api'
 
 interface StatsData {
@@ -38,15 +38,18 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-xl font-mono font-bold text-neon-green">
-          System Statistics
-        </h2>
-        <p className="text-blackhat-400 font-mono text-sm mt-1">
-          Current IOC processing status
-        </p>
+      <div className="flex items-center space-x-3">
+        <Fingerprint className="h-6 w-6 text-neon-purple glow-text" />
+        <div>
+          <h2 className="text-xl font-mono font-bold text-neon-purple glow-text">
+            System Statistics
+          </h2>
+          <p className="text-slate-400 font-mono text-sm mt-1">
+            Current IOC processing status
+          </p>
+        </div>
       </div>
 
       {/* Stats Grid */}

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Upload, FileText, CheckCircle, XCircle, AlertTriangle, Play } from 'lucide-react'
+import { Upload, FileText, CheckCircle, XCircle, AlertTriangle, Play, Shield, Terminal } from 'lucide-react'
 import { api } from '../lib/api'
 import toast from 'react-hot-toast'
 
@@ -136,41 +136,46 @@ export function UploadPage() {
   const invalidRows = preview.length - validRows
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-xl font-mono font-bold text-neon-green">
-          Upload CSV File
-        </h2>
-        <p className="text-blackhat-400 font-mono text-sm mt-1">
-          Upload CSV files containing IOCs for enrichment
-        </p>
+      <div className="flex items-center space-x-3">
+        <Shield className="h-6 w-6 text-neon-green glow-text" />
+        <div>
+          <h2 className="text-xl font-mono font-bold text-neon-green glow-text">
+            Upload CSV File
+          </h2>
+          <p className="text-slate-400 font-mono text-sm mt-1">
+            Upload CSV files containing IOCs for enrichment
+          </p>
+        </div>
       </div>
 
       {/* Upload Area */}
-      <div className="card">
+      <div className="card cyber-border">
         <div
           {...getRootProps()}
-          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
+          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-300 relative overflow-hidden ${
             isDragActive
-              ? 'border-neon-green bg-neon-green/10'
-              : 'border-blackhat-700 hover:border-neon-green/50 hover:bg-neon-green/5'
+              ? 'border-neon-green bg-neon-green/10 scan-line'
+              : 'border-slate-600 hover:border-neon-green/50 hover:bg-neon-green/5 hover:scan-line'
           }`}
         >
           <input {...getInputProps()} />
-          <Upload className="h-12 w-12 text-neon-green mx-auto mb-4" />
-          {isDragActive ? (
-            <p className="text-neon-green font-mono">Drop the CSV file here...</p>
-          ) : (
-            <div>
-              <p className="text-white font-mono mb-2">
-                Drag & drop a CSV file here, or click to select
-              </p>
-              <p className="text-sm text-blackhat-400 font-mono">
-                Supports .csv files up to 10MB
-              </p>
-            </div>
-          )}
+          <div className="relative z-10">
+            <Upload className="h-12 w-12 text-neon-green mx-auto mb-4 glow-text" />
+            {isDragActive ? (
+              <p className="text-neon-green font-mono glow-text">Drop the CSV file here...</p>
+            ) : (
+              <div>
+                <p className="text-slate-300 font-mono mb-2 glow-text">
+                  Drag & drop a CSV file here, or click to select
+                </p>
+                <p className="text-sm text-slate-500 font-mono">
+                  Supports .csv files up to 10MB
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {file && (
@@ -300,8 +305,8 @@ export function UploadPage() {
             >
               {uploadMutation.isPending ? (
                 <div className="flex items-center">
-                  <div className="w-4 h-4 border-2 border-blackhat-950 border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Processing...
+                  <Terminal className="h-4 w-4 mr-2 text-neon-green" />
+                  <span className="terminal-cursor">Enriching IOCs</span>
                 </div>
               ) : (
                 <>

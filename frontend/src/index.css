@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,7 +14,15 @@
     background-image: 
       linear-gradient(rgba(0,255,65,0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,255,65,0.03) 1px, transparent 1px);
-    background-size: 20px 20px;
+    background-size: 50px 50px;
+    animation: grid-move 20s linear infinite;
+    overflow-x: hidden;
+  }
+  
+  /* Animated grid background */
+  @keyframes grid-move {
+    0% { background-position: 0 0; }
+    100% { background-position: 50px 50px; }
   }
   
   /* Custom scrollbar */
@@ -35,47 +45,102 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-neon-green text-blackhat-950 font-mono font-semibold px-4 py-2 rounded-md 
-           hover:bg-neon-green/80 transition-all duration-200 
-           focus:outline-none focus:ring-2 focus:ring-neon-green/50
-           shadow-lg shadow-neon-green/20;
+    @apply bg-neon-green text-blackhat-950 font-mono font-bold px-6 py-3 rounded-lg relative overflow-hidden;
+    background: linear-gradient(135deg, #00ff41 0%, #00ffff 100%);
+    box-shadow: 
+      0 4px 15px rgba(0, 255, 65, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #00ffff 0%, #00ff41 100%);
+    box-shadow: 
+      0 6px 20px rgba(0, 255, 65, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+  
+  .btn-primary:active {
+    transform: translateY(0);
   }
   
   .btn-secondary {
-    @apply bg-blackhat-800 text-neon-green border border-neon-green/30 font-mono font-semibold px-4 py-2 rounded-md 
-           hover:bg-neon-green/10 hover:border-neon-green/50 transition-all duration-200 
-           focus:outline-none focus:ring-2 focus:ring-neon-green/50;
+    @apply bg-slate-800 text-slate-100 border border-slate-600 font-mono px-6 py-3 rounded-lg relative overflow-hidden;
+    background: linear-gradient(135deg, #1e293b 0%, #111827 100%);
+    transition: all 0.3s ease;
+  }
+  
+  .btn-secondary:hover {
+    @apply bg-slate-700 border-slate-500;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+    transform: translateY(-1px);
   }
   
   .btn-danger {
-    @apply bg-neon-red text-white font-mono font-semibold px-4 py-2 rounded-md 
-           hover:bg-neon-red/80 transition-all duration-200 
-           focus:outline-none focus:ring-2 focus:ring-neon-red/50
-           shadow-lg shadow-neon-red/20;
+    @apply bg-neon-red text-blackhat-950 font-mono font-bold px-6 py-3 rounded-lg relative overflow-hidden;
+    background: linear-gradient(135deg, #ff0040 0%, #ff4080 100%);
+    box-shadow: 0 4px 15px rgba(255, 0, 64, 0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .btn-danger:hover {
+    background: linear-gradient(135deg, #ff4080 0%, #ff0040 100%);
+    box-shadow: 0 6px 20px rgba(255, 0, 64, 0.4);
+    transform: translateY(-2px);
   }
   
   .input-field {
-    @apply bg-blackhat-900 border border-blackhat-700 text-white font-mono px-3 py-2 rounded-md
-           focus:outline-none focus:ring-2 focus:ring-neon-green/50 focus:border-neon-green/50
-           placeholder:text-blackhat-500 transition-all duration-200;
+    @apply bg-slate-800 border border-slate-600 text-slate-100 font-mono px-4 py-2 rounded-lg;
+    background: linear-gradient(135deg, #1e293b 0%, #111827 100%);
+    transition: all 0.3s ease;
+  }
+  
+  .input-field:focus {
+    @apply border-neon-green;
+    box-shadow: 
+      0 0 0 3px rgba(0, 255, 65, 0.1),
+      0 0 20px rgba(0, 255, 65, 0.2);
+    outline: none;
   }
   
   .card {
-    @apply bg-blackhat-900/50 border border-blackhat-700/50 rounded-lg p-6
-           backdrop-blur-sm shadow-xl;
+    @apply bg-slate-900 border border-slate-700 rounded-lg p-6 relative;
+    background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.3),
+      0 2px 4px -1px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  
+  .card:hover {
+    @apply border-slate-600;
+    box-shadow: 
+      0 4px 6px -1px rgba(0, 0, 0, 0.4),
+      0 2px 4px -1px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      0 0 20px rgba(0, 255, 65, 0.1);
+    transition: all 0.3s ease;
   }
   
   .terminal-text {
     @apply font-mono text-neon-green;
+    text-shadow: 0 0 10px currentColor;
   }
   
   .terminal-cursor::after {
-    content: '_';
-    @apply animate-terminal-cursor;
+    content: '█';
+    animation: terminal-cursor 1s infinite;
+    color: #00ff41;
+  }
+  
+  @keyframes terminal-cursor {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
   }
   
   .glow-text {
-    @apply animate-glow;
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
   }
   
   .scan-line {
@@ -87,28 +152,61 @@
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
+    left: -100%;
+    width: 100%;
     height: 2px;
     background: linear-gradient(90deg, transparent, #00ff41, transparent);
     animation: scan-line 3s linear infinite;
     z-index: 10;
   }
   
+  @keyframes scan-line {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+  
   .risk-low {
-    @apply text-neon-green bg-neon-green/10 border-neon-green/30;
+    @apply text-neon-green;
+    text-shadow: 0 0 10px currentColor;
   }
   
   .risk-medium {
-    @apply text-neon-yellow bg-neon-yellow/10 border-neon-yellow/30;
+    @apply text-neon-yellow;
+    text-shadow: 0 0 10px currentColor;
   }
   
   .risk-high {
-    @apply text-orange-400 bg-orange-400/10 border-orange-400/30;
+    @apply text-orange-400;
+    text-shadow: 0 0 10px currentColor;
   }
   
   .risk-critical {
-    @apply text-neon-red bg-neon-red/10 border-neon-red/30;
+    @apply text-neon-red;
+    text-shadow: 0 0 10px currentColor;
+  }
+  
+  .cyber-border {
+    position: relative;
+    border: 1px solid #00ff41;
+    background: linear-gradient(45deg, transparent 30%, rgba(0, 255, 65, 0.1) 50%, transparent 70%);
+  }
+  
+  .cyber-border::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #00ff41, #00ffff, #bf00ff, #00ff41);
+    border-radius: inherit;
+    z-index: -1;
+    animation: border-rotate 3s linear infinite;
+  }
+  
+  @keyframes border-rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
   }
 }
 

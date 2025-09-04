@@ -9,7 +9,10 @@ import {
   Shield,
   AlertTriangle,
   CheckCircle,
-  XCircle
+  XCircle,
+  Bug,
+  Fingerprint,
+  Terminal
 } from 'lucide-react'
 import { api } from '../lib/api'
 import toast from 'react-hot-toast'
@@ -98,15 +101,18 @@ export function SearchPage() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-xl font-mono font-bold text-neon-green">
-          IOC Results
-        </h2>
-        <p className="text-blackhat-400 font-mono text-sm mt-1">
-          View and search enriched IOCs
-        </p>
+      <div className="flex items-center space-x-3">
+        <Bug className="h-6 w-6 text-neon-cyan glow-text" />
+        <div>
+          <h2 className="text-xl font-mono font-bold text-neon-cyan glow-text">
+            IOC Results
+          </h2>
+          <p className="text-slate-400 font-mono text-sm mt-1">
+            View and search enriched IOCs
+          </p>
+        </div>
       </div>
 
       {/* Search and Filters */}
