@@ -193,12 +193,12 @@ export function UploadPage() {
 
       {/* Campaign Settings */}
       <div className="card">
-        <h3 className="text-lg font-mono font-bold text-neon-green mb-4">
+        <h3 className="text-lg font-mono font-bold text-emerald-400 mb-4">
           Campaign Settings
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-mono text-neon-green mb-2">
+            <label className="block text-sm font-mono text-emerald-400 mb-2">
               Campaign ID
             </label>
             <input
@@ -210,7 +210,7 @@ export function UploadPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-mono text-neon-green mb-2">
+            <label className="block text-sm font-mono text-emerald-400 mb-2">
               Default Classification
             </label>
             <select
@@ -231,17 +231,17 @@ export function UploadPage() {
       {preview.length > 0 && (
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-mono font-bold text-neon-green">
+            <h3 className="text-lg font-mono font-bold text-emerald-400">
               CSV Preview (First 50 rows)
             </h3>
             <div className="flex items-center space-x-4 text-sm font-mono">
               <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-neon-green" />
-                <span className="text-neon-green">{validRows} valid</span>
+                <CheckCircle className="h-4 w-4 text-emerald-400" />
+                <span className="text-emerald-400">{validRows} valid</span>
               </div>
               <div className="flex items-center space-x-2">
-                <XCircle className="h-4 w-4 text-neon-red" />
-                <span className="text-neon-red">{invalidRows} invalid</span>
+                <XCircle className="h-4 w-4 text-red-400" />
+                <span className="text-red-400">{invalidRows} invalid</span>
               </div>
             </div>
           </div>
@@ -249,24 +249,24 @@ export function UploadPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm font-mono">
               <thead>
-                <tr className="border-b border-blackhat-700">
-                  <th className="text-left py-2 text-neon-green">Status</th>
-                  <th className="text-left py-2 text-neon-green">IOC Value</th>
-                  <th className="text-left py-2 text-neon-green">Type</th>
-                  <th className="text-left py-2 text-neon-green">Classification</th>
-                  <th className="text-left py-2 text-neon-green">Source</th>
+                <tr className="border-b border-slate-700">
+                  <th className="text-left py-2 text-emerald-400">Status</th>
+                  <th className="text-left py-2 text-emerald-400">IOC Value</th>
+                  <th className="text-left py-2 text-emerald-400">Type</th>
+                  <th className="text-left py-2 text-emerald-400">Classification</th>
+                  <th className="text-left py-2 text-emerald-400">Source</th>
                 </tr>
               </thead>
               <tbody>
                 {preview.slice(0, 10).map((row, _index) => {
                   const validation = validateRow(row, _index)
                   return (
-                    <tr key={_index} className="border-b border-blackhat-800">
+                    <tr key={_index} className="border-b border-slate-800">
                       <td className="py-2">
                         {validation.isValid ? (
-                          <CheckCircle className="h-4 w-4 text-neon-green" />
+                          <CheckCircle className="h-4 w-4 text-emerald-400" />
                         ) : (
-                          <XCircle className="h-4 w-4 text-neon-red" />
+                          <XCircle className="h-4 w-4 text-red-400" />
                         )}
                       </td>
                       <td className="py-2 text-white truncate max-w-xs">
@@ -281,7 +281,7 @@ export function UploadPage() {
               </tbody>
             </table>
             {preview.length > 10 && (
-              <p className="text-center text-blackhat-400 font-mono mt-4">
+              <p className="text-center text-slate-400 font-mono mt-4">
                 ... and {preview.length - 10} more rows
               </p>
             )}
@@ -292,7 +292,7 @@ export function UploadPage() {
       {/* Action Buttons */}
       {file && (
         <div className="flex justify-between items-center">
-          <div className="text-sm font-mono text-blackhat-400">
+          <div className="text-sm font-mono text-slate-400">
             {validRows} valid rows ready for processing
           </div>
           <div className="flex space-x-3">
@@ -319,14 +319,14 @@ export function UploadPage() {
 
       {/* Validation Errors */}
       {invalidRows > 0 && (
-        <div className="card border-neon-red/30 bg-neon-red/5">
+        <div className="card border-red-500/30 bg-red-500/5">
           <div className="flex items-center space-x-2 mb-2">
-            <AlertTriangle className="h-5 w-5 text-neon-red" />
-            <h3 className="font-mono font-bold text-neon-red">
+            <AlertTriangle className="h-5 w-5 text-red-400" />
+            <h3 className="font-mono font-bold text-red-400">
               Validation Errors
             </h3>
           </div>
-          <p className="text-sm font-mono text-blackhat-300">
+          <p className="text-sm font-mono text-slate-300">
             Please fix the validation errors before uploading. Required fields: ioc_value, ioc_type, email_id, source_platform, classification.
           </p>
         </div>

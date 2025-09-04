@@ -87,16 +87,16 @@ export function SearchPage() {
       case 'Medium': return 'risk-medium'
       case 'High': return 'risk-high'
       case 'Critical': return 'risk-critical'
-      default: return 'text-blackhat-400'
+      default: return 'text-slate-400'
     }
   }
 
   const getVerdictIcon = (verdict: string) => {
     switch (verdict) {
-      case 'malicious': return <XCircle className="h-4 w-4 text-neon-red" />
-      case 'suspicious': return <AlertTriangle className="h-4 w-4 text-neon-yellow" />
-      case 'benign': return <CheckCircle className="h-4 w-4 text-neon-green" />
-      default: return <Shield className="h-4 w-4 text-blackhat-400" />
+      case 'malicious': return <XCircle className="h-4 w-4 text-red-400" />
+      case 'suspicious': return <AlertTriangle className="h-4 w-4 text-yellow-400" />
+      case 'benign': return <CheckCircle className="h-4 w-4 text-emerald-400" />
+      default: return <Shield className="h-4 w-4 text-slate-400" />
     }
   }
 
@@ -120,11 +120,11 @@ export function SearchPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {/* Search */}
           <div className="xl:col-span-2">
-            <label className="block text-sm font-mono text-neon-green mb-2">
+            <label className="block text-sm font-mono text-emerald-400 mb-2">
               Search Query
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blackhat-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
@@ -137,7 +137,7 @@ export function SearchPage() {
 
           {/* IOC Type */}
           <div>
-            <label className="block text-sm font-mono text-neon-green mb-2">
+            <label className="block text-sm font-mono text-emerald-400 mb-2">
               IOC Type
             </label>
             <select
@@ -158,7 +158,7 @@ export function SearchPage() {
 
           {/* Risk Band */}
           <div>
-            <label className="block text-sm font-mono text-neon-green mb-2">
+            <label className="block text-sm font-mono text-emerald-400 mb-2">
               Risk Band
             </label>
             <select
@@ -176,7 +176,7 @@ export function SearchPage() {
 
           {/* Classification */}
           <div>
-            <label className="block text-sm font-mono text-neon-green mb-2">
+            <label className="block text-sm font-mono text-emerald-400 mb-2">
               Classification
             </label>
             <select
@@ -194,7 +194,7 @@ export function SearchPage() {
 
           {/* Source Platform */}
           <div>
-            <label className="block text-sm font-mono text-neon-green mb-2">
+            <label className="block text-sm font-mono text-emerald-400 mb-2">
               Source Platform
             </label>
             <select
@@ -210,8 +210,8 @@ export function SearchPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-blackhat-700">
-          <div className="flex items-center space-x-2 text-sm font-mono text-blackhat-400">
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700">
+          <div className="flex items-center space-x-2 text-sm font-mono text-slate-400">
             <Filter className="h-4 w-4" />
             <span>Active filters: {[selectedType, selectedRisk, selectedClassification, selectedSource].filter(Boolean).length}</span>
           </div>
@@ -227,33 +227,33 @@ export function SearchPage() {
         {isLoading ? (
           <div className="flex items-center justify-center h-32">
             <div className="text-center">
-              <div className="w-8 h-8 border-2 border-neon-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="terminal-text">Searching threat intelligence...</p>
+              <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-slate-300 font-mono">Searching threat intelligence...</p>
             </div>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm font-mono">
               <thead>
-                <tr className="border-b border-blackhat-700">
-                  <th className="text-left py-3 text-neon-green">IOC</th>
-                  <th className="text-left py-3 text-neon-green">Type</th>
-                  <th className="text-left py-3 text-neon-green">Risk</th>
-                  <th className="text-left py-3 text-neon-green">Verdicts</th>
-                  <th className="text-left py-3 text-neon-green">Source</th>
-                  <th className="text-left py-3 text-neon-green">Campaign</th>
-                  <th className="text-left py-3 text-neon-green">Actions</th>
+                <tr className="border-b border-slate-700">
+                  <th className="text-left py-3 text-emerald-400">IOC</th>
+                  <th className="text-left py-3 text-emerald-400">Type</th>
+                  <th className="text-left py-3 text-emerald-400">Risk</th>
+                  <th className="text-left py-3 text-emerald-400">Verdicts</th>
+                  <th className="text-left py-3 text-emerald-400">Source</th>
+                  <th className="text-left py-3 text-emerald-400">Campaign</th>
+                  <th className="text-left py-3 text-emerald-400">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {iocs?.map((ioc) => (
-                  <tr key={ioc.id} className="border-b border-blackhat-800 hover:bg-blackhat-800/30">
+                  <tr key={ioc.id} className="border-b border-slate-800 hover:bg-slate-800/30">
                     <td className="py-3">
                       <div className="flex items-center space-x-2">
                         <span className="text-white truncate max-w-xs">{ioc.value}</span>
                         <button
                           onClick={() => copyToClipboard(ioc.value)}
-                          className="text-blackhat-400 hover:text-neon-green transition-colors"
+                          className="text-slate-400 hover:text-emerald-400 transition-colors"
                         >
                           <Copy className="h-3 w-3" />
                         </button>
@@ -275,7 +275,7 @@ export function SearchPage() {
                           </div>
                         ))}
                         {ioc.enrichment_results && ioc.enrichment_results.length > 3 && (
-                          <span className="text-xs text-blackhat-400">
+                          <span className="text-xs text-slate-400">
                             +{ioc.enrichment_results.length - 3}
                           </span>
                         )}
@@ -299,8 +299,8 @@ export function SearchPage() {
 
             {(!iocs || iocs.length === 0) && (
               <div className="text-center py-8">
-                <Shield className="h-12 w-12 text-blackhat-600 mx-auto mb-4" />
-                <p className="text-blackhat-400 font-mono">No IOCs found matching your criteria</p>
+                <Shield className="h-12 w-12 text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-400 font-mono">No IOCs found matching your criteria</p>
               </div>
             )}
           </div>
@@ -310,15 +310,15 @@ export function SearchPage() {
       {/* IOC Details Drawer */}
       {selectedIOC && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-blackhat-900 border border-neon-green/30 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-slate-800 border border-emerald-500/30 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-mono font-bold text-neon-green">
+                <h3 className="text-xl font-mono font-bold text-emerald-400">
                   IOC Details
                 </h3>
                 <button
                   onClick={() => setSelectedIOC(null)}
-                  className="text-blackhat-400 hover:text-neon-green transition-colors"
+                  className="text-slate-400 hover:text-emerald-400 transition-colors"
                 >
                   <XCircle className="h-6 w-6" />
                 </button>
@@ -328,27 +328,27 @@ export function SearchPage() {
                 {/* Overview */}
                 <div className="space-y-4">
                   <div>
-                    <h4 className="font-mono font-bold text-neon-green mb-2">Overview</h4>
+                    <h4 className="font-mono font-bold text-emerald-400 mb-2">Overview</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-blackhat-400">Value:</span>
+                        <span className="text-slate-400">Value:</span>
                         <span className="text-white font-mono">{selectedIOC.value}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-blackhat-400">Type:</span>
+                        <span className="text-slate-400">Type:</span>
                         <span className="text-white capitalize">{selectedIOC.type}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-blackhat-400">Classification:</span>
+                        <span className="text-slate-400">Classification:</span>
                         <span className="text-white capitalize">{selectedIOC.classification}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-blackhat-400">Source:</span>
+                        <span className="text-slate-400">Source:</span>
                         <span className="text-white">{selectedIOC.source_platform}</span>
                       </div>
                       {selectedIOC.campaign_id && (
                         <div className="flex justify-between">
-                          <span className="text-blackhat-400">Campaign:</span>
+                          <span className="text-slate-400">Campaign:</span>
                           <span className="text-white">{selectedIOC.campaign_id}</span>
                         </div>
                       )}
@@ -358,18 +358,18 @@ export function SearchPage() {
                   {/* Risk Score */}
                   {selectedIOC.latest_score && (
                     <div>
-                      <h4 className="font-mono font-bold text-neon-green mb-2">Risk Assessment</h4>
+                      <h4 className="font-mono font-bold text-emerald-400 mb-2">Risk Assessment</h4>
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-blackhat-400">Risk Score:</span>
+                          <span className="text-slate-400">Risk Score:</span>
                           <span className="text-white font-mono">{selectedIOC.latest_score.risk_score}/100</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-blackhat-400">Attribution Score:</span>
+                          <span className="text-slate-400">Attribution Score:</span>
                           <span className="text-white font-mono">{selectedIOC.latest_score.attribution_score}/100</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-blackhat-400">Risk Band:</span>
+                          <span className="text-slate-400">Risk Band:</span>
                           <span className={`px-2 py-1 rounded text-xs font-bold ${getRiskColor(selectedIOC.latest_score.risk_band)}`}>
                             {selectedIOC.latest_score.risk_band}
                           </span>
@@ -381,24 +381,24 @@ export function SearchPage() {
 
                 {/* Provider Results */}
                 <div>
-                  <h4 className="font-mono font-bold text-neon-green mb-2">Provider Analysis</h4>
+                  <h4 className="font-mono font-bold text-emerald-400 mb-2">Provider Analysis</h4>
                   <div className="space-y-3">
                     {selectedIOC.enrichment_results?.map((result, index) => (
-                      <div key={index} className="bg-blackhat-800/50 rounded p-3">
+                      <div key={index} className="bg-slate-700/50 rounded p-3">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="font-mono text-sm text-neon-green capitalize">{result.provider}</span>
+                          <span className="font-mono text-sm text-emerald-400 capitalize">{result.provider}</span>
                           <div className="flex items-center space-x-2">
                             {getVerdictIcon(result.verdict)}
                             <span className="text-xs text-white capitalize">{result.verdict}</span>
                           </div>
                         </div>
                         {result.confidence && (
-                          <div className="text-xs text-blackhat-400 mb-1">
+                          <div className="text-xs text-slate-400 mb-1">
                             Confidence: {result.confidence}%
                           </div>
                         )}
                         {result.evidence && (
-                          <div className="text-xs text-blackhat-300">
+                          <div className="text-xs text-slate-300">
                             {result.evidence}
                           </div>
                         )}
@@ -411,12 +411,12 @@ export function SearchPage() {
               {/* Tags */}
               {selectedIOC.tags && selectedIOC.tags.length > 0 && (
                 <div className="mt-6">
-                  <h4 className="font-mono font-bold text-neon-green mb-2">Tags</h4>
+                  <h4 className="font-mono font-bold text-emerald-400 mb-2">Tags</h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedIOC.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="px-2 py-1 bg-neon-green/20 text-neon-green text-xs font-mono rounded"
+                        className="px-2 py-1 bg-emerald-400/20 text-emerald-400 text-xs font-mono rounded"
                       >
                         {tag.name} ({tag.kind})
                       </span>

@@ -23,8 +23,8 @@ export function DashboardPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-neon-green border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="terminal-text">Loading threat intelligence...</p>
+          <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-300 font-mono">Loading threat intelligence...</p>
         </div>
       </div>
     )
@@ -58,12 +58,12 @@ export function DashboardPage() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-mono text-blackhat-400">Total IOCs</p>
+              <p className="text-sm font-mono text-slate-400">Total IOCs</p>
               <p className="text-2xl font-mono font-bold text-white">
                 {stats?.total_iocs?.toLocaleString() || 0}
               </p>
             </div>
-            <Shield className="h-8 w-8 text-neon-green" />
+            <Shield className="h-8 w-8 text-emerald-400" />
           </div>
         </div>
 
@@ -71,12 +71,12 @@ export function DashboardPage() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-mono text-blackhat-400">Last 7 Days</p>
+              <p className="text-sm font-mono text-slate-400">Last 7 Days</p>
               <p className="text-2xl font-mono font-bold text-white">
                 {stats?.last_7d_iocs?.toLocaleString() || 0}
               </p>
             </div>
-            <TrendingUp className="h-8 w-8 text-neon-blue" />
+            <TrendingUp className="h-8 w-8 text-cyan-400" />
           </div>
         </div>
 
@@ -84,12 +84,12 @@ export function DashboardPage() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-mono text-blackhat-400">High Risk</p>
-              <p className="text-2xl font-mono font-bold text-neon-red">
+              <p className="text-sm font-mono text-slate-400">High Risk</p>
+              <p className="text-2xl font-mono font-bold text-red-400">
                 {(stats?.risk_bands?.['High'] || 0) + (stats?.risk_bands?.['Critical'] || 0)}
               </p>
             </div>
-            <AlertTriangle className="h-8 w-8 text-neon-red" />
+            <AlertTriangle className="h-8 w-8 text-red-400" />
           </div>
         </div>
 
@@ -97,12 +97,12 @@ export function DashboardPage() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-mono text-blackhat-400">Active Providers</p>
+              <p className="text-sm font-mono text-slate-400">Active Providers</p>
               <p className="text-2xl font-mono font-bold text-white">
                 {Object.keys(stats?.providers || {}).length}
               </p>
             </div>
-            <CheckCircle className="h-8 w-8 text-neon-green" />
+            <CheckCircle className="h-8 w-8 text-emerald-400" />
           </div>
         </div>
       </div>
@@ -110,14 +110,14 @@ export function DashboardPage() {
       {/* Risk Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="card">
-          <h3 className="text-lg font-mono font-bold text-neon-green mb-4">
+          <h3 className="text-lg font-mono font-bold text-emerald-400 mb-4">
             Risk Distribution
           </h3>
           <div className="space-y-3">
             {Object.entries(stats?.risk_bands || {}).map(([band, count]) => (
               <div key={band} className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className={`w-3 h-3 rounded-full ${riskBandColors[band as keyof typeof riskBandColors] || 'bg-blackhat-600'}`}></div>
+                  <div className={`w-3 h-3 rounded-full ${riskBandColors[band as keyof typeof riskBandColors] || 'bg-slate-600'}`}></div>
                   <span className="font-mono text-sm">{band}</span>
                 </div>
                 <span className="font-mono font-bold">{count}</span>
@@ -127,7 +127,7 @@ export function DashboardPage() {
         </div>
 
         <div className="card">
-          <h3 className="text-lg font-mono font-bold text-neon-green mb-4">
+          <h3 className="text-lg font-mono font-bold text-emerald-400 mb-4">
             IOC Types
           </h3>
           <div className="space-y-3">
@@ -143,17 +143,17 @@ export function DashboardPage() {
 
       {/* Provider Status */}
       <div className="card">
-        <h3 className="text-lg font-mono font-bold text-neon-green mb-4">
+        <h3 className="text-lg font-mono font-bold text-emerald-400 mb-4">
           Provider Status
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {Object.entries(stats?.providers || {}).map(([provider, count]) => (
             <div key={provider} className="text-center">
-              <div className="w-12 h-12 bg-neon-green/20 rounded-lg flex items-center justify-center mx-auto mb-2">
-                <Shield className="h-6 w-6 text-neon-green" />
+              <div className="w-12 h-12 bg-emerald-400/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+                <Shield className="h-6 w-6 text-emerald-400" />
               </div>
-              <p className="font-mono text-sm text-blackhat-400 capitalize">{provider}</p>
-              <p className="font-mono font-bold text-neon-green">{count}</p>
+              <p className="font-mono text-sm text-slate-400 capitalize">{provider}</p>
+              <p className="font-mono font-bold text-emerald-400">{count}</p>
             </div>
           ))}
         </div>

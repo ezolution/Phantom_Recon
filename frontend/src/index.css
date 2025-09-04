@@ -20,15 +20,15 @@
   }
   
   ::-webkit-scrollbar-track {
-    @apply bg-blackhat-900;
+    @apply bg-slate-800;
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-neon-green/30 rounded-full;
+    @apply bg-emerald-500/30 rounded-full;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-neon-green/50;
+    @apply bg-emerald-500/50;
   }
 }
 

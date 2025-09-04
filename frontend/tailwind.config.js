@@ -8,27 +8,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // BlackHat theme colors
-        'blackhat': {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
-        },
-        'neon': {
-          'green': '#00ff41',
-          'blue': '#00d4ff',
-          'purple': '#bf00ff',
-          'red': '#ff0040',
-          'yellow': '#ffff00',
-        },
+        // Custom colors for the dark theme
         'terminal': {
           'bg': '#0a0a0a',
           'text': '#00ff00',
