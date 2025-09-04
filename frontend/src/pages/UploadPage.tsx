@@ -63,8 +63,8 @@ export function UploadPage() {
       const rows: CSVRow[] = lines.slice(1, 51).map(line => { // Preview first 50 rows
         const values = line.split(',').map(v => v.trim().replace(/"/g, ''))
         const row: any = {}
-        headers.forEach((header, index) => {
-          row[header] = values[index] || ''
+        headers.forEach((header, _index) => {
+          row[header] = values[_index] || ''
         })
         return row as CSVRow
       })

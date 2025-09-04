@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Shield, TrendingUp, AlertTriangle, CheckCircle, Clock } from 'lucide-react'
+import { Shield, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react'
 import { api } from '../lib/api'
 
 interface StatsData {

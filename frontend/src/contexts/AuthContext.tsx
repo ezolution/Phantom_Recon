@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { api } from '../lib/api'
 
 interface User {
@@ -29,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`
       // Verify token and get user info
       api.get('/auth/me')
-        .then(response => {
+        .then((response: any) => {
           setUser(response.data)
         })
         .catch(() => {

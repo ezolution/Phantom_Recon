@@ -6,7 +6,6 @@ import {
   Download, 
   Eye, 
   Copy,
-  Calendar,
   Shield,
   AlertTriangle,
   CheckCircle,
@@ -50,10 +49,10 @@ export function SearchPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedType, setSelectedType] = useState('')
   const [selectedRisk, setSelectedRisk] = useState('')
-  const [selectedProvider, setSelectedProvider] = useState('')
+  const [selectedProvider] = useState('')
   const [selectedClassification, setSelectedClassification] = useState('')
   const [selectedSource, setSelectedSource] = useState('')
-  const [page, setPage] = useState(1)
+  const [page] = useState(1)
   const [selectedIOC, setSelectedIOC] = useState<IOC | null>(null)
 
   const { data: iocs, isLoading } = useQuery<IOC[]>({
