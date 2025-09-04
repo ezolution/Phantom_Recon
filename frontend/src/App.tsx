@@ -24,10 +24,10 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 w-full">
+    <div className="min-h-screen bg-black w-full">
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
-      <main className="flex-1 lg:ml-64 bg-slate-900">
-        <div className="p-6 bg-slate-900">
+      <main className="flex-1 lg:ml-64 bg-black">
+        <div className="p-6 bg-black">
           {renderContent()}
         </div>
       </main>

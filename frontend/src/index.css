@@ -11,12 +11,12 @@
   
   html {
     font-family: 'Inter', system-ui, sans-serif;
-    @apply bg-slate-900;
+    @apply bg-black;
     height: 100%;
   }
   
   body {
-    @apply bg-slate-900 text-slate-100;
+    @apply bg-black text-white;
     overflow-x: hidden;
     margin: 0;
     padding: 0;
@@ -24,7 +24,7 @@
   }
   
   #root {
-    @apply bg-slate-900;
+    @apply bg-black;
     min-height: 100vh;
     height: 100%;
   }
