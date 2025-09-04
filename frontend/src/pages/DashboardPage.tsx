@@ -40,13 +40,16 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-mono font-bold text-slate-100 mb-2">
-          System Statistics
-        </h1>
-        <p className="text-slate-400 font-mono">
-          Current IOC processing status
-        </p>
+      <div className="flex items-center space-x-3">
+        <Fingerprint className="h-6 w-6 text-neon-purple glow-text" />
+        <div>
+          <h1 className="text-2xl font-mono font-bold text-slate-100 mb-2 glow-text">
+            System Statistics
+          </h1>
+          <p className="text-slate-400 font-mono">
+            Current IOC processing status
+          </p>
+        </div>
       </div>
 
       {/* Stats Grid */}

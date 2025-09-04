@@ -103,13 +103,16 @@ export function SearchPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-mono font-bold text-slate-100 mb-2">
-          IOC Results
-        </h1>
-        <p className="text-slate-400 font-mono">
-          View and search enriched IOCs
-        </p>
+      <div className="flex items-center space-x-3">
+        <Bug className="h-6 w-6 text-neon-cyan glow-text" />
+        <div>
+          <h1 className="text-2xl font-mono font-bold text-slate-100 mb-2 glow-text">
+            IOC Results
+          </h1>
+          <p className="text-slate-400 font-mono">
+            View and search enriched IOCs
+          </p>
+        </div>
       </div>
 
       {/* Search and Filters */}

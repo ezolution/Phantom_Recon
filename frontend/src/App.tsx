@@ -25,14 +25,16 @@ function App() {
   }
 
   return (
-    <Layout>
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
-      <main className="flex-1 lg:ml-64">
-        <div className="p-6">
-          {renderContent()}
-        </div>
-      </main>
-    </Layout>
+    <div className="min-h-screen bg-blackhat-950">
+      <Layout>
+        <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+        <main className="flex-1 lg:ml-64">
+          <div className="p-6">
+            {renderContent()}
+          </div>
+        </main>
+      </Layout>
+    </div>
   )
 }
 

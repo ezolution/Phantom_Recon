@@ -18,13 +18,16 @@ export function SettingsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-mono font-bold text-slate-100 mb-2">
-          Settings
-        </h1>
-        <p className="text-slate-400 font-mono">
-          Configure system preferences
-        </p>
+      <div className="flex items-center space-x-3">
+        <Settings className="h-6 w-6 text-neon-purple glow-text" />
+        <div>
+          <h1 className="text-2xl font-mono font-bold text-slate-100 mb-2 glow-text">
+            Settings
+          </h1>
+          <p className="text-slate-400 font-mono">
+            Configure system preferences
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
