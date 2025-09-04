@@ -38,21 +38,15 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-mono font-bold text-neon-green glow-text">
-            Threat Intelligence Dashboard
-          </h1>
-          <p className="text-blackhat-400 font-mono mt-1">
-            Real-time IOC analysis and enrichment status
-          </p>
-        </div>
-        <div className="flex items-center space-x-2 text-sm font-mono text-neon-green">
-          <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse"></div>
-          <span>System Online</span>
-        </div>
+      <div>
+        <h2 className="text-xl font-mono font-bold text-neon-green">
+          System Statistics
+        </h2>
+        <p className="text-blackhat-400 font-mono text-sm mt-1">
+          Current IOC processing status
+        </p>
       </div>
 
       {/* Stats Grid */}

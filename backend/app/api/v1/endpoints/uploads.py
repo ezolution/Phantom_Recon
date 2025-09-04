@@ -12,8 +12,7 @@ from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from app.core.auth import get_current_active_user
-from app.models.user import User
+# Removed authentication dependencies
 from app.core.config import settings
 from app.core.database import get_db
 from app.models.upload import Upload
@@ -57,7 +56,6 @@ async def upload_csv(
     file: UploadFile = File(...),
     campaign_id: str = Form(None),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
 ) -> Any:
     """Upload and validate CSV file"""
     
@@ -102,7 +100,7 @@ async def upload_csv(
     # Create upload record
     upload = Upload(
         filename=file.filename,
-        uploaded_by=current_user.id,
+        uploaded_by=1,  # Default system user
         rows_ok=rows_ok,
         rows_failed=rows_failed,
         total_rows=len(rows),

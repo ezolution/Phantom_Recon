@@ -8,8 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from app.core.auth import get_current_active_user, require_admin_role
-from app.models.user import User
+# Removed authentication dependencies
 from app.core.database import get_db
 from app.models.job import Job
 from app.models.upload import Upload
@@ -22,7 +21,7 @@ router = APIRouter()
 async def get_job(
     job_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    # Removed authentication
 ) -> Any:
     """Get job status and summary"""
     

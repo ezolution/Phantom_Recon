@@ -8,8 +8,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
-from app.core.auth import get_current_active_user
-from app.models.user import User
+# Removed authentication dependencies
 from app.core.database import get_db
 from app.models.ioc import IOC, IOCScore, RiskBand
 from app.models.enrichment import EnrichmentResult
@@ -20,7 +19,7 @@ router = APIRouter()
 @router.get("/overview")
 async def get_overview_stats(
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    # Removed authentication
 ) -> Any:
     """Get overview statistics"""
     

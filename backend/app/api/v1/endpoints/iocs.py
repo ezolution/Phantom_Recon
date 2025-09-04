@@ -9,8 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_, func
 from sqlalchemy.orm import selectinload
 
-from app.core.auth import get_current_active_user
-from app.models.user import User
+# Removed authentication dependencies
 from app.core.database import get_db
 from app.models.ioc import IOC, IOCScore, EnrichmentResult
 from app.models.enrichment import EnrichmentResult as EnrichmentResultModel
@@ -34,7 +33,7 @@ async def search_iocs(
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(50, ge=1, le=100, description="Page size"),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    # Removed authentication
 ) -> Any:
     """Search and filter IOCs"""
     
@@ -87,7 +86,7 @@ async def search_iocs(
 async def get_ioc_details(
     ioc_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    # Removed authentication
 ) -> Any:
     """Get detailed IOC information"""
     

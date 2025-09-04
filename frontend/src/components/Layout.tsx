@@ -1,17 +1,15 @@
-import { Outlet } from 'react-router-dom'
-import { TopBar } from './TopBar'
-import { Sidebar } from './Sidebar'
+import { ReactNode } from 'react'
 
-export function Layout() {
+interface LayoutProps {
+  children: ReactNode
+}
+
+export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-blackhat-950">
-      <TopBar />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6">
-          <Outlet />
-        </main>
-      </div>
+      <main className="p-6">
+        {children}
+      </main>
     </div>
   )
 }

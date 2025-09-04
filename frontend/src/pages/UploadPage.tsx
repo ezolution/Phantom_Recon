@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Upload, FileText, CheckCircle, XCircle, AlertTriangle } from 'lucide-react'
+import { Upload, FileText, CheckCircle, XCircle, AlertTriangle, Play } from 'lucide-react'
 import { api } from '../lib/api'
 import toast from 'react-hot-toast'
 
@@ -136,14 +136,14 @@ export function UploadPage() {
   const invalidRows = preview.length - validRows
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-mono font-bold text-neon-green glow-text">
-          Upload & Enrich
-        </h1>
-        <p className="text-blackhat-400 font-mono mt-1">
-          Upload CSV files containing IOCs for threat intelligence enrichment
+        <h2 className="text-xl font-mono font-bold text-neon-green">
+          Upload CSV File
+        </h2>
+        <p className="text-blackhat-400 font-mono text-sm mt-1">
+          Upload CSV files containing IOCs for enrichment
         </p>
       </div>
 
@@ -286,23 +286,31 @@ export function UploadPage() {
         </div>
       )}
 
-      {/* Submit Button */}
+      {/* Action Buttons */}
       {file && (
-        <div className="flex justify-end">
-          <button
-            onClick={handleSubmit}
-            disabled={uploadMutation.isPending || invalidRows > 0}
-            className="btn-primary"
-          >
-            {uploadMutation.isPending ? (
-              <div className="flex items-center">
-                <div className="w-4 h-4 border-2 border-blackhat-950 border-t-transparent rounded-full animate-spin mr-2"></div>
-                Processing...
-              </div>
-            ) : (
-              'Start Enrichment'
-            )}
-          </button>
+        <div className="flex justify-between items-center">
+          <div className="text-sm font-mono text-blackhat-400">
+            {validRows} valid rows ready for processing
+          </div>
+          <div className="flex space-x-3">
+            <button
+              onClick={handleSubmit}
+              disabled={uploadMutation.isPending || invalidRows > 0}
+              className="btn-primary"
+            >
+              {uploadMutation.isPending ? (
+                <div className="flex items-center">
+                  <div className="w-4 h-4 border-2 border-blackhat-950 border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Processing...
+                </div>
+              ) : (
+                <>
+                  <Play className="h-4 w-4 mr-2" />
+                  Start Enrichment
+                </>
+              )}
+            </button>
+          </div>
         </div>
       )}
 

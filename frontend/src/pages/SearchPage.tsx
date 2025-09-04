@@ -98,14 +98,14 @@ export function SearchPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-mono font-bold text-neon-green glow-text">
-          Search & History
-        </h1>
-        <p className="text-blackhat-400 font-mono mt-1">
-          Search and analyze enriched IOCs with detailed threat intelligence
+        <h2 className="text-xl font-mono font-bold text-neon-green">
+          IOC Results
+        </h2>
+        <p className="text-blackhat-400 font-mono text-sm mt-1">
+          View and search enriched IOCs
         </p>
       </div>
 
