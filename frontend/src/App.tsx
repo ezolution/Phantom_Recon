@@ -25,7 +25,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-black">
       <Layout>
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
         <main className="flex-1 lg:ml-64">

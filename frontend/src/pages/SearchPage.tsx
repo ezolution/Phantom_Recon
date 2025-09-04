@@ -106,10 +106,10 @@ export function SearchPage() {
       <div className="flex items-center space-x-3">
         <Bug className="h-6 w-6 text-cyan-400" />
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 mb-2">
+          <h1 className="text-2xl font-bold text-green-400 mb-2">
             IOC Results
           </h1>
-          <p className="text-slate-400">
+          <p className="text-green-300">
             View and search enriched IOCs
           </p>
         </div>
@@ -120,11 +120,11 @@ export function SearchPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {/* Search */}
           <div className="xl:col-span-2">
-            <label className="block text-sm font-mono text-emerald-400 mb-2">
+            <label className="block text-sm font-mono text-green-400 mb-2">
               Search Query
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-green-500" />
               <input
                 type="text"
                 value={searchQuery}
@@ -137,7 +137,7 @@ export function SearchPage() {
 
           {/* IOC Type */}
           <div>
-            <label className="block text-sm font-mono text-emerald-400 mb-2">
+            <label className="block text-sm font-mono text-green-400 mb-2">
               IOC Type
             </label>
             <select
@@ -158,7 +158,7 @@ export function SearchPage() {
 
           {/* Risk Band */}
           <div>
-            <label className="block text-sm font-mono text-emerald-400 mb-2">
+            <label className="block text-sm font-mono text-green-400 mb-2">
               Risk Band
             </label>
             <select
@@ -176,7 +176,7 @@ export function SearchPage() {
 
           {/* Classification */}
           <div>
-            <label className="block text-sm font-mono text-emerald-400 mb-2">
+            <label className="block text-sm font-mono text-green-400 mb-2">
               Classification
             </label>
             <select
@@ -194,7 +194,7 @@ export function SearchPage() {
 
           {/* Source Platform */}
           <div>
-            <label className="block text-sm font-mono text-emerald-400 mb-2">
+            <label className="block text-sm font-mono text-green-400 mb-2">
               Source Platform
             </label>
             <select
