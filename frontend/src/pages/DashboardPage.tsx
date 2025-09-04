@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Shield, TrendingUp, AlertTriangle, CheckCircle } from 'lucide-react'
-import { api } from '@/lib/api'
+import { api } from '../lib/api'
 
 interface StatsData {
   total_iocs: number

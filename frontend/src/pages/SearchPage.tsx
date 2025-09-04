@@ -11,7 +11,7 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react'
-import { api } from '@/lib/api'
+import { api } from '../lib/api'
 import toast from 'react-hot-toast'
 
 interface IOC {
