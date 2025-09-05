@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Upload, FileText, CheckCircle, XCircle, AlertTriangle, Play, Shield, Terminal } from 'lucide-react'
+import { Upload, FileText, CheckCircle, XCircle, AlertTriangle, Play, Shield, Terminal, Settings } from 'lucide-react'
 import { api } from '../lib/api'
 import toast from 'react-hot-toast'
 
