@@ -38,19 +38,27 @@ export function DashboardPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center space-x-3">
-        <Fingerprint className="h-6 w-6 text-slate-300" />
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100 mb-2">
-            System Statistics
-          </h1>
-          <p className="text-slate-400">
-            Current IOC processing status
-          </p>
+      <div className="bg-slate-900/50 border-b border-slate-800 px-8 py-6">
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-center w-10 h-10 bg-emerald-500/20 rounded-lg">
+            <Fingerprint className="h-5 w-5 text-emerald-400" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white">
+              Dashboard
+            </h1>
+            <p className="text-slate-400 text-sm">
+              System overview and threat intelligence metrics
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-8">
+        <div className="max-w-7xl mx-auto space-y-6">
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -156,6 +164,7 @@ export function DashboardPage() {
               <p className="font-mono font-bold text-slate-200">{count}</p>
             </div>
           ))}
+        </div>
         </div>
       </div>
     </div>

@@ -16,19 +16,27 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center space-x-3">
-        <Settings className="h-6 w-6 text-purple-400" />
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100 mb-2">
-            Settings
-          </h1>
-          <p className="text-slate-400">
-            Configure system preferences
-          </p>
+      <div className="bg-slate-900/50 border-b border-slate-800 px-8 py-6">
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-center w-10 h-10 bg-emerald-500/20 rounded-lg">
+            <Settings className="h-5 w-5 text-emerald-400" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white">
+              Settings
+            </h1>
+            <p className="text-slate-400 text-sm">
+              Configure system preferences and settings
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-8">
+        <div className="max-w-4xl mx-auto space-y-6">
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* General Settings */}
@@ -129,6 +137,8 @@ export function SettingsPage() {
           <Save className="h-4 w-4" />
           <span>Save Settings</span>
         </button>
+      </div>
+        </div>
       </div>
     </div>
   )

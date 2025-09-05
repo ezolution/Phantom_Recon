@@ -101,19 +101,27 @@ export function SearchPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center space-x-3">
-        <Bug className="h-6 w-6 text-slate-300" />
-        <div>
-          <h1 className="text-2xl font-bold text-slate-100 mb-2">
-            IOC Results
-          </h1>
-          <p className="text-slate-400">
-            View and search enriched IOCs
-          </p>
+      <div className="bg-slate-900/50 border-b border-slate-800 px-8 py-6">
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-center w-10 h-10 bg-emerald-500/20 rounded-lg">
+            <Bug className="h-5 w-5 text-emerald-400" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-white">
+              IOC Search
+            </h1>
+            <p className="text-slate-400 text-sm">
+              Search and analyze enriched IOC data
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-8">
+        <div className="max-w-7xl mx-auto space-y-6">
 
       {/* Search and Filters */}
       <div className="card">
@@ -428,6 +436,8 @@ export function SearchPage() {
           </div>
         </div>
       )}
+        </div>
+      </div>
     </div>
   )
 }

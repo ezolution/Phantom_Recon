@@ -16,18 +16,22 @@ function App() {
         return <SearchPage />
       case 'dashboard':
         return <DashboardPage />
+      case 'analytics':
+        return <DashboardPage /> // For now, reuse dashboard - can create separate analytics page later
       case 'settings':
         return <SettingsPage />
+      case 'logs':
+        return <SettingsPage /> // For now, reuse settings - can create separate logs page later
       default:
         return <UploadPage />
     }
   }
 
   return (
-    <div className="min-h-screen w-full" style={{backgroundColor: '#000000'}}>
+    <div className="min-h-screen w-full flex" style={{backgroundColor: '#000000'}}>
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
-      <main className="flex-1 lg:ml-64" style={{backgroundColor: '#000000'}}>
-        <div className="p-6" style={{backgroundColor: '#000000'}}>
+      <main className="flex-1 lg:ml-72 min-h-screen" style={{backgroundColor: '#000000'}}>
+        <div className="h-full">
           {renderContent()}
         </div>
       </main>
