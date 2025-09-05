@@ -24,10 +24,10 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-black w-full">
+    <div className="min-h-screen w-full" style={{backgroundColor: '#000000'}}>
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
-      <main className="flex-1 lg:ml-64 bg-black">
-        <div className="p-6 bg-black">
+      <main className="flex-1 lg:ml-64" style={{backgroundColor: '#000000'}}>
+        <div className="p-6" style={{backgroundColor: '#000000'}}>
           {renderContent()}
         </div>
       </main>

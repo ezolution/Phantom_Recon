@@ -11,12 +11,13 @@
   
   html {
     font-family: 'Inter', system-ui, sans-serif;
-    @apply bg-black;
+    background-color: #000000 !important;
     height: 100%;
   }
   
   body {
-    @apply bg-black text-white;
+    background-color: #000000 !important;
+    color: #ffffff !important;
     overflow-x: hidden;
     margin: 0;
     padding: 0;
@@ -24,7 +25,7 @@
   }
   
   #root {
-    @apply bg-black;
+    background-color: #000000 !important;
     min-height: 100vh;
     height: 100%;
   }
