@@ -165,7 +165,7 @@ export function UploadPage() {
                 <Upload className="h-6 w-6 text-emerald-400" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">Upload CSV File</h2>
+                <h2 className="text-3xl font-bold text-white">Upload CSV File</h2>
                 <p className="text-slate-400">Select your CSV file containing IOCs for processing</p>
               </div>
             </div>
@@ -209,7 +209,7 @@ export function UploadPage() {
             )}
           </div>
 
-          {/* 2. Run Enrichment Section */}
+          {/* 2. Process Enrichment Section */}
           {file && (
             <div className="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-8">
               <div className="flex items-center space-x-4 mb-8">
@@ -217,7 +217,7 @@ export function UploadPage() {
                   <Play className="h-6 w-6 text-orange-400" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Run Enrichment</h2>
+                  <h2 className="text-3xl font-bold text-white">Process Enrichment</h2>
                   <p className="text-slate-400">Configure settings and start IOC processing</p>
                 </div>
               </div>
@@ -273,12 +273,12 @@ export function UploadPage() {
                   {uploadMutation.isPending ? (
                     <div className="flex items-center">
                       <Terminal className="h-5 w-5 mr-3" />
-                      <span>Enriching IOCs...</span>
+                      <span>Processing IOCs...</span>
                     </div>
                   ) : (
                     <div className="flex items-center">
                       <Play className="h-5 w-5 mr-3" />
-                      <span>Start Enrichment</span>
+                      <span>Start Processing</span>
                     </div>
                   )}
                 </button>
@@ -294,7 +294,7 @@ export function UploadPage() {
                   <FileText className="h-6 w-6 text-purple-400" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-2xl font-bold text-white">Upload Results</h2>
+                  <h2 className="text-3xl font-bold text-white">Upload Results</h2>
                   <p className="text-slate-400">Preview and validation results of your uploaded CSV</p>
                 </div>
                 <div className="flex items-center space-x-8 text-lg">
