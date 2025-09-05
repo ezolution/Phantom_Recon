@@ -158,7 +158,7 @@ export function UploadPage() {
       <div className="flex-1 p-6">
         <div className="w-full space-y-6">
           
-          {/* 1. Upload CSV Section */}
+          {/* 1. Upload CSV File Section */}
           <div className="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-8">
             <div className="flex items-center space-x-4 mb-8">
               <div className="flex items-center justify-center w-12 h-12 bg-emerald-500/20 rounded-xl">
@@ -349,24 +349,19 @@ export function UploadPage() {
                   </p>
                 )}
               </div>
-            </div>
-          )}
 
-          {/* Validation Errors Section */}
-          {invalidRows > 0 && (
-            <div className="w-full bg-red-500/10 border border-red-500/30 rounded-xl p-8">
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="flex items-center justify-center w-12 h-12 bg-red-500/20 rounded-xl">
-                  <AlertTriangle className="h-6 w-6 text-red-400" />
+              {/* Validation Errors - Show within Results section if there are errors */}
+              {invalidRows > 0 && (
+                <div className="mt-8 p-6 bg-red-500/10 border border-red-500/30 rounded-xl">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <AlertTriangle className="h-5 w-5 text-red-400" />
+                    <h3 className="text-lg font-bold text-red-400">Validation Errors</h3>
+                  </div>
+                  <p className="text-red-200">
+                    Required fields: <span className="font-mono">ioc_value</span>, <span className="font-mono">ioc_type</span>, <span className="font-mono">email_id</span>, <span className="font-mono">source_platform</span>, <span className="font-mono">classification</span>
+                  </p>
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-red-400">Validation Errors</h2>
-                  <p className="text-red-300">Please fix these issues before processing</p>
-                </div>
-              </div>
-              <p className="text-lg text-red-200">
-                Required fields: <span className="font-mono">ioc_value</span>, <span className="font-mono">ioc_type</span>, <span className="font-mono">email_id</span>, <span className="font-mono">source_platform</span>, <span className="font-mono">classification</span>
-              </p>
+              )}
             </div>
           )}
         </div>
