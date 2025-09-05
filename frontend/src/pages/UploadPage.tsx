@@ -156,189 +156,234 @@ export function UploadPage() {
 
       {/* Main Content */}
       <div className="flex-1 p-8">
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="max-w-6xl mx-auto space-y-6">
+          
+          {/* Upload Section */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="flex items-center justify-center w-10 h-10 bg-emerald-500/20 rounded-lg">
+                <Upload className="h-5 w-5 text-emerald-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">File Upload</h2>
+                <p className="text-slate-400 text-sm">Select your CSV file for IOC processing</p>
+              </div>
+            </div>
+            
+            <div
+              {...getRootProps()}
+              className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
+                isDragActive
+                  ? 'border-emerald-400 bg-emerald-500/10'
+                  : 'border-slate-600 hover:border-emerald-400 hover:bg-emerald-500/5'
+              }`}
+            >
+              <input {...getInputProps()} />
+              <Upload className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+              {isDragActive ? (
+                <p className="text-slate-300">Drop the CSV file here...</p>
+              ) : (
+                <div>
+                  <p className="text-slate-300 mb-2">
+                    Drag & drop a CSV file here, or click to select
+                  </p>
+                  <p className="text-sm text-slate-500">
+                    Supports .csv files up to 10MB
+                  </p>
+                </div>
+              )}
+            </div>
 
-      {/* Upload Area */}
-      <div className="card">
-        <div
-          {...getRootProps()}
-          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200 ${
-            isDragActive
-              ? 'border-slate-400 bg-slate-700/50'
-              : 'border-slate-600 hover:border-slate-400 hover:bg-slate-700/30'
-          }`}
-        >
-          <input {...getInputProps()} />
-          <Upload className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-          {isDragActive ? (
-            <p className="text-slate-300">Drop the CSV file here...</p>
-          ) : (
-            <div>
-              <p className="text-slate-300 mb-2">
-                Drag & drop a CSV file here, or click to select
-              </p>
-              <p className="text-sm text-slate-500">
-                Supports .csv files up to 10MB
+            {file && (
+              <div className="mt-4 p-4 bg-slate-700/50 rounded-lg border border-slate-600">
+                <div className="flex items-center space-x-3">
+                  <FileText className="h-5 w-5 text-emerald-400" />
+                  <div>
+                    <p className="font-mono text-white">{file.name}</p>
+                    <p className="text-sm text-slate-400 font-mono">
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Campaign Settings Section */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="flex items-center justify-center w-10 h-10 bg-blue-500/20 rounded-lg">
+                <Settings className="h-5 w-5 text-blue-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-white">Campaign Settings</h2>
+                <p className="text-slate-400 text-sm">Configure processing parameters for this upload</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Campaign ID
+                </label>
+                <input
+                  type="text"
+                  value={campaignId}
+                  onChange={(e) => setCampaignId(e.target.value)}
+                  className="input-field w-full"
+                  placeholder="Optional campaign identifier"
+                />
+                <p className="text-xs text-slate-500 mt-1">Used to group related IOC uploads</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Default Classification
+                </label>
+                <select
+                  value={classification}
+                  onChange={(e) => setClassification(e.target.value)}
+                  className="input-field w-full"
+                >
+                  <option value="unknown">Unknown</option>
+                  <option value="malicious">Malicious</option>
+                  <option value="suspicious">Suspicious</option>
+                  <option value="benign">Benign</option>
+                </select>
+                <p className="text-xs text-slate-500 mt-1">Default classification for unclassified IOCs</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CSV Preview Section */}
+          {preview.length > 0 && (
+            <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="flex items-center justify-center w-10 h-10 bg-purple-500/20 rounded-lg">
+                  <FileText className="h-5 w-5 text-purple-400" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-bold text-white">CSV Preview</h2>
+                  <p className="text-slate-400 text-sm">First 10 rows of your uploaded file</p>
+                </div>
+                <div className="flex items-center space-x-6 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="h-4 w-4 text-green-400" />
+                    <span className="text-green-400 font-medium">{validRows} valid</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <XCircle className="h-4 w-4 text-red-400" />
+                    <span className="text-red-400 font-medium">{invalidRows} invalid</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm font-mono">
+                  <thead>
+                    <tr className="border-b border-slate-700">
+                      <th className="text-left py-3 text-slate-300">Status</th>
+                      <th className="text-left py-3 text-slate-300">IOC Value</th>
+                      <th className="text-left py-3 text-slate-300">Type</th>
+                      <th className="text-left py-3 text-slate-300">Classification</th>
+                      <th className="text-left py-3 text-slate-300">Source</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {preview.slice(0, 10).map((row, _index) => {
+                      const validation = validateRow(row, _index)
+                      return (
+                        <tr key={_index} className="border-b border-slate-800">
+                          <td className="py-3">
+                            {validation.isValid ? (
+                              <CheckCircle className="h-4 w-4 text-green-400" />
+                            ) : (
+                              <XCircle className="h-4 w-4 text-red-400" />
+                            )}
+                          </td>
+                          <td className="py-3 text-white truncate max-w-xs">
+                            {row.ioc_value}
+                          </td>
+                          <td className="py-3 text-white">{row.ioc_type}</td>
+                          <td className="py-3 text-white">{row.classification}</td>
+                          <td className="py-3 text-white">{row.source_platform}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+                {preview.length > 10 && (
+                  <p className="text-center text-slate-400 font-mono mt-4">
+                    ... and {preview.length - 10} more rows
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Action Section */}
+          {file && (
+            <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="flex items-center justify-center w-10 h-10 bg-orange-500/20 rounded-lg">
+                  <Play className="h-5 w-5 text-orange-400" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white">Process Upload</h2>
+                  <p className="text-slate-400 text-sm">Start IOC enrichment and processing</p>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-slate-400">
+                  <span className="font-medium text-white">{validRows}</span> valid rows ready for processing
+                  {invalidRows > 0 && (
+                    <span className="text-red-400 ml-2">({invalidRows} errors need fixing)</span>
+                  )}
+                </div>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={handleSubmit}
+                    disabled={uploadMutation.isPending || invalidRows > 0}
+                    className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 ${
+                      uploadMutation.isPending || invalidRows > 0
+                        ? 'bg-slate-600 text-slate-400 cursor-not-allowed'
+                        : 'bg-emerald-500 hover:bg-emerald-600 text-white hover:shadow-lg'
+                    }`}
+                  >
+                    {uploadMutation.isPending ? (
+                      <div className="flex items-center">
+                        <Terminal className="h-4 w-4 mr-2" />
+                        <span>Enriching IOCs...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center">
+                        <Play className="h-4 w-4 mr-2" />
+                        <span>Start Enrichment</span>
+                      </div>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Validation Errors Section */}
+          {invalidRows > 0 && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="flex items-center justify-center w-10 h-10 bg-red-500/20 rounded-lg">
+                  <AlertTriangle className="h-5 w-5 text-red-400" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-red-400">Validation Errors</h2>
+                  <p className="text-red-300 text-sm">Please fix these issues before processing</p>
+                </div>
+              </div>
+              <p className="text-sm text-red-200">
+                Required fields: <span className="font-mono">ioc_value</span>, <span className="font-mono">ioc_type</span>, <span className="font-mono">email_id</span>, <span className="font-mono">source_platform</span>, <span className="font-mono">classification</span>
               </p>
             </div>
           )}
-        </div>
-
-        {file && (
-          <div className="mt-4 p-4 bg-slate-700/50 rounded-lg border border-slate-600">
-            <div className="flex items-center space-x-3">
-              <FileText className="h-5 w-5 text-emerald-400" />
-              <div>
-                <p className="font-mono text-white">{file.name}</p>
-                <p className="text-sm text-slate-400 font-mono">
-                  {(file.size / 1024 / 1024).toFixed(2)} MB
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Campaign Settings */}
-      <div className="card">
-        <h3 className="text-lg font-mono font-bold text-slate-200 mb-4">
-          Campaign Settings
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-mono text-slate-300 mb-2">
-              Campaign ID
-            </label>
-            <input
-              type="text"
-              value={campaignId}
-              onChange={(e) => setCampaignId(e.target.value)}
-              className="input-field w-full"
-              placeholder="Optional campaign identifier"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-mono text-slate-300 mb-2">
-              Default Classification
-            </label>
-            <select
-              value={classification}
-              onChange={(e) => setClassification(e.target.value)}
-              className="input-field w-full"
-            >
-              <option value="unknown">Unknown</option>
-              <option value="malicious">Malicious</option>
-              <option value="suspicious">Suspicious</option>
-              <option value="benign">Benign</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Preview */}
-      {preview.length > 0 && (
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-mono font-bold text-slate-200">
-              CSV Preview (First 50 rows)
-            </h3>
-            <div className="flex items-center space-x-4 text-sm font-mono">
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-4 w-4 text-green-400" />
-                <span className="text-green-400">{validRows} valid</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <XCircle className="h-4 w-4 text-red-400" />
-                <span className="text-red-400">{invalidRows} invalid</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm font-mono">
-              <thead>
-                <tr className="border-b border-slate-700">
-                  <th className="text-left py-2 text-slate-300">Status</th>
-                  <th className="text-left py-2 text-slate-300">IOC Value</th>
-                  <th className="text-left py-2 text-slate-300">Type</th>
-                  <th className="text-left py-2 text-slate-300">Classification</th>
-                  <th className="text-left py-2 text-slate-300">Source</th>
-                </tr>
-              </thead>
-              <tbody>
-                {preview.slice(0, 10).map((row, _index) => {
-                  const validation = validateRow(row, _index)
-                  return (
-                    <tr key={_index} className="border-b border-slate-800">
-                      <td className="py-2">
-                        {validation.isValid ? (
-                          <CheckCircle className="h-4 w-4 text-green-400" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-red-400" />
-                        )}
-                      </td>
-                      <td className="py-2 text-white truncate max-w-xs">
-                        {row.ioc_value}
-                      </td>
-                      <td className="py-2 text-white">{row.ioc_type}</td>
-                      <td className="py-2 text-white">{row.classification}</td>
-                      <td className="py-2 text-white">{row.source_platform}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-            {preview.length > 10 && (
-              <p className="text-center text-slate-400 font-mono mt-4">
-                ... and {preview.length - 10} more rows
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Action Buttons */}
-      {file && (
-        <div className="flex justify-between items-center">
-          <div className="text-sm font-mono text-slate-400">
-            {validRows} valid rows ready for processing
-          </div>
-          <div className="flex space-x-3">
-            <button
-              onClick={handleSubmit}
-              disabled={uploadMutation.isPending || invalidRows > 0}
-              className="btn-primary"
-            >
-              {uploadMutation.isPending ? (
-                <div className="flex items-center">
-                  <Terminal className="h-4 w-4 mr-2 text-slate-300" />
-                  <span>Enriching IOCs</span>
-                </div>
-              ) : (
-                <>
-                  <Play className="h-4 w-4 mr-2" />
-                  Start Enrichment
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Validation Errors */}
-      {invalidRows > 0 && (
-        <div className="card border-red-500/30 bg-red-500/5">
-          <div className="flex items-center space-x-2 mb-2">
-            <AlertTriangle className="h-5 w-5 text-red-400" />
-            <h3 className="font-mono font-bold text-red-400">
-              Validation Errors
-            </h3>
-          </div>
-          <p className="text-sm font-mono text-slate-300">
-            Please fix the validation errors before uploading. Required fields: ioc_value, ioc_type, email_id, source_platform, classification.
-          </p>
-        </div>
-      )}
         </div>
       </div>
     </div>
