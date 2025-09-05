@@ -28,12 +28,10 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen w-full flex" style={{backgroundColor: '#000000'}}>
+    <div className="min-h-screen w-full" style={{backgroundColor: '#000000'}}>
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
-      <main className="flex-1 lg:ml-72 min-h-screen" style={{backgroundColor: '#000000'}}>
-        <div className="h-full">
-          {renderContent()}
-        </div>
+      <main className="min-h-screen" style={{backgroundColor: '#000000'}}>
+        {renderContent()}
       </main>
     </div>
   )
