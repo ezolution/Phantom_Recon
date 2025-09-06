@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Upload, FileText, CheckCircle, XCircle, AlertTriangle, Play, Shield, Terminal, Settings } from 'lucide-react'
+import { Upload, FileText, CheckCircle, XCircle, AlertTriangle, Play, Terminal, Settings } from 'lucide-react'
 import { api } from '../lib/api'
 import toast from 'react-hot-toast'
 
@@ -139,18 +139,13 @@ export function UploadPage() {
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="bg-slate-900/50 border-b border-slate-800 px-8 py-6">
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center justify-center w-10 h-10 bg-emerald-500/20 rounded-lg">
-            <Shield className="h-5 w-5 text-emerald-400" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">
-              Upload CSV File
-            </h1>
-            <p className="text-slate-400 text-sm">
-              Process and enrich IOC data from CSV files
-            </p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-bold text-white">
+            Upload CSV File
+          </h1>
+          <p className="text-slate-400 text-sm">
+            Process and enrich IOC data from CSV files
+          </p>
         </div>
       </div>
 
