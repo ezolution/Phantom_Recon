@@ -2,14 +2,13 @@
 IOC schemas
 """
 
+from __future__ import annotations
+
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional
 
 from pydantic import BaseModel
-
-if TYPE_CHECKING:
-    from app.schemas.enrichment import EnrichmentResult
 
 
 class IOCType(str, Enum):
