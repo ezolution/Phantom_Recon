@@ -104,8 +104,8 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
             </div>
           </div>
 
-          {/* Right Side - Search Bar and Icons */}
-          <div className="flex items-center space-x-4">
+          {/* Right Side - Search Bar and Icons - Aligned to top right corner */}
+          <div className="flex items-center space-x-2 -mr-6">
             {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -117,7 +117,7 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
             </div>
 
             {/* Icon Buttons */}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1">
               <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
                 <Shield className="h-5 w-5 text-white" />
               </button>
