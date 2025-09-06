@@ -136,44 +136,44 @@ export function UploadPage() {
   const invalidRows = preview.length - validRows
 
   return (
-    <div className="h-full flex flex-col bg-slate-100">
+    <div className="h-full flex flex-col bg-gray-100">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-8 py-6">
+      <div className="bg-white border-b border-gray-200 px-8 py-6 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-gray-900">
             Upload CSV File
           </h1>
-          <p className="text-slate-600 text-sm">
+          <p className="text-gray-600 text-sm">
             Process and enrich IOC data from CSV files
           </p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6 bg-slate-100">
+      <div className="flex-1 p-6 bg-gray-100">
         <div className="w-full space-y-6">
           
           {/* 1. Upload CSV File Section */}
-          <div className="w-full bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+          <div className="w-full bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
             
             <div
               {...getRootProps()}
               className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all duration-200 ${
                 isDragActive
                   ? 'border-red-500 bg-red-50'
-                  : 'border-slate-300 hover:border-red-400 hover:bg-slate-50'
+                  : 'border-gray-300 hover:border-red-400 hover:bg-gray-50'
               }`}
             >
               <input {...getInputProps()} />
-              <Upload className="h-16 w-16 text-slate-400 mx-auto mb-6" />
+              <Upload className="h-16 w-16 text-gray-400 mx-auto mb-6" />
               {isDragActive ? (
-                <p className="text-xl text-slate-700">Drop the CSV file here...</p>
+                <p className="text-xl text-gray-700">Drop the CSV file here...</p>
               ) : (
                 <div>
-                  <p className="text-xl text-slate-700 mb-3">
+                  <p className="text-xl text-gray-700 mb-3">
                     Drag & drop a CSV file here, or click to select
                   </p>
-                  <p className="text-slate-500">
+                  <p className="text-gray-500">
                     Supports .csv files up to 10MB
                   </p>
                 </div>
@@ -181,12 +181,12 @@ export function UploadPage() {
             </div>
 
             {file && (
-              <div className="mt-6 p-6 bg-slate-50 rounded-xl border border-slate-200">
+              <div className="mt-6 p-6 bg-gray-50 rounded-xl border border-gray-200">
                 <div className="flex items-center space-x-4">
                   <FileText className="h-6 w-6 text-red-600" />
                   <div>
-                    <p className="text-lg font-mono text-slate-900">{file.name}</p>
-                    <p className="text-slate-600 font-mono">
+                    <p className="text-lg font-mono text-gray-900">{file.name}</p>
+                    <p className="text-gray-600 font-mono">
                       {(file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
@@ -197,52 +197,52 @@ export function UploadPage() {
 
           {/* 2. Process Enrichment Section */}
           {file && (
-            <div className="w-full bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+            <div className="w-full bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
               <div className="flex items-center space-x-4 mb-8">
                 <div className="flex items-center justify-center w-12 h-12 bg-red-100 rounded-xl">
                   <Play className="h-6 w-6 text-red-600" />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-bold text-slate-900">Process Enrichment</h2>
-                  <p className="text-slate-600">Configure settings and start IOC processing</p>
+                  <h2 className="text-3xl font-bold text-gray-900">Process Enrichment</h2>
+                  <p className="text-gray-600">Configure settings and start IOC processing</p>
                 </div>
               </div>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 <div>
-                  <label className="block text-lg font-medium text-slate-700 mb-3">
+                  <label className="block text-lg font-medium text-gray-700 mb-3">
                     Campaign ID
                   </label>
                   <input
                     type="text"
                     value={campaignId}
                     onChange={(e) => setCampaignId(e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     placeholder="Optional campaign identifier"
                   />
-                  <p className="text-sm text-slate-500 mt-2">Used to group related IOC uploads</p>
+                  <p className="text-sm text-gray-500 mt-2">Used to group related IOC uploads</p>
                 </div>
                 <div>
-                  <label className="block text-lg font-medium text-slate-700 mb-3">
+                  <label className="block text-lg font-medium text-gray-700 mb-3">
                     Default Classification
                   </label>
                   <select
                     value={classification}
                     onChange={(e) => setClassification(e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
                     <option value="unknown">Unknown</option>
                     <option value="malicious">Malicious</option>
                     <option value="suspicious">Suspicious</option>
                     <option value="benign">Benign</option>
                   </select>
-                  <p className="text-sm text-slate-500 mt-2">Default classification for unclassified IOCs</p>
+                  <p className="text-sm text-gray-500 mt-2">Default classification for unclassified IOCs</p>
                 </div>
               </div>
 
               <div className="flex justify-between items-center">
-                <div className="text-lg text-slate-600">
-                  <span className="font-bold text-slate-900">{validRows}</span> valid rows ready for processing
+                <div className="text-lg text-gray-600">
+                  <span className="font-bold text-gray-900">{validRows}</span> valid rows ready for processing
                   {invalidRows > 0 && (
                     <span className="text-red-600 ml-2">({invalidRows} errors need fixing)</span>
                   )}
@@ -252,7 +252,7 @@ export function UploadPage() {
                   disabled={uploadMutation.isPending || invalidRows > 0}
                   className={`px-8 py-4 rounded-xl font-bold text-lg transition-all duration-200 ${
                     uploadMutation.isPending || invalidRows > 0
-                      ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : 'bg-red-600 hover:bg-red-700 text-white hover:shadow-lg'
                   }`}
                 >
@@ -275,24 +275,24 @@ export function UploadPage() {
           {/* Divider between Process Enrichment and Results */}
           {file && preview.length > 0 && (
             <div className="flex items-center justify-center py-4">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
-              <div className="px-6 py-2 bg-white border border-slate-300 rounded-full shadow-sm">
-                <span className="text-slate-600 text-sm font-medium">Processing Complete</span>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+              <div className="px-6 py-2 bg-white border border-gray-300 rounded-full shadow-sm">
+                <span className="text-gray-600 text-sm font-medium">Processing Complete</span>
               </div>
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
             </div>
           )}
 
           {/* 3. Results Section */}
           {preview.length > 0 && (
-            <div className="w-full bg-white border border-slate-200 rounded-xl p-8 shadow-sm">
+            <div className="w-full bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
               <div className="flex items-center space-x-4 mb-8">
                 <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-xl">
                   <FileText className="h-6 w-6 text-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-3xl font-bold text-slate-900">Upload Results</h2>
-                  <p className="text-slate-600">Preview and validation results of your uploaded CSV</p>
+                  <h2 className="text-3xl font-bold text-gray-900">Upload Results</h2>
+                  <p className="text-gray-600">Preview and validation results of your uploaded CSV</p>
                 </div>
                 <div className="flex items-center space-x-8 text-lg">
                   <div className="flex items-center space-x-3">
@@ -309,19 +309,19 @@ export function UploadPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-lg font-mono">
                   <thead>
-                    <tr className="border-b border-slate-200">
-                      <th className="text-left py-4 text-slate-700">Status</th>
-                      <th className="text-left py-4 text-slate-700">IOC Value</th>
-                      <th className="text-left py-4 text-slate-700">Type</th>
-                      <th className="text-left py-4 text-slate-700">Classification</th>
-                      <th className="text-left py-4 text-slate-700">Source</th>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-4 text-gray-700">Status</th>
+                      <th className="text-left py-4 text-gray-700">IOC Value</th>
+                      <th className="text-left py-4 text-gray-700">Type</th>
+                      <th className="text-left py-4 text-gray-700">Classification</th>
+                      <th className="text-left py-4 text-gray-700">Source</th>
                     </tr>
                   </thead>
                   <tbody>
                     {preview.slice(0, 10).map((row, _index) => {
                       const validation = validateRow(row, _index)
                       return (
-                        <tr key={_index} className="border-b border-slate-100">
+                        <tr key={_index} className="border-b border-gray-100">
                           <td className="py-4">
                             {validation.isValid ? (
                               <CheckCircle className="h-6 w-6 text-green-600" />
@@ -329,19 +329,19 @@ export function UploadPage() {
                               <XCircle className="h-6 w-6 text-red-600" />
                             )}
                           </td>
-                          <td className="py-4 text-slate-900 truncate max-w-xs">
+                          <td className="py-4 text-gray-900 truncate max-w-xs">
                             {row.ioc_value}
                           </td>
-                          <td className="py-4 text-slate-900">{row.ioc_type}</td>
-                          <td className="py-4 text-slate-900">{row.classification}</td>
-                          <td className="py-4 text-slate-900">{row.source_platform}</td>
+                          <td className="py-4 text-gray-900">{row.ioc_type}</td>
+                          <td className="py-4 text-gray-900">{row.classification}</td>
+                          <td className="py-4 text-gray-900">{row.source_platform}</td>
                         </tr>
                       )
                     })}
                   </tbody>
                 </table>
                 {preview.length > 10 && (
-                  <p className="text-center text-slate-500 font-mono mt-6 text-lg">
+                  <p className="text-center text-gray-500 font-mono mt-6 text-lg">
                     ... and {preview.length - 10} more rows
                   </p>
                 )}

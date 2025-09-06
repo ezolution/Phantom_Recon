@@ -101,18 +101,18 @@ export function SearchPage() {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-gray-100">
       {/* Header */}
-      <div className="bg-slate-900/50 border-b border-slate-800 px-8 py-6">
+      <div className="bg-white border-b border-gray-200 px-8 py-6 shadow-sm">
         <div className="flex items-center space-x-3">
           <div className="flex items-center justify-center w-10 h-10 bg-emerald-500/20 rounded-lg">
-            <Bug className="h-5 w-5 text-emerald-400" />
+            <Bug className="h-5 w-5 text-emerald-500" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-2xl font-bold text-gray-900">
               IOC Search
             </h1>
-            <p className="text-slate-400 text-sm">
+            <p className="text-gray-600 text-sm">
               Search and analyze enriched IOC data
             </p>
           </div>
@@ -120,24 +120,24 @@ export function SearchPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-8 bg-gray-100">
         <div className="max-w-7xl mx-auto space-y-6">
 
       {/* Search and Filters */}
-      <div className="card">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {/* Search */}
           <div className="xl:col-span-2">
-            <label className="block text-sm font-mono text-slate-300 mb-2">
+            <label className="block text-sm font-mono text-gray-700 mb-2">
               Search Query
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="input-field w-full pl-10"
+                className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 placeholder="Search IOCs, emails, campaigns..."
               />
             </div>
@@ -145,13 +145,13 @@ export function SearchPage() {
 
           {/* IOC Type */}
           <div>
-            <label className="block text-sm font-mono text-slate-300 mb-2">
+            <label className="block text-sm font-mono text-gray-700 mb-2">
               IOC Type
             </label>
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="input-field w-full"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
             >
               <option value="">All Types</option>
               <option value="url">URL</option>
@@ -166,13 +166,13 @@ export function SearchPage() {
 
           {/* Risk Band */}
           <div>
-            <label className="block text-sm font-mono text-slate-300 mb-2">
+            <label className="block text-sm font-mono text-gray-700 mb-2">
               Risk Band
             </label>
             <select
               value={selectedRisk}
               onChange={(e) => setSelectedRisk(e.target.value)}
-              className="input-field w-full"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
             >
               <option value="">All Risks</option>
               <option value="Low">Low</option>
@@ -184,13 +184,13 @@ export function SearchPage() {
 
           {/* Classification */}
           <div>
-            <label className="block text-sm font-mono text-slate-300 mb-2">
+            <label className="block text-sm font-mono text-gray-700 mb-2">
               Classification
             </label>
             <select
               value={selectedClassification}
               onChange={(e) => setSelectedClassification(e.target.value)}
-              className="input-field w-full"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
             >
               <option value="">All Classifications</option>
               <option value="malicious">Malicious</option>
@@ -202,13 +202,13 @@ export function SearchPage() {
 
           {/* Source Platform */}
           <div>
-            <label className="block text-sm font-mono text-slate-300 mb-2">
+            <label className="block text-sm font-mono text-gray-700 mb-2">
               Source Platform
             </label>
             <select
               value={selectedSource}
               onChange={(e) => setSelectedSource(e.target.value)}
-              className="input-field w-full"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
             >
               <option value="">All Sources</option>
               <option value="EOP">EOP</option>
@@ -218,20 +218,20 @@ export function SearchPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700">
-          <div className="flex items-center space-x-2 text-sm font-mono text-slate-400">
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+          <div className="flex items-center space-x-2 text-sm font-mono text-gray-600">
             <Filter className="h-4 w-4" />
             <span>Active filters: {[selectedType, selectedRisk, selectedClassification, selectedSource].filter(Boolean).length}</span>
           </div>
-          <button className="btn-secondary">
-            <Download className="h-4 w-4 mr-2" />
+          <button className="px-4 py-2 bg-gray-700 text-gray-200 border border-gray-600 font-medium rounded-md hover:bg-gray-600 transition-colors">
+            <Download className="h-4 w-4 mr-2 inline" />
             Export Results
           </button>
         </div>
       </div>
 
       {/* Results */}
-      <div className="card">
+      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
         {isLoading ? (
           <div className="flex items-center justify-center h-32">
             <div className="text-center">

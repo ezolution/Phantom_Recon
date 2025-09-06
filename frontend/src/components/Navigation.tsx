@@ -99,8 +99,7 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
                 <Shield className="h-5 w-5 text-white" />
               </div>
               <div>
-                <span className="text-white font-semibold text-lg">Threat Intelligence</span>
-                <span className="text-slate-300 ml-2">IOC Processing Platform</span>
+                <span className="text-white font-semibold text-lg">Threat Intelligence IOC Processing Platform</span>
               </div>
             </div>
           </div>
@@ -109,32 +108,32 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
           <div className="flex items-center space-x-4">
             {/* Search Bar */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search"
-                className="w-64 pl-10 pr-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                className="w-64 pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
               />
             </div>
 
             {/* Icon Buttons */}
             <div className="flex items-center space-x-2">
-              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
                 <Shield className="h-5 w-5 text-white" />
               </button>
-              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
                 <Bell className="h-5 w-5 text-white" />
               </button>
-              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
                 <FileText className="h-5 w-5 text-white" />
               </button>
-              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
                 <Code className="h-5 w-5 text-white" />
               </button>
-              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
                 <User className="h-5 w-5 text-white" />
               </button>
-              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
                 <HelpCircle className="h-5 w-5 text-white" />
               </button>
             </div>
