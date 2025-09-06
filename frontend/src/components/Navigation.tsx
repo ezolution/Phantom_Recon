@@ -94,16 +94,14 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
               <Menu className="h-5 w-5" />
             </button>
             
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-white font-semibold">Threat Intelligence</span>
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                <Shield className="h-5 w-5 text-white" />
               </div>
-              <div className="h-6 w-px bg-slate-600"></div>
-              <span className="text-slate-300">IOC Processing Platform</span>
-              <Bookmark className="h-4 w-4 text-slate-400" />
+              <div>
+                <span className="text-white font-semibold text-lg">Threat Intelligence</span>
+                <span className="text-slate-300 ml-2">IOC Processing Platform</span>
+              </div>
             </div>
           </div>
 
