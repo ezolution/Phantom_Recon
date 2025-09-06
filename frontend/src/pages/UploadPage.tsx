@@ -160,15 +160,6 @@ export function UploadPage() {
           
           {/* 1. Upload CSV File Section */}
           <div className="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-8">
-            <div className="flex items-center space-x-4 mb-8">
-              <div className="flex items-center justify-center w-12 h-12 bg-emerald-500/20 rounded-xl">
-                <Upload className="h-6 w-6 text-emerald-400" />
-              </div>
-              <div>
-                <h2 className="text-3xl font-bold text-white">Upload CSV File</h2>
-                <p className="text-slate-400">Select your CSV file containing IOCs for processing</p>
-              </div>
-            </div>
             
             <div
               {...getRootProps()}
