@@ -159,7 +159,7 @@ export function UploadPage() {
         <div className="w-full space-y-6">
           
           {/* 1. Upload CSV File Section */}
-          <div className="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-8">
+          <div className="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-8 shadow-lg">
             
             <div
               {...getRootProps()}
@@ -202,7 +202,7 @@ export function UploadPage() {
 
           {/* 2. Process Enrichment Section */}
           {file && (
-            <div className="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-8">
+            <div className="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-8 shadow-lg">
               <div className="flex items-center space-x-4 mb-8">
                 <div className="flex items-center justify-center w-12 h-12 bg-orange-500/20 rounded-xl">
                   <Play className="h-6 w-6 text-orange-400" />
@@ -277,9 +277,20 @@ export function UploadPage() {
             </div>
           )}
 
+          {/* Divider between Process Enrichment and Results */}
+          {file && preview.length > 0 && (
+            <div className="flex items-center justify-center py-4">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent"></div>
+              <div className="px-6 py-2 bg-slate-800 border border-slate-600 rounded-full">
+                <span className="text-slate-400 text-sm font-medium">Processing Complete</span>
+              </div>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent"></div>
+            </div>
+          )}
+
           {/* 3. Results Section */}
           {preview.length > 0 && (
-            <div className="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-8">
+            <div className="w-full bg-slate-800/50 border border-slate-700 rounded-xl p-8 shadow-lg">
               <div className="flex items-center space-x-4 mb-8">
                 <div className="flex items-center justify-center w-12 h-12 bg-purple-500/20 rounded-xl">
                   <FileText className="h-6 w-6 text-purple-400" />
