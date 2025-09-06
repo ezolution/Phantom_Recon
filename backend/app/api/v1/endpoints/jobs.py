@@ -10,7 +10,7 @@ from sqlalchemy import select
 
 # Removed authentication dependencies
 from app.core.database import get_db
-from app.models.job import Job
+from app.models.job import Job, JobStatus
 from app.models.upload import Upload
 from app.schemas.job import Job as JobSchema, JobSummary
 
@@ -36,18 +36,7 @@ async def get_job(
             detail="Job not found"
         )
     
-    # Check if user has access to this job
-    result = await db.execute(
-        select(Upload).where(Upload.id == job.upload_id)
-    )
-    upload = result.scalar_one_or_none()
-    
-    if not upload or upload.uploaded_by != current_user.id:
-        if current_user.role != "admin":
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Not enough permissions"
-            )
+    # No authentication required - allow access to all jobs
     
     # Calculate progress
     progress_percentage = 0.0
@@ -64,9 +53,8 @@ async def get_job(
 async def start_enrichment(
     job_id: int,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_admin_role),
 ) -> Any:
-    """Start or force enrichment for a job (admin only)"""
+    """Start or force enrichment for a job"""
     
     result = await db.execute(
         select(Job).where(Job.id == job_id)
