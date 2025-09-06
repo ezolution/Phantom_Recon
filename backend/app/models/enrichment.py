@@ -6,8 +6,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, JSON
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -29,7 +28,7 @@ class EnrichmentResult(Base):
     id = Column(Integer, primary_key=True, index=True)
     ioc_id = Column(Integer, ForeignKey("iocs.id"), nullable=False)
     provider = Column(String(50), nullable=False, index=True)
-    raw_json = Column(JSONB, nullable=True)
+    raw_json = Column(JSON, nullable=True)
     verdict = Column(String(20), default=Verdict.UNKNOWN, nullable=False)
     first_seen = Column(DateTime, nullable=True)
     last_seen = Column(DateTime, nullable=True)

@@ -5,8 +5,7 @@ Audit log model
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, JSON
 from sqlalchemy.orm import relationship
 
 from app.core.database import Base
@@ -22,7 +21,7 @@ class AuditLog(Base):
     action = Column(String(100), nullable=False, index=True)
     target_type = Column(String(50), nullable=True, index=True)
     target_id = Column(Integer, nullable=True)
-    meta_json = Column(JSONB, nullable=True)
+    meta_json = Column(JSON, nullable=True)
     ip_address = Column(String(45), nullable=True)
     user_agent = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
