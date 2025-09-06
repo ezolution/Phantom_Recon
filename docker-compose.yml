@@ -1,34 +1,6 @@
 services:
-  # PostgreSQL Database
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: threatforge
-      POSTGRES_USER: threatforge
-      POSTGRES_PASSWORD: threatforge
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U threatforge -d threatforge"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Redis Cache
-  redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # SQLite Database (file-based, no separate container needed)
+  # Database file will be stored in ./data directory
 
   # FastAPI Backend
   api:
@@ -36,14 +8,13 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     environment:
-      - DATABASE_URL=postgresql+asyncpg://threatforge:threatforge@db:5432/threatforge
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=your-secret-key-change-in-production
-      - JWT_SECRET_KEY=your-jwt-secret-key-change-in-production
-      - ALLOWED_ORIGINS=http://localhost:3000,http://frontend:3000
-      - ALLOWED_HOSTS=localhost,127.0.0.1,api
-      - ENVIRONMENT=development
-      - DEBUG=true
+      - DATABASE_URL=sqlite+aiosqlite:///./data/threatforge.db
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here-change-this-in-production}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-your-jwt-secret-key-here-change-this-in-production}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-["http://localhost:3000", "http://localhost", "http://129.212.186.236"]}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-["localhost", "127.0.0.1", "129.212.186.236"]}
+      - ENVIRONMENT=production
+      - DEBUG=false
       - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY:-}
       - URLSCAN_API_KEY=${URLSCAN_API_KEY:-}
       - CROWDSTRIKE_CLIENT_ID=${CROWDSTRIKE_CLIENT_ID:-}
@@ -52,75 +23,18 @@ services:
       - RECORDED_FUTURE_API_KEY=${RECORDED_FUTURE_API_KEY:-}
     ports:
       - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
     volumes:
-      - ./backend:/app
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      - ./data:/app/data  # Mount data directory for SQLite files
+    restart: unless-stopped
 
-  # Celery Worker
-  worker:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    command: celery -A app.core.celery_app worker --loglevel=info
-    environment:
-      - DATABASE_URL=postgresql+asyncpg://threatforge:threatforge@db:5432/threatforge
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=your-secret-key-change-in-production
-      - JWT_SECRET_KEY=your-jwt-secret-key-change-in-production
-      - VIRUSTOTAL_API_KEY=${VIRUSTOTAL_API_KEY:-}
-      - URLSCAN_API_KEY=${URLSCAN_API_KEY:-}
-      - CROWDSTRIKE_CLIENT_ID=${CROWDSTRIKE_CLIENT_ID:-}
-      - CROWDSTRIKE_CLIENT_SECRET=${CROWDSTRIKE_CLIENT_SECRET:-}
-      - FLASHPOINT_API_KEY=${FLASHPOINT_API_KEY:-}
-      - RECORDED_FUTURE_API_KEY=${RECORDED_FUTURE_API_KEY:-}
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - ./backend:/app
-
-  # Celery Beat Scheduler
-  beat:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    command: celery -A app.core.celery_app beat --loglevel=info
-    environment:
-      - DATABASE_URL=postgresql+asyncpg://threatforge:threatforge@db:5432/threatforge
-      - REDIS_URL=redis://redis:6379/0
-      - SECRET_KEY=your-secret-key-change-in-production
-      - JWT_SECRET_KEY=your-jwt-secret-key-change-in-production
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    volumes:
-      - ./backend:/app
-
-  # React Frontend
+  # React Frontend (Nginx static)
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     ports:
-      - "3000:3000"
-    depends_on:
-      - api
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - "3000:80"
+    restart: unless-stopped
 
   # Nginx Reverse Proxy
   nginx:
@@ -129,12 +43,12 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx.simple.conf:/etc/nginx/nginx.conf
       - ./ssl:/etc/nginx/ssl
     depends_on:
       - api
       - frontend
+    restart: unless-stopped
 
 volumes:
-  postgres_data:
-  redis_data:
+  data:
