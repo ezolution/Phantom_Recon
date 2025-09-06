@@ -137,5 +137,5 @@ class IOCSearch(BaseModel):
 class IOCWithDetails(IOC):
     """IOC with enrichment details"""
     latest_score: Optional[IOCScore] = None
-    enrichment_results: List["EnrichmentResult"] = []
+    enrichment_results: List[dict] = []  # Use dict instead of EnrichmentResult to avoid circular import
     tags: List[Tag] = []
