@@ -28,11 +28,14 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen w-full" style={{backgroundColor: '#000000'}}>
+    <div className="min-h-screen w-full bg-slate-900">
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
-      <main className="min-h-screen" style={{backgroundColor: '#000000'}}>
-        {renderContent()}
-      </main>
+      <div className="flex min-h-screen">
+        {/* Left Sidebar - will be added to Navigation component */}
+        <main className="flex-1 bg-slate-100">
+          {renderContent()}
+        </main>
+      </div>
     </div>
   )
 }
