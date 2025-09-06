@@ -11,8 +11,8 @@ from sqlalchemy.orm import selectinload
 
 # Removed authentication dependencies
 from app.core.database import get_db
-from app.models.ioc import IOC, IOCScore, EnrichmentResult
-from app.models.enrichment import EnrichmentResult as EnrichmentResultModel
+from app.models.ioc import IOC, IOCScore
+from app.models.enrichment import EnrichmentResult
 from app.schemas.ioc import IOC as IOCSchema, IOCWithDetails, IOCSearch
 from app.schemas.enrichment import EnrichmentResult as EnrichmentResultSchema
 
