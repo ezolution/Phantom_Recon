@@ -8,9 +8,9 @@ import toast from 'react-hot-toast'
 interface CSVRow {
   ioc_value: string
   ioc_type: string
-  email_id: string
+  email_id?: string
   source_platform: string
-  classification: string
+  classification?: string
   campaign_id?: string
   user_reported?: string
   first_seen?: string
@@ -58,15 +58,58 @@ export function UploadPage() {
     reader.onload = (e) => {
       const text = e.target?.result as string
       const lines = text.split('\n').filter(line => line.trim())
-      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
-      
+      const rawHeaders = lines[0].split(',').map(h => h.trim().replace(/"/g, ''))
+
+      // Normalize header tokens: lowercase, remove spaces/underscores
+      const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '')
+      const headerIndex: Record<string, number> = {}
+      rawHeaders.forEach((h, i) => { headerIndex[norm(h)] = i })
+
+      const pick = (values: string[], variants: string[]): string => {
+        for (const v of variants) {
+          const idx = headerIndex[norm(v)]
+          if (idx !== undefined && values[idx] !== undefined) return values[idx]
+        }
+        return ''
+      }
+
+      const normalizeType = (t: string) => {
+        const x = t.toLowerCase().trim()
+        if (x === 'ipv4' || x === 'ip' || x === 'ip4') return 'ipv4'
+        if (x === 'url' || x === 'link') return 'url'
+        if (x === 'urldomain' || x === 'domain') return 'domain'
+        if (x === 'sha256' || x === 'sha-256') return 'sha256'
+        if (x === 'md5') return 'md5'
+        if (x === 'email' || x === 'emailaddress') return 'email'
+        if (x === 'subject' || x === 'subject_keyword') return 'subject_keyword'
+        return x
+      }
+
       const rows: CSVRow[] = lines.slice(1, 51).map(line => { // Preview first 50 rows
         const values = line.split(',').map(v => v.trim().replace(/"/g, ''))
-        const row: any = {}
-        headers.forEach((header, _index) => {
-          row[header] = values[_index] || ''
-        })
-        return row as CSVRow
+
+        const ioc_value = pick(values, ['ioc_value','ioc value','ioc','value','iocvalue','ioc_value_','IOC_Value'])
+          || pick(values, ['url','domain','ip','hash'])
+        const ioc_type_raw = pick(values, ['ioc_type','ioctype','IOC_Type'])
+        const ioc_type = normalizeType(ioc_type_raw)
+        const source_platform = pick(values, ['source_platform','source','Source'])
+        const classificationCell = pick(values, ['classification','class'])
+        const first_seen = pick(values, ['first_seen','firstseen','FirstSeen'])
+        const last_seen = pick(values, ['last_seen','lastseen','LastSeen'])
+        const campaign_id = pick(values, ['campaign_id','campaign','CampaignKey'])
+        const hits = pick(values, ['hits','Hits'])
+
+        const row: CSVRow = {
+          ioc_value,
+          ioc_type,
+          source_platform,
+          classification: classificationCell || undefined,
+          first_seen: first_seen || undefined,
+          last_seen: last_seen || undefined,
+          campaign_id: campaign_id || undefined,
+          notes: hits ? `hits:${hits}` : undefined,
+        }
+        return row
       })
       
       setPreview(rows)
@@ -79,16 +122,15 @@ export function UploadPage() {
     
     if (!row.ioc_value) errors.push('Missing IOC value')
     if (!row.ioc_type) errors.push('Missing IOC type')
-    if (!row.email_id) errors.push('Missing email ID')
     if (!row.source_platform) errors.push('Missing source platform')
-    if (!row.classification) errors.push('Missing classification')
+    // classification and email_id are optional (classification can default later)
     
     const validTypes = ['url', 'domain', 'ipv4', 'sha256', 'md5', 'email', 'subject_keyword']
     if (row.ioc_type && !validTypes.includes(row.ioc_type)) {
       errors.push('Invalid IOC type')
     }
     
-    const validClassifications = ['malicious', 'suspicious', 'benign', 'unknown']
+    const validClassifications = ['malicious', 'suspicious', 'benign', 'unknown', '']
     if (row.classification && !validClassifications.includes(row.classification)) {
       errors.push('Invalid classification')
     }
@@ -128,6 +170,8 @@ export function UploadPage() {
     const formData = new FormData()
     formData.append('file', file)
     if (campaignId) formData.append('campaign_id', campaignId)
+    // Pass default classification for backend to use when missing
+    if (classification) formData.append('default_classification', classification)
 
     uploadMutation.mutate(formData)
   }
@@ -333,7 +377,7 @@ export function UploadPage() {
                             {row.ioc_value}
                           </td>
                           <td className="py-4 text-gray-900">{row.ioc_type}</td>
-                          <td className="py-4 text-gray-900">{row.classification}</td>
+                          <td className="py-4 text-gray-900">{row.classification || classification}</td>
                           <td className="py-4 text-gray-900">{row.source_platform}</td>
                         </tr>
                       )
@@ -355,7 +399,7 @@ export function UploadPage() {
                     <h3 className="text-lg font-bold text-red-600">Validation Errors</h3>
                   </div>
                   <p className="text-red-700">
-                    Required fields: <span className="font-mono">ioc_value</span>, <span className="font-mono">ioc_type</span>, <span className="font-mono">email_id</span>, <span className="font-mono">source_platform</span>, <span className="font-mono">classification</span>
+                    Required fields: <span className="font-mono">ioc_value</span>, <span className="font-mono">ioc_type</span>, <span className="font-mono">source_platform</span>
                   </p>
                 </div>
               )}
