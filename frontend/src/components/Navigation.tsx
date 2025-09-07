@@ -24,25 +24,28 @@ interface TopNavigationProps {
 export function TopNavigation({ onMenuClick }: TopNavigationProps) {
   return (
     <div className="bg-slate-900 border-b border-slate-800 px-8 py-5">
-      <div className="flex items-center justify-between w-full">
-        {/* Left Side - Menu and Branding */}
-        <div className="flex items-center space-x-6">
+      <div className="relative flex items-center justify-between w-full">
+        {/* Left - Menu only */}
+        <div className="flex items-center">
           <button
             onClick={onMenuClick}
             className="p-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
           >
             <Menu className="h-5 w-5" />
           </button>
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg">
-              <Shield className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <span className="text-white font-bold text-xl">Threat Intelligence IOC Processing Platform</span>
-            </div>
+        </div>
+
+        {/* Center - Branding (perfectly centered regardless of left/right widths) */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center space-x-4">
+          <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg">
+            <Shield className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <span className="text-white font-bold text-xl">Threat Intelligence IOC Processing Platform</span>
           </div>
         </div>
-        {/* Right Side - Search Bar and Icons */}
+
+        {/* Right - Search + Icons */}
         <div className="flex items-center space-x-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
