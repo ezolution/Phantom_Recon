@@ -24,7 +24,7 @@ interface TopNavigationProps {
 export function TopNavigation({ onMenuClick }: TopNavigationProps) {
   return (
     <div className="bg-slate-900 border-b border-slate-800 px-8 h-16">
-      <div className="relative h-full grid grid-cols-[auto_1fr_auto] items-center w-full">
+      <div className="relative h-full topbar w-full">
         {/* Left - Menu only */}
         <div className="flex items-center justify-self-start">
           <button
@@ -36,7 +36,7 @@ export function TopNavigation({ onMenuClick }: TopNavigationProps) {
         </div>
 
         {/* Center - Branding (centered; truncates to avoid wrap) */}
-        <div className="flex items-center space-x-4 justify-self-center min-w-0">
+        <div className="flex items-center space-x-4 topbar-center min-w-0">
           <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg">
             <Shield className="h-6 w-6 text-white" />
           </div>
@@ -46,7 +46,7 @@ export function TopNavigation({ onMenuClick }: TopNavigationProps) {
         </div>
 
         {/* Right - Search + Icons */}
-        <div className="flex items-center space-x-3 justify-self-end">
+        <div className="flex items-center space-x-3 topbar-right">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input

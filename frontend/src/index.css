@@ -120,47 +120,22 @@
     @apply bg-blue-600/20 border-l-4 border-l-blue-500;
   }
   
-  .risk-low {
-    @apply text-emerald-400;
-  }
-  
-  .risk-medium {
-    @apply text-yellow-400;
-  }
-  
-  .risk-high {
-    @apply text-orange-400;
-  }
-  
-  .risk-critical {
-    @apply text-red-400;
-  }
-  
-  .status-enriched {
-    @apply text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-full text-xs font-medium;
-  }
-  
-  .status-pending {
-    @apply text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded-full text-xs font-medium;
-  }
-  
-  .status-failed {
-    @apply text-red-400 bg-red-400/10 px-2 py-1 rounded-full text-xs font-medium;
-  }
+  .risk-low { @apply text-emerald-400; }
+  .risk-medium { @apply text-yellow-400; }
+  .risk-high { @apply text-orange-400; }
+  .risk-critical { @apply text-red-400; }
 
-  /* Mobile responsive adjustments */
-  @media (max-width: 1024px) {
-    .mobile-main {
-      margin-left: 0;
-    }
-  }
+  .status-enriched { @apply text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-full text-xs font-medium; }
+  .status-pending { @apply text-yellow-400 bg-yellow-400/10 px-2 py-1 rounded-full text-xs font-medium; }
+  .status-failed { @apply text-red-400 bg-red-400/10 px-2 py-1 rounded-full text-xs font-medium; }
+
+  /* Header alignment helpers (deterministic, not purged) */
+  .topbar { display: grid; grid-template-columns: auto 1fr auto; align-items: center; }
+  .topbar-center { justify-self: center; min-width: 0; }
+  .topbar-right { justify-self: end; }
 }
 
 @layer utilities {
-  .text-shadow-subtle {
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  }
+  .text-shadow-subtle { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
 }
-/* Force rebuild Fri Sep  5 10:31:21 +08 2025 */
-/* Force rebuild Fri Sep  5 10:41:23 +08 2025 - DBBA52E4-C6C2-403D-9C9D-85059B7BF66D */
-/* Force rebuild Fri Sep  5 10:42:24 +08 2025 - 0C0DBC34-F0CF-4974-8E92-FDD152065CC8 */
+/* Force rebuild */
