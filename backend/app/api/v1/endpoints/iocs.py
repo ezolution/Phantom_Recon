@@ -15,6 +15,7 @@ from app.models.ioc import IOC, IOCScore
 from app.models.enrichment import EnrichmentResult
 from app.schemas.ioc import IOC as IOCSchema, IOCWithDetails, IOCSearch
 from app.schemas.enrichment import EnrichmentResult as EnrichmentResultSchema
+from app.services.enrichment_pipeline import EnrichmentPipeline
 
 router = APIRouter()
 
@@ -108,3 +109,50 @@ async def get_ioc_details(
         )
     
     return ioc
+
+
+@router.post("/{ioc_id}/enrich")
+async def enrich_ioc_now(
+    ioc_id: int,
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """On-demand, search-only enrichment for a single IOC.
+    Stores provider results and computed scores, then returns updated IOC details.
+    """
+    result = await db.execute(
+        select(IOC).where(IOC.id == ioc_id)
+    )
+    ioc = result.scalar_one_or_none()
+    if not ioc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="IOC not found"
+        )
+
+    pipeline = EnrichmentPipeline()
+    enrichment_results = await pipeline.enrich_ioc(ioc, db)
+
+    # Compute and store scores
+    risk_score = pipeline.calculate_risk_score(enrichment_results)
+    attribution_score = pipeline.calculate_attribution_score(enrichment_results)
+    risk_band = pipeline.get_risk_band(risk_score)
+
+    db.add(IOCScore(
+        ioc_id=ioc.id,
+        risk_score=risk_score,
+        attribution_score=attribution_score,
+        risk_band=risk_band,
+    ))
+    await db.commit()
+
+    # Return updated IOC with relationships
+    result = await db.execute(
+        select(IOC)
+        .options(
+            selectinload(IOC.enrichment_results),
+            selectinload(IOC.scores),
+            selectinload(IOC.tags)
+        )
+        .where(IOC.id == ioc_id)
+    )
+    return result.scalar_one()

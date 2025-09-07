@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { 
   Search, 
   Filter, 
@@ -57,6 +57,7 @@ export function SearchPage() {
   const [selectedSource, setSelectedSource] = useState('')
   const [page] = useState(1)
   const [selectedIOC, setSelectedIOC] = useState<IOC | null>(null)
+  const queryClient = useQueryClient()
 
   const { data: iocs, isLoading } = useQuery<IOC[]>({
     queryKey: ['iocs', searchQuery, selectedType, selectedRisk, selectedProvider, selectedClassification, selectedSource, page],
@@ -293,7 +294,19 @@ export function SearchPage() {
                     <td className="py-3 text-white">{ioc.campaign_id || '-'}</td>
                     <td className="py-3">
                       <button
-                        onClick={() => setSelectedIOC(ioc)}
+                        onClick={async () => {
+                          setSelectedIOC(ioc)
+                          try {
+                            // If no enrichment yet, trigger on-demand enrichment
+                            if (!ioc.enrichment_results || ioc.enrichment_results.length === 0) {
+                              await api.post(`/iocs/${ioc.id}/enrich`)
+                              // Refetch list to get updated data
+                              queryClient.invalidateQueries({ queryKey: ['iocs', searchQuery, selectedType, selectedRisk, selectedProvider, selectedClassification, selectedSource, page] })
+                            }
+                          } catch (e: any) {
+                            // Non-fatal
+                          }
+                        }}
                         className="btn-secondary text-xs"
                       >
                         <Eye className="h-3 w-3 mr-1" />
