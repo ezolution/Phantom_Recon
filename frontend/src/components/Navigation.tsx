@@ -104,37 +104,37 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
             </div>
           </div>
 
-          {/* Right Side - Search Bar and Icons - Perfectly aligned to top right */}
-          <div className="flex items-center space-x-3">
+          {/* Right Side - Search Bar and Icons - Truly aligned to top right corner */}
+          <div className="flex items-center space-x-3 ml-auto">
             {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search IOCs, campaigns, threats..."
-                className="w-72 pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
+                className="w-64 pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
               />
             </div>
 
-            {/* Icon Buttons */}
-            <div className="flex items-center space-x-2">
-              <button className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
-                <Shield className="h-5 w-5 text-white" />
+            {/* Icon Buttons - Compact and aligned to far right */}
+            <div className="flex items-center space-x-1">
+              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
+                <Shield className="h-4 w-4 text-white" />
               </button>
-              <button className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
-                <Bell className="h-5 w-5 text-white" />
+              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
+                <Bell className="h-4 w-4 text-white" />
               </button>
-              <button className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
-                <FileText className="h-5 w-5 text-white" />
+              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
+                <FileText className="h-4 w-4 text-white" />
               </button>
-              <button className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
-                <Code className="h-5 w-5 text-white" />
+              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
+                <Code className="h-4 w-4 text-white" />
               </button>
-              <button className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
-                <User className="h-5 w-5 text-white" />
+              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
+                <User className="h-4 w-4 text-white" />
               </button>
-              <button className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
-                <HelpCircle className="h-5 w-5 text-white" />
+              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
+                <HelpCircle className="h-4 w-4 text-white" />
               </button>
             </div>
           </div>
