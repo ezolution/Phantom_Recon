@@ -45,8 +45,8 @@ export function TopNavigation({ onMenuClick }: TopNavigationProps) {
           </div>
         </div>
 
-        {/* Right - Search + Icons */}
-        <div className="inline-flex items-center gap-2 topbar-right whitespace-nowrap flex-nowrap">
+        {/* Right - Search + Icons (anchored to far right) */}
+        <div className="absolute right-8 top-1/2 -translate-y-1/2 inline-flex items-center gap-2 whitespace-nowrap">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
