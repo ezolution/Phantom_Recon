@@ -1,5 +1,5 @@
 """
-URLScan.io API adapter
+URLScan.io API adapter (search-only)
 """
 
 import asyncio
@@ -16,7 +16,12 @@ logger = structlog.get_logger(__name__)
 
 
 class URLScanAdapter(BaseAdapter):
-    """URLScan.io API adapter"""
+    """URLScan.io API adapter
+
+    Search-only policy: we NEVER submit new scans to avoid tipping off adversaries
+    or leaking sensitive indicators. If no prior result is found, we return a
+    safe 'unknown' verdict with a clear evidence note.
+    """
     
     def __init__(self):
         super().__init__("urlscan")
@@ -34,36 +39,11 @@ class URLScanAdapter(BaseAdapter):
         }
     
     async def _submit_scan(self, url: str) -> Optional[str]:
-        """Submit URL for scanning"""
-        submit_url = f"{self.base_url}/scan/"
-        
-        payload = {
-            "url": url,
-            "visibility": "public"
-        }
-        
-        try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.post(
-                    submit_url,
-                    headers=self._get_headers(),
-                    json=payload
-                )
-                
-                if response.status_code == 200:
-                    result = response.json()
-                    return result.get("uuid")
-                else:
-                    logger.warning(
-                        "URLScan submit failed",
-                        status_code=response.status_code,
-                        response=response.text
-                    )
-                    return None
-                    
-        except Exception as e:
-            logger.error("URLScan submit error", error=str(e))
-            return None
+        """(Disabled) Submit URL for scanning.
+        Retained for reference but not used due to search-only policy.
+        """
+        logger.info("URLScan submit suppressed due to search-only policy", url=url)
+        return None
     
     async def _get_scan_result(self, scan_id: str) -> Optional[Dict[str, Any]]:
         """Get scan result"""
@@ -179,7 +159,7 @@ class URLScanAdapter(BaseAdapter):
         return "; ".join(evidence_parts) if evidence_parts else "No specific evidence"
     
     async def enrich(self, ioc_value: str, ioc_type: str) -> Dict[str, Any]:
-        """Enrich IOC with URLScan data"""
+        """Enrich IOC with URLScan data (search-only)"""
         if not self.api_key:
             return {
                 "verdict": "unknown",
@@ -204,17 +184,12 @@ class URLScanAdapter(BaseAdapter):
             }
         
         # Normalize URL
-        if ioc_type == "domain":
-            url = f"https://{ioc_value}"
-        else:
-            url = ioc_value
+        url = f"https://{ioc_value}" if ioc_type == "domain" else ioc_value
         
         try:
-            # First, search for existing results
+            # Search for existing results only (no submission)
             existing_result = await self._search_existing(url)
-            
             if existing_result:
-                # Use existing result
                 verdict = self._extract_verdict(existing_result)
                 confidence = self._extract_confidence(existing_result)
                 evidence = self._extract_evidence(existing_result)
@@ -229,52 +204,14 @@ class URLScanAdapter(BaseAdapter):
                     "raw_json": existing_result
                 }
             
-            # Submit new scan
-            scan_id = await self._submit_scan(url)
-            if not scan_id:
-                return {
-                    "verdict": "unknown",
-                    "confidence": None,
-                    "actor": None,
-                    "family": None,
-                    "evidence": "Failed to submit scan",
-                    "http_status": 500,
-                    "raw_json": None
-                }
-            
-            # Wait for scan to complete (polling)
-            max_wait_time = 60  # 60 seconds
-            wait_interval = 5   # 5 seconds
-            waited = 0
-            
-            while waited < max_wait_time:
-                await asyncio.sleep(wait_interval)
-                waited += wait_interval
-                
-                result = await self._get_scan_result(scan_id)
-                if result:
-                    verdict = self._extract_verdict(result)
-                    confidence = self._extract_confidence(result)
-                    evidence = self._extract_evidence(result)
-                    
-                    return {
-                        "verdict": verdict,
-                        "confidence": confidence,
-                        "actor": None,
-                        "family": None,
-                        "evidence": evidence,
-                        "http_status": 200,
-                        "raw_json": result
-                    }
-            
-            # Timeout
+            # No prior result; do not submit
             return {
                 "verdict": "unknown",
                 "confidence": None,
                 "actor": None,
                 "family": None,
-                "evidence": "Scan timeout",
-                "http_status": 408,
+                "evidence": "No prior URLScan result found; submission disabled by policy",
+                "http_status": 204,
                 "raw_json": None
             }
             
