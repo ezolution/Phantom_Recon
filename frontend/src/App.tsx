@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigation } from './components/Navigation'
+import { TopNavigation, Sidebar } from './components/Navigation'
 import { UploadPage } from './pages/UploadPage'
 import { SearchPage } from './pages/SearchPage'
 import { DashboardPage } from './pages/DashboardPage'
@@ -7,6 +7,7 @@ import { SettingsPage } from './pages/SettingsPage'
 
 function App() {
   const [activeTab, setActiveTab] = useState('upload')
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
   const renderContent = () => {
     switch (activeTab) {
@@ -27,11 +28,13 @@ function App() {
     }
   }
 
+  const handleMenuClick = () => setIsSidebarOpen((open) => !open)
+
   return (
     <div className="min-h-screen w-full bg-slate-900">
-      <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+      <TopNavigation onMenuClick={handleMenuClick} />
       <div className="flex min-h-screen">
-        {/* Left Sidebar - will be added to Navigation component */}
+        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} isOpen={isSidebarOpen} />
         <main className="flex-1 bg-gray-100 min-h-screen">
           {renderContent()}
         </main>
@@ -41,5 +44,3 @@ function App() {
 }
 
 export default App
-// Force rebuild Fri Sep  5 10:41:23 +08 2025
-// Force rebuild Fri Sep  5 10:42:29 +08 2025
