@@ -46,32 +46,32 @@ export function TopNavigation({ onMenuClick }: TopNavigationProps) {
         </div>
 
         {/* Right - Search + Icons (anchored to far right) */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 whitespace-nowrap">
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 whitespace-nowrap">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search IOCs, campaigns, threats..."
-              className="align-middle w-32 sm:w-44 md:w-48 lg:w-56 xl:w-64 pl-10 pr-3 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
+              className="align-middle w-28 sm:w-36 md:w-44 lg:w-52 xl:w-60 pl-10 pr-2 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
             />
           </div>
-          <div className="flex items-center space-x-1 ml-2 shrink-0">
-            <button className="align-middle p-1.5 sm:p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
+          <div className="flex items-center space-x-1 ml-1 shrink-0">
+            <button className="align-middle p-1 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
               <Shield className="h-4 w-4 text-white" />
             </button>
-            <button className="align-middle p-1.5 sm:p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
+            <button className="align-middle p-1 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
               <Bell className="h-4 w-4 text-white" />
             </button>
-            <button className="align-middle p-1.5 sm:p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
+            <button className="align-middle p-1 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
               <FileText className="h-4 w-4 text-white" />
             </button>
-            <button className="align-middle p-1.5 sm:p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
+            <button className="align-middle p-1 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
               <Code className="h-4 w-4 text-white" />
             </button>
-            <button className="align-middle p-1.5 sm:p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
+            <button className="align-middle p-1 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
               <User className="h-4 w-4 text-white" />
             </button>
-            <button className="align-middle p-1.5 sm:p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
+            <button className="align-middle p-1 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
               <HelpCircle className="h-4 w-4 text-white" />
             </button>
           </div>
