@@ -32,7 +32,7 @@ function App() {
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="flex min-h-screen">
         {/* Left Sidebar - will be added to Navigation component */}
-        <main className="flex-1 bg-gray-100">
+        <main className="flex-1 bg-gray-100 min-h-screen">
           {renderContent()}
         </main>
       </div>

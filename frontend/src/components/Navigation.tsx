@@ -83,57 +83,57 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
   return (
     <>
       {/* Top Navigation Bar */}
-      <div className="bg-slate-900 border-b border-slate-800 px-6 py-4">
+      <div className="bg-slate-900 border-b border-slate-800 px-8 py-5">
         <div className="flex items-center justify-between">
           {/* Left Side - Menu and Branding */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
             >
               <Menu className="h-5 w-5" />
             </button>
             
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-                <Shield className="h-5 w-5 text-white" />
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Shield className="h-6 w-6 text-white" />
               </div>
               <div>
-                <span className="text-white font-semibold text-lg">Threat Intelligence IOC Processing Platform</span>
+                <span className="text-white font-bold text-xl">Threat Intelligence IOC Processing Platform</span>
               </div>
             </div>
           </div>
 
-          {/* Right Side - Search Bar and Icons - Aligned to top right corner */}
-          <div className="flex items-center space-x-2 -mr-6">
+          {/* Right Side - Search Bar and Icons - Perfectly aligned to top right */}
+          <div className="flex items-center space-x-3">
             {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search"
-                className="w-64 pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
+                placeholder="Search IOCs, campaigns, threats..."
+                className="w-72 pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
               />
             </div>
 
             {/* Icon Buttons */}
-            <div className="flex items-center space-x-1">
-              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
+            <div className="flex items-center space-x-2">
+              <button className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
                 <Shield className="h-5 w-5 text-white" />
               </button>
-              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
+              <button className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
                 <Bell className="h-5 w-5 text-white" />
               </button>
-              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
+              <button className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
                 <FileText className="h-5 w-5 text-white" />
               </button>
-              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
+              <button className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
                 <Code className="h-5 w-5 text-white" />
               </button>
-              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
+              <button className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
                 <User className="h-5 w-5 text-white" />
               </button>
-              <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm">
+              <button className="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
                 <HelpCircle className="h-5 w-5 text-white" />
               </button>
             </div>
@@ -144,20 +144,20 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
       {/* Left Sidebar */}
       {isSidebarOpen && (
         <div className="w-64 bg-slate-900 border-r border-slate-800 min-h-screen">
-          <div className="p-6">
+          <div className="p-8">
             {/* Sidebar Header */}
-            <div className="mb-8">
-              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Navigation</h2>
+            <div className="mb-10">
+              <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-6">Navigation</h2>
             </div>
 
             {/* Navigation Sections */}
-            <div className="space-y-6">
+            <div className="space-y-8">
               {navigationSections.map((section) => (
                 <div key={section.title}>
-                  <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">
+                  <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">
                     {section.title}
                   </h3>
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     {section.items.map((item) => {
                       const Icon = item.icon
                       const isActive = activeTab === item.id
@@ -167,17 +167,17 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
                           key={item.id}
                           onClick={() => onTabChange(item.id)}
                           className={`
-                            w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-left transition-all duration-200 group
+                            w-full flex items-center space-x-4 px-4 py-3 rounded-xl text-left transition-all duration-200 group
                             ${isActive 
-                              ? 'bg-red-600 text-white' 
-                              : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                              ? 'bg-red-600 text-white shadow-lg' 
+                              : 'text-slate-300 hover:text-white hover:bg-slate-800 hover:shadow-md'
                             }
                           `}
                         >
-                          <Icon className="h-4 w-4" />
+                          <Icon className="h-5 w-5" />
                           <span className="font-medium text-sm">{item.label}</span>
                           {item.badge && (
-                            <span className="ml-auto px-2 py-0.5 text-xs font-medium bg-emerald-500 text-white rounded-full">
+                            <span className="ml-auto px-2.5 py-1 text-xs font-medium bg-emerald-500 text-white rounded-full">
                               {item.badge}
                             </span>
                           )}
@@ -190,10 +190,10 @@ export function Navigation({ activeTab, onTabChange }: NavigationProps) {
             </div>
 
             {/* Sidebar Footer */}
-            <div className="mt-8 pt-6 border-t border-slate-800">
-              <div className="flex items-center space-x-2 text-xs text-slate-400">
-                <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                <span>System Online</span>
+            <div className="mt-10 pt-8 border-t border-slate-800">
+              <div className="flex items-center space-x-3 text-sm text-slate-400">
+                <div className="w-3 h-3 bg-emerald-400 rounded-full shadow-sm"></div>
+                <span className="font-medium">System Online</span>
               </div>
             </div>
           </div>
