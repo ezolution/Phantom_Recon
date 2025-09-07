@@ -23,8 +23,8 @@ interface TopNavigationProps {
 
 export function TopNavigation({ onMenuClick }: TopNavigationProps) {
   return (
-    <div className="bg-slate-900 border-b border-slate-800 px-8 py-5">
-      <div className="relative flex items-center justify-between w-full">
+    <div className="bg-slate-900 border-b border-slate-800 px-8 h-16">
+      <div className="relative h-full flex items-center justify-between w-full">
         {/* Left - Menu only */}
         <div className="flex items-center">
           <button
