@@ -28,4 +28,5 @@ class User(Base):
     
     # Relationships
     uploads = relationship("Upload", back_populates="uploaded_by_user")
-    audit_logs = relationship("AuditLog", back_populates="actor_user")
+    # Match AuditLog relationship name in audit.py (actor_user_rel)
+    audit_logs = relationship("AuditLog", back_populates="actor_user_rel")
