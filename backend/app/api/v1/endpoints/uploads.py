@@ -26,7 +26,8 @@ limiter = Limiter(key_func=get_remote_address)
 
 
 def _norm(s: str) -> str:
-    return (s or '').strip().lower().replace(' ', '').replace('_', '')
+    # Normalize header/keys: trim, lowercase, remove spaces/underscores, strip UTF-8 BOM
+    return (s or '').lstrip('\ufeff').strip().lower().replace(' ', '').replace('_', '')
 
 
 def _map_row(raw: dict) -> dict:
@@ -52,12 +53,27 @@ def _map_row(raw: dict) -> dict:
         'notes': pick('notes','Hits') and f"hits:{pick('notes','Hits')}" or '',
     }
 
-    # Normalize type tokens
-    t = row['ioc_type'].lower()
-    if t in ('ip','ip4'): row['ioc_type'] = 'ipv4'
-    elif t in ('urldomain','domain'): row['ioc_type'] = 'domain'
-    elif t in ('sha-256','sha256'): row['ioc_type'] = 'sha256'
-    elif t in ('link',): row['ioc_type'] = 'url'
+    # Normalize ioc_type and classification to canonical enum values
+    allowed_types = {'url','domain','ipv4','sha256','md5','email','subject_keyword'}
+    t = (row.get('ioc_type') or '').strip().lower()
+    # Map common synonyms first
+    if t in ('ip','ip4'):
+        row['ioc_type'] = 'ipv4'
+    elif t in ('urldomain','domain'):
+        row['ioc_type'] = 'domain'
+    elif t in ('sha-256','sha256'):
+        row['ioc_type'] = 'sha256'
+    elif t in ('link',):
+        row['ioc_type'] = 'url'
+    elif t in allowed_types:
+        row['ioc_type'] = t
+    else:
+        # leave as-is; validator will catch invalid types
+        row['ioc_type'] = t
+
+    # Normalize classification
+    c = (row.get('classification') or 'unknown').strip().lower()
+    row['classification'] = c or 'unknown'
 
     return row
 
@@ -72,14 +88,14 @@ def validate_csv_row(row: dict, row_num: int) -> tuple[bool, str]:
     
     # Validate IOC type
     try:
-        IOCType(row["ioc_type"])
+        IOCType((row["ioc_type"] or '').lower())
     except ValueError:
         return False, f"Invalid IOC type: {row['ioc_type']}"
     
     # classification optional; defaulted to 'unknown'
     if row.get("classification"):
         try:
-            Classification(row["classification"])
+            Classification((row["classification"] or '').lower())
         except ValueError:
             return False, f"Invalid classification: {row['classification']}"
     
