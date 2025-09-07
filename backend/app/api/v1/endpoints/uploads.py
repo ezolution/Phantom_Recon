@@ -104,14 +104,14 @@ async def upload_csv(
             detail="File must be a CSV"
         )
     
-    if file.size > settings.MAX_UPLOAD_SIZE:
+    # Read and parse CSV
+    content = await file.read()
+    content_len = len(content)
+    if content_len > settings.MAX_UPLOAD_SIZE:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
             detail=f"File too large. Maximum size: {settings.MAX_UPLOAD_SIZE} bytes"
         )
-    
-    # Read and parse CSV
-    content = await file.read()
     csv_content = content.decode('utf-8')
     csv_reader = csv.DictReader(io.StringIO(csv_content))
     
@@ -143,7 +143,7 @@ async def upload_csv(
         rows_ok=rows_ok,
         rows_failed=rows_failed,
         total_rows=len(raw_rows),
-        file_size=file.size,
+        file_size=content_len,
         mime_type=file.content_type or "text/csv"
     )
     
