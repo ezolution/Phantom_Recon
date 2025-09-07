@@ -6,7 +6,7 @@ import csv
 import io
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -89,7 +89,7 @@ def validate_csv_row(row: dict, row_num: int) -> tuple[bool, str]:
 @router.post("/", response_model=UploadResponse)
 @limiter.limit("5/minute")
 async def upload_csv(
-    request,
+    request: Request,
     file: UploadFile = File(...),
     campaign_id: str = Form(None),
     default_classification: str = Form('unknown'),
