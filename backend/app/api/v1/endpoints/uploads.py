@@ -4,6 +4,7 @@ Upload endpoints
 
 import csv
 import io
+import asyncio
 from typing import Any, List
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status, Request
@@ -14,12 +15,13 @@ from sqlalchemy import select
 
 # Removed authentication dependencies
 from app.core.config import settings
-from app.core.database import get_db
+from app.core.database import get_db, AsyncSessionLocal
 from app.models.upload import Upload
 from app.models.job import Job, JobStatus
 from app.models.ioc import IOC, IOCType, Classification
 from app.schemas.upload import UploadResponse
 from app.schemas.job import JobCreate
+from app.services.enrichment_pipeline import EnrichmentPipeline
 
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
@@ -100,6 +102,13 @@ def validate_csv_row(row: dict, row_num: int) -> tuple[bool, str]:
             return False, f"Invalid classification: {row['classification']}"
     
     return True, ""
+
+
+async def _run_enrichment_job(job_id: int) -> None:
+    """Run enrichment job in background (no Celery)."""
+    async with AsyncSessionLocal() as session:
+        pipeline = EnrichmentPipeline()
+        await pipeline.process_job(job_id, session)
 
 
 @router.post("/", response_model=UploadResponse)
@@ -195,6 +204,13 @@ async def upload_csv(
     await db.commit()
     await db.refresh(job)
     
+    # Fire-and-forget background enrichment in-process
+    try:
+        asyncio.create_task(_run_enrichment_job(job.id))
+    except Exception:
+        # Non-fatal; upload still succeeds
+        pass
+
     return UploadResponse(
         upload=upload,
         job_id=job.id,

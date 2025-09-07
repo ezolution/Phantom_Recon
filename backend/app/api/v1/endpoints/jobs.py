@@ -3,6 +3,7 @@ Job endpoints
 """
 
 from typing import Any
+import asyncio
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +14,8 @@ from app.core.database import get_db
 from app.models.job import Job, JobStatus
 from app.models.upload import Upload
 from app.schemas.job import Job as JobSchema, JobSummary
+from app.services.enrichment_pipeline import EnrichmentPipeline
+from app.core.database import AsyncSessionLocal
 
 router = APIRouter()
 
@@ -72,6 +75,15 @@ async def start_enrichment(
         job.status = JobStatus.QUEUED
         await db.commit()
     
-    # TODO: Enqueue enrichment task with Celery
+    # In-process background task (no Celery/Redis)
+    async def _run():
+        async with AsyncSessionLocal() as session:
+            pipeline = EnrichmentPipeline()
+            await pipeline.process_job(job_id, session)
+
+    try:
+        asyncio.create_task(_run())
+    except Exception:
+        pass
     
-    return {"message": "Enrichment job queued successfully"}
+    return {"message": "Enrichment job started"}
