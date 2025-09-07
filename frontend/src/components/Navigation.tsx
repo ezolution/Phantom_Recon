@@ -36,26 +36,26 @@ export function TopNavigation({ onMenuClick }: TopNavigationProps) {
         </div>
 
         {/* Center - Branding (centered; truncates to avoid wrap) */}
-        <div className="flex items-center space-x-4 topbar-center min-w-0">
+        <div className="flex items-center space-x-4 topbar-center min-w-0 overflow-hidden">
           <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg">
             <Shield className="h-6 w-6 text-white" />
           </div>
           <div>
-            <span className="text-white font-bold text-xl truncate max-w-[50vw]">Threat Intelligence IOC Processing Platform</span>
+            <span className="text-white font-bold text-xl truncate max-w-[40vw]">Threat Intelligence IOC Processing Platform</span>
           </div>
         </div>
 
         {/* Right - Search + Icons */}
-        <div className="flex items-center space-x-3 topbar-right whitespace-nowrap flex-nowrap">
+        <div className="inline-flex items-center gap-2 topbar-right whitespace-nowrap flex-nowrap">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search IOCs, campaigns, threats..."
-              className="w-40 md:w-60 pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
+              className="w-36 sm:w-48 md:w-56 lg:w-64 pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
             />
           </div>
-          <div className="flex items-center space-x-1 ml-2">
+          <div className="inline-flex items-center space-x-1 ml-2">
             <button className="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors shadow-sm hover:shadow-md">
               <Shield className="h-4 w-4 text-white" />
             </button>
