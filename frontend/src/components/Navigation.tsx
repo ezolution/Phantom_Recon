@@ -24,9 +24,9 @@ interface TopNavigationProps {
 export function TopNavigation({ onMenuClick }: TopNavigationProps) {
   return (
     <div className="bg-slate-900 border-b border-slate-800 px-8 h-16">
-      <div className="relative h-full flex items-center justify-between w-full">
+      <div className="relative h-full grid grid-cols-[auto_1fr_auto] items-center w-full">
         {/* Left - Menu only */}
-        <div className="flex items-center">
+        <div className="flex items-center justify-self-start">
           <button
             onClick={onMenuClick}
             className="p-2.5 text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
@@ -35,24 +35,24 @@ export function TopNavigation({ onMenuClick }: TopNavigationProps) {
           </button>
         </div>
 
-        {/* Center - Branding (perfectly centered regardless of left/right widths) */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center space-x-4">
+        {/* Center - Branding (centered; truncates to avoid wrap) */}
+        <div className="flex items-center space-x-4 justify-self-center min-w-0">
           <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg">
             <Shield className="h-6 w-6 text-white" />
           </div>
           <div>
-            <span className="text-white font-bold text-xl">Threat Intelligence IOC Processing Platform</span>
+            <span className="text-white font-bold text-xl truncate max-w-[50vw]">Threat Intelligence IOC Processing Platform</span>
           </div>
         </div>
 
         {/* Right - Search + Icons */}
-        <div className="absolute right-8 top-1/2 -translate-y-1/2 flex items-center space-x-3">
+        <div className="flex items-center space-x-3 justify-self-end">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
               placeholder="Search IOCs, campaigns, threats..."
-              className="w-64 pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
+              className="w-44 md:w-64 pl-10 pr-4 py-2.5 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent shadow-sm"
             />
           </div>
           <div className="flex items-center space-x-1">
