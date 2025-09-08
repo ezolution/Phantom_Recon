@@ -9,6 +9,7 @@ from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel
+from app.schemas.enrichment import EnrichmentResult as EnrichmentResultSchema
 
 
 class IOCType(str, Enum):
@@ -135,7 +136,7 @@ class IOCSearch(BaseModel):
 
 
 class IOCWithDetails(IOC):
-    """IOC with enrichment details"""
+    """IOC with enrichment and tag details for responses"""
     latest_score: Optional[IOCScore] = None
-    enrichment_results: List[dict] = []  # Use dict instead of EnrichmentResult to avoid circular import
+    enrichment_results: List[EnrichmentResultSchema] = []
     tags: List[Tag] = []
