@@ -2,7 +2,7 @@
 Enrichment pipeline for processing IOCs
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 import structlog
@@ -53,14 +53,39 @@ class EnrichmentPipeline:
                 # Enrich with provider
                 enrichment_data = await adapter.enrich_with_cache(ioc.value, ioc.type)
                 
+                # Normalize datetime fields
+                def _to_datetime(value: Any) -> Optional[datetime]:
+                    if value is None:
+                        return None
+                    if isinstance(value, datetime):
+                        # Ensure stored as naive UTC
+                        if value.tzinfo is not None:
+                            return value.astimezone(timezone.utc).replace(tzinfo=None)
+                        return value
+                    if isinstance(value, (int, float)):
+                        # Treat as epoch seconds (UTC)
+                        return datetime.utcfromtimestamp(value)
+                    if isinstance(value, str):
+                        try:
+                            dt = datetime.fromisoformat(value.replace('Z', '+00:00'))
+                            if dt.tzinfo is not None:
+                                dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+                            return dt
+                        except Exception:
+                            return None
+                    return None
+
+                first_seen_dt = _to_datetime(enrichment_data.get("first_seen"))
+                last_seen_dt = _to_datetime(enrichment_data.get("last_seen"))
+
                 # Store enrichment result
                 enrichment_result = EnrichmentResult(
                     ioc_id=ioc.id,
                     provider=provider_name,
                     raw_json=enrichment_data.get("raw_json"),
                     verdict=enrichment_data.get("verdict", "unknown"),
-                    first_seen=enrichment_data.get("first_seen"),
-                    last_seen=enrichment_data.get("last_seen"),
+                    first_seen=first_seen_dt,
+                    last_seen=last_seen_dt,
                     actor=enrichment_data.get("actor"),
                     family=enrichment_data.get("family"),
                     confidence=enrichment_data.get("confidence"),
@@ -199,6 +224,7 @@ class EnrichmentPipeline:
     
     async def process_job(self, job_id: int, db: AsyncSession) -> None:
         """Process all IOCs in a job"""
+        logger.info("Job start", job_id=job_id)
         # Get job
         result = await db.execute(select(Job).where(Job.id == job_id))
         job = result.scalar_one_or_none()
@@ -211,6 +237,7 @@ class EnrichmentPipeline:
         job.status = JobStatus.RUNNING
         job.started_at = datetime.utcnow()
         await db.commit()
+        logger.info("Job set to running", job_id=job_id)
         
         try:
             # Get upload timestamp explicitly to avoid lazy-load in async context
@@ -224,6 +251,7 @@ class EnrichmentPipeline:
                     select(IOC).where(IOC.created_at >= upload_created_at)
                 )
                 iocs = result.scalars().all()
+            logger.info("IOCs selected for job", job_id=job_id, ioc_count=len(iocs))
             
             job.total_iocs = len(iocs)
             successful_iocs = 0
