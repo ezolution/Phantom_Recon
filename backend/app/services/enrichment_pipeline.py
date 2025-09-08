@@ -123,6 +123,20 @@ class EnrichmentPipeline:
                 )
                 
                 db.add(enrichment_result)
+                # Commit after each provider to isolate failures
+                try:
+                    await db.commit()
+                except Exception as commit_exc:
+                    await db.rollback()
+                    logger.error(
+                        "Provider result commit failed",
+                        ioc_id=ioc.id,
+                        provider=provider_name,
+                        error=str(commit_exc),
+                        exc_info=True
+                    )
+                    # Skip adding a separate error record to avoid cascading failures
+                    continue
                 results[provider_name] = enrichment_data
                 
             except Exception as e:
