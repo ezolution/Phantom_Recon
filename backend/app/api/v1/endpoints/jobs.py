@@ -74,16 +74,8 @@ async def start_enrichment(
         job.status = JobStatus.QUEUED
         await db.commit()
     
-    # Launch background enrichment without Celery
-    async def _bg():
-        async with AsyncSessionLocal() as session:
-            pipeline = EnrichmentPipeline()
-            await pipeline.process_job(job_id, session)
-    
-    import asyncio
-    try:
-        asyncio.create_task(_bg())
-    except Exception:
-        pass
-    
-    return {"message": "Enrichment job started"}
+    # Run enrichment inline using a fresh AsyncSession to avoid closed-session/greenlet issues
+    async with AsyncSessionLocal() as session:
+        pipeline = EnrichmentPipeline()
+        await pipeline.process_job(job_id, session)
+    return {"message": "Enrichment job completed"}
