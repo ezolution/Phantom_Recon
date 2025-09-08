@@ -12,7 +12,7 @@ from typing import Any, Dict, Optional
 
 import httpx
 import structlog
-from redis import Redis
+from typing import Tuple
 
 from app.core.config import settings
 
@@ -24,7 +24,9 @@ class BaseAdapter(ABC):
     
     def __init__(self, provider_name: str):
         self.provider_name = provider_name
-        self.redis_client = Redis.from_url(settings.REDIS_URL)
+        # In-process cache (no Redis). Key -> (expires_at_epoch, result_dict)
+        if not hasattr(BaseAdapter, "_local_cache"):
+            BaseAdapter._local_cache: Dict[str, Tuple[float, Dict[str, Any]]] = {}
         self.cache_ttl_positive = 24 * 60 * 60  # 24 hours
         self.cache_ttl_negative = 6 * 60 * 60   # 6 hours
         self.max_retries = 4
@@ -36,17 +38,22 @@ class BaseAdapter(ABC):
         return hashlib.md5(key_data.encode()).hexdigest()
     
     async def _get_cached_result(self, ioc_value: str, ioc_type: str) -> Optional[Dict[str, Any]]:
-        """Get cached result for IOC"""
+        """Get cached result for IOC from in-process cache"""
         cache_key = self._get_cache_key(ioc_value, ioc_type)
-        cached = self.redis_client.get(cache_key)
-        if cached:
-            return json.loads(cached)
-        return None
+        entry = BaseAdapter._local_cache.get(cache_key)
+        if not entry:
+            return None
+        expires_at, payload = entry
+        if time.time() >= expires_at:
+            # Expired
+            BaseAdapter._local_cache.pop(cache_key, None)
+            return None
+        return payload
     
     async def _cache_result(self, ioc_value: str, ioc_type: str, result: Dict[str, Any], ttl: int):
-        """Cache result for IOC"""
+        """Cache result for IOC in in-process cache"""
         cache_key = self._get_cache_key(ioc_value, ioc_type)
-        self.redis_client.setex(cache_key, ttl, json.dumps(result))
+        BaseAdapter._local_cache[cache_key] = (time.time() + ttl, result)
     
     async def _make_request(self, url: str, headers: Dict[str, str] = None, **kwargs) -> httpx.Response:
         """Make HTTP request with retry logic"""
