@@ -69,21 +69,47 @@ class CrowdStrikeAdapter(BaseAdapter):
         }
     
     def _extract_verdict(self, raw_data: Dict[str, Any]) -> str:
-        """Extract verdict from CrowdStrike data"""
-        # CrowdStrike typically provides threat level indicators
-        threat_level = raw_data.get("threat_level", 0)
-        
-        if threat_level >= 4:
+        """Extract verdict from CrowdStrike data (best-effort)."""
+        # Prefer malicious_confidence textual level
+        conf = (raw_data.get("malicious_confidence") or "").lower()
+        if conf in {"high", "very-high", "critical"}:
             return "malicious"
-        elif threat_level >= 2:
+        if conf in {"medium", "moderate"}:
             return "suspicious"
-        else:
-            return "benign"
+        if conf in {"low", "unknown", "unverified"}:
+            # Fall through to label checks
+            pass
+        
+        # Look at labels/tags
+        labels = raw_data.get("labels") or raw_data.get("tags") or []
+        labels_lc = [str(x).lower() for x in labels]
+        if any("malicious" in x or "malware" in x for x in labels_lc):
+            return "malicious"
+        if any("suspicious" in x for x in labels_lc):
+            return "suspicious"
+        
+        return "benign"
     
     def _extract_actors_families(self, raw_data: Dict[str, Any]) -> tuple[Optional[str], Optional[str]]:
-        """Extract actor and family from CrowdStrike data"""
-        actor = raw_data.get("actor", {}).get("name") if raw_data.get("actor") else None
-        family = raw_data.get("malware_family", {}).get("name") if raw_data.get("malware_family") else None
+        """Extract actor and family from CrowdStrike data (robust to schema)."""
+        actor: Optional[str] = None
+        family: Optional[str] = None
+        
+        # Actors may be an array or object
+        if isinstance(raw_data.get("actors"), list) and raw_data["actors"]:
+            actor = str(raw_data["actors"][0])
+        elif isinstance(raw_data.get("actor"), dict):
+            actor = raw_data["actor"].get("name")
+        elif isinstance(raw_data.get("actor"), str):
+            actor = raw_data.get("actor")
+        
+        # Families may be array or object
+        if isinstance(raw_data.get("malware_families"), list) and raw_data["malware_families"]:
+            family = str(raw_data["malware_families"][0])
+        elif isinstance(raw_data.get("malware_family"), dict):
+            family = raw_data["malware_family"].get("name")
+        elif isinstance(raw_data.get("family"), str):
+            family = raw_data.get("family")
         
         return actor, family
     
@@ -151,7 +177,7 @@ class CrowdStrikeAdapter(BaseAdapter):
             
             if response.status_code == 200:
                 data = response.json()
-                resources = data.get("resources", [])
+                resources = data.get("resources", []) or data.get("errors", []) and []
                 
                 if resources:
                     indicator = resources[0]
@@ -162,12 +188,19 @@ class CrowdStrikeAdapter(BaseAdapter):
                     # Extract actor and family
                     actor, family = self._extract_actors_families(indicator)
                     
+                    # Dates
+                    first_seen = indicator.get("published_date") or indicator.get("first_seen")
+                    last_seen = indicator.get("last_updated") or indicator.get("last_seen")
+                    
                     # Build evidence
                     evidence_parts = []
-                    if indicator.get("threat_level"):
-                        evidence_parts.append(f"Threat Level: {indicator['threat_level']}")
+                    if indicator.get("malicious_confidence"):
+                        evidence_parts.append(f"Malicious confidence: {indicator['malicious_confidence']}")
                     if indicator.get("confidence"):
                         evidence_parts.append(f"Confidence: {indicator['confidence']}")
+                    labels = indicator.get("labels") or []
+                    if labels:
+                        evidence_parts.append("Labels: " + ", ".join(map(str, labels)))
                     
                     evidence = "; ".join(evidence_parts) if evidence_parts else "CrowdStrike intelligence available"
                     
@@ -178,7 +211,9 @@ class CrowdStrikeAdapter(BaseAdapter):
                         "family": family,
                         "evidence": evidence,
                         "http_status": response.status_code,
-                        "raw_json": indicator
+                        "raw_json": indicator,
+                        "first_seen": first_seen,
+                        "last_seen": last_seen
                     }
                 else:
                     return {
