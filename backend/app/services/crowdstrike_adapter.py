@@ -45,7 +45,7 @@ class CrowdStrikeAdapter(BaseAdapter):
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(token_url, data=data)
                 
-                if response.status_code == 200:
+                if response.status_code in (200, 201):
                     token_data = response.json()
                     self.access_token = token_data.get("access_token")
                     return self.access_token
