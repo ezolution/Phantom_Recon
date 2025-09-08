@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 
 from app.models.ioc import IOC, IOCScore, RiskBand
+from app.models.upload import Upload
 from app.models.enrichment import EnrichmentResult
 from app.models.job import Job, JobStatus
 from app.services.virustotal_adapter import VirusTotalAdapter
@@ -211,13 +212,17 @@ class EnrichmentPipeline:
         await db.commit()
         
         try:
-            # Get all IOCs for this job's upload
-            result = await db.execute(
-                select(IOC).where(IOC.id.in_(
-                    select(IOC.id).where(IOC.created_at >= job.upload.created_at)
-                ))
-            )
-            iocs = result.scalars().all()
+            # Get upload timestamp explicitly to avoid lazy-load in async context
+            up_res = await db.execute(select(Upload.created_at).where(Upload.id == job.upload_id))
+            upload_created_at = up_res.scalar_one_or_none()
+            if upload_created_at is None:
+                logger.error("Upload not found for job", job_id=job_id, upload_id=job.upload_id)
+                iocs = []
+            else:
+                result = await db.execute(
+                    select(IOC).where(IOC.created_at >= upload_created_at)
+                )
+                iocs = result.scalars().all()
             
             job.total_iocs = len(iocs)
             successful_iocs = 0
