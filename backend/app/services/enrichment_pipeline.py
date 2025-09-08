@@ -76,7 +76,8 @@ class EnrichmentPipeline:
                     "Provider enrichment failed",
                     ioc_id=ioc.id,
                     provider=provider_name,
-                    error=str(e)
+                    error=str(e),
+                    exc_info=True
                 )
                 
                 # Store error result
@@ -288,7 +289,8 @@ class EnrichmentPipeline:
             logger.error(
                 "Job processing failed",
                 job_id=job_id,
-                error=str(e)
+                error=str(e),
+                exc_info=True
             )
             
             # Update job status to error
