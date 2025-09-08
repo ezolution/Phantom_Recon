@@ -12,6 +12,7 @@ from sqlalchemy import select
 from app.core.database import get_db
 from app.models.job import Job, JobStatus
 from app.models.upload import Upload
+from app.models.ioc import IOCScore, RiskBand
 from app.schemas.job import Job as JobSchema, JobSummary
 from app.services.enrichment_pipeline import EnrichmentPipeline
 from app.core.database import AsyncSessionLocal
@@ -135,7 +136,19 @@ async def start_enrichment(
         try:
             for ioc in iocs:
                 try:
-                    await pipeline.enrich_ioc(ioc, session)
+                    # Enrich
+                    enrichment_results = await pipeline.enrich_ioc(ioc, session)
+
+                    # Compute and persist scores (to populate latest_score in UI)
+                    risk_score = pipeline.calculate_risk_score(enrichment_results)
+                    attribution_score = pipeline.calculate_attribution_score(enrichment_results)
+                    risk_band = pipeline.get_risk_band(risk_score)
+                    session.add(IOCScore(
+                        ioc_id=ioc.id,
+                        risk_score=risk_score,
+                        attribution_score=attribution_score,
+                        risk_band=risk_band,
+                    ))
                     successful += 1
                 except Exception as e:
                     failed += 1
