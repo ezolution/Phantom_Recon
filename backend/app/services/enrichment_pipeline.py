@@ -3,6 +3,7 @@ Enrichment pipeline for processing IOCs
 """
 
 from datetime import datetime, timedelta, timezone
+import json
 from typing import Any, Dict, List, Optional
 
 import structlog
@@ -78,11 +79,39 @@ class EnrichmentPipeline:
                 first_seen_dt = _to_datetime(enrichment_data.get("first_seen"))
                 last_seen_dt = _to_datetime(enrichment_data.get("last_seen"))
 
+                # Ensure raw_json is JSON-serializable (e.g., httpx.URL -> str)
+                def _json_safe(value: Any) -> Any:
+                    try:
+                        json.dumps(value)
+                        return value
+                    except TypeError:
+                        pass
+                    # dicts
+                    if isinstance(value, dict):
+                        return {k: _json_safe(v) for k, v in value.items()}
+                    # lists/tuples/sets
+                    if isinstance(value, (list, tuple, set)):
+                        return [_json_safe(v) for v in value]
+                    # httpx.URL or similar objects -> str
+                    try:
+                        from httpx import URL  # type: ignore
+                        if isinstance(value, URL):
+                            return str(value)
+                    except Exception:
+                        pass
+                    # fallback: stringify unknown objects
+                    try:
+                        return str(value)
+                    except Exception:
+                        return None
+
+                raw_json_sanitized = _json_safe(enrichment_data.get("raw_json"))
+
                 # Store enrichment result
                 enrichment_result = EnrichmentResult(
                     ioc_id=ioc.id,
                     provider=provider_name,
-                    raw_json=enrichment_data.get("raw_json"),
+                    raw_json=raw_json_sanitized,
                     verdict=enrichment_data.get("verdict", "unknown"),
                     first_seen=first_seen_dt,
                     last_seen=last_seen_dt,
