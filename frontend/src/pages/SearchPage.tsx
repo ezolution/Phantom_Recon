@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { 
   Search, 
   Filter, 
@@ -57,7 +57,6 @@ export function SearchPage() {
   const [selectedSource, setSelectedSource] = useState('')
   const [page] = useState(1)
   const [selectedIOC, setSelectedIOC] = useState<IOC | null>(null)
-  const queryClient = useQueryClient()
 
   const { data: iocs, isLoading } = useQuery<IOC[]>({
     queryKey: ['iocs', searchQuery, selectedType, selectedRisk, selectedProvider, selectedClassification, selectedSource, page],
@@ -270,10 +269,12 @@ export function SearchPage() {
                     </td>
                     <td className="py-3 text-white capitalize">{ioc.type}</td>
                     <td className="py-3">
-                      {ioc.latest_score && (
+                      {ioc.latest_score ? (
                         <span className={`px-2 py-1 rounded text-xs font-bold ${getRiskColor(ioc.latest_score.risk_band)}`}>
                           {ioc.latest_score.risk_band}
                         </span>
+                      ) : (
+                        <span className="px-2 py-1 rounded text-xs font-mono bg-amber-100 text-amber-800">pending</span>
                       )}
                     </td>
                     <td className="py-3">
@@ -283,6 +284,9 @@ export function SearchPage() {
                             {getVerdictIcon(result.verdict)}
                           </div>
                         ))}
+                        {(!ioc.enrichment_results || ioc.enrichment_results.length === 0) && (
+                          <span className="text-xs text-slate-400">no results yet</span>
+                        )}
                         {ioc.enrichment_results && ioc.enrichment_results.length > 3 && (
                           <span className="text-xs text-slate-400">
                             +{ioc.enrichment_results.length - 3}
@@ -294,19 +298,7 @@ export function SearchPage() {
                     <td className="py-3 text-white">{ioc.campaign_id || '-'}</td>
                     <td className="py-3">
                       <button
-                        onClick={async () => {
-                          setSelectedIOC(ioc)
-                          try {
-                            // If no enrichment yet, trigger on-demand enrichment
-                            if (!ioc.enrichment_results || ioc.enrichment_results.length === 0) {
-                              await api.post(`/iocs/${ioc.id}/enrich`)
-                              // Refetch list to get updated data
-                              queryClient.invalidateQueries({ queryKey: ['iocs', searchQuery, selectedType, selectedRisk, selectedProvider, selectedClassification, selectedSource, page] })
-                            }
-                          } catch (e: any) {
-                            // Non-fatal
-                          }
-                        }}
+                        onClick={() => setSelectedIOC(ioc)}
                         className="btn-secondary text-xs"
                       >
                         <Eye className="h-3 w-3 mr-1" />

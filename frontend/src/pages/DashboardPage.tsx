@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Shield, TrendingUp, AlertTriangle, CheckCircle, Terminal, Bug, Fingerprint, Activity, Clock, Database } from 'lucide-react'
+import { Shield, TrendingUp, AlertTriangle, CheckCircle, Fingerprint, Activity, Clock } from 'lucide-react'
 import { api } from '../lib/api'
 
 interface StatsData {
@@ -20,6 +20,26 @@ export function DashboardPage() {
       const response = await api.get('/stats/overview')
       return response.data
     },
+  })
+
+  type JobSummary = {
+    job: {
+      id: number
+      status: 'queued' | 'running' | 'done' | 'error'
+      processed_iocs: number
+      total_iocs: number
+      error_message?: string | null
+    }
+    progress_percentage: number
+  }
+
+  const { data: latestJob } = useQuery<JobSummary>({
+    queryKey: ['jobs', 'latest'],
+    queryFn: async () => {
+      const res = await api.get('/jobs/latest')
+      return res.data
+    },
+    refetchInterval: 2000, // live refresh
   })
 
   if (isLoading) {
@@ -116,6 +136,31 @@ export function DashboardPage() {
               </div>
             </div>
           </div>
+
+          {/* Job Status */}
+          {latestJob && (
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-mono text-gray-500">Latest Enrichment Job</p>
+                  <div className="flex items-center space-x-3 mt-1">
+                    <span className="font-mono text-gray-900">Job #{latestJob.job.id}</span>
+                    <span className={`px-2 py-0.5 text-xs font-mono rounded capitalize ${latestJob.job.status === 'running' ? 'bg-amber-100 text-amber-800' : latestJob.job.status === 'done' ? 'bg-emerald-100 text-emerald-800' : latestJob.job.status === 'error' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}`}>
+                      {latestJob.job.status}
+                    </span>
+                  </div>
+                  <div className="mt-3 w-full bg-gray-100 h-2 rounded">
+                    <div className="h-2 bg-emerald-500 rounded" style={{ width: `${Math.min(100, latestJob.progress_percentage || 0)}%` }} />
+                  </div>
+                  <p className="text-xs font-mono text-gray-600 mt-1">
+                    {latestJob.job.processed_iocs}/{latestJob.job.total_iocs} processed
+                    {latestJob.job.error_message ? ` · ${latestJob.job.error_message}` : ''}
+                  </p>
+                </div>
+                <Activity className="h-8 w-8 text-gray-400" />
+              </div>
+            </div>
+          )}
 
           {/* Risk Distribution */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

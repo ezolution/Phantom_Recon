@@ -22,6 +22,29 @@ from app.models.upload import Upload
 router = APIRouter()
 
 
+@router.get("/latest", response_model=JobSummary)
+async def get_latest_job(
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """Get the most recent job status and summary"""
+    result = await db.execute(
+        select(Job).order_by(Job.id.desc()).limit(1)
+    )
+    job = result.scalar_one_or_none()
+
+    if not job:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No jobs found"
+        )
+
+    progress_percentage = 0.0
+    if job.total_iocs > 0:
+        progress_percentage = (job.processed_iocs / job.total_iocs) * 100
+
+    return JobSummary(job=job, progress_percentage=progress_percentage)
+
+
 @router.get("/{job_id}", response_model=JobSummary)
 async def get_job(
     job_id: int,
