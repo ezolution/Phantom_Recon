@@ -210,7 +210,7 @@ async def upload_csv(
     except Exception:
         # Non-fatal; upload still succeeds
         pass
-
+    
     return UploadResponse(
         upload=upload,
         job_id=job.id,
