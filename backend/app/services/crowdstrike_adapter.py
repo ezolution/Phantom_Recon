@@ -162,12 +162,12 @@ class CrowdStrikeAdapter(BaseAdapter):
             }
         
         try:
-            # Search for indicators
+            # Search for indicators (use indicator field; optionally constrain by type)
             search_url = f"{self.base_url}/intel/combined/indicators/v1"
-            params = {
-                "filter": f"type:'{cs_type}'+value:'{ioc_value}'",
-                "limit": 1
-            }
+            filter_parts = [f"indicator:'{ioc_value}'"]
+            if cs_type:
+                filter_parts.append(f"type:'{cs_type}'")
+            params = {"filter": "+".join(filter_parts), "limit": 1}
             
             response = await self._make_request(
                 search_url, 
