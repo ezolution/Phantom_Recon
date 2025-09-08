@@ -140,6 +140,13 @@ class URLScanAdapter(BaseAdapter):
             title = page.get("title", "")
             if title:
                 evidence_parts.append(f"Page title: {title}")
+            # ASN and IP
+            asn = page.get("asn") or page.get("asnname")
+            if asn:
+                evidence_parts.append(f"ASN: {asn}")
+            ip = page.get("ip")
+            if ip:
+                evidence_parts.append(f"IP: {ip}")
         
         # Get verdict details
         verdicts = result_data.get("verdicts", {})
@@ -150,6 +157,19 @@ class URLScanAdapter(BaseAdapter):
         elif overall.get("suspicious"):
             evidence_parts.append("Overall verdict: suspicious")
         
+        # Get redirect chain
+        lists = result_data.get("lists", {})
+        if isinstance(lists, dict):
+            redirects = lists.get("links", [])
+            if redirects:
+                try:
+                    first = redirects[0]
+                    last = redirects[-1]
+                    if first and last and first != last:
+                        evidence_parts.append("Redirect chain present")
+                except Exception:
+                    pass
+
         # Get screenshot URL if available
         task = result_data.get("task", {})
         screenshot_url = task.get("screenshotURL")

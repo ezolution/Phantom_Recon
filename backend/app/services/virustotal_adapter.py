@@ -117,15 +117,50 @@ class VirusTotalAdapter(BaseAdapter):
                 # Extract actor and family
                 actor, family = self._extract_actors_families(raw_data)
                 
+                # First/last seen (timestamps -> ISO8601 if present)
+                first_seen = attributes.get("first_submission_date") or attributes.get("creation_date")
+                last_seen = attributes.get("last_analysis_date")
+                if isinstance(first_seen, int):
+                    from datetime import datetime
+                    first_seen = datetime.utcfromtimestamp(first_seen).isoformat() + "Z"
+                if isinstance(last_seen, int):
+                    from datetime import datetime
+                    last_seen = datetime.utcfromtimestamp(last_seen).isoformat() + "Z"
+
+                # Relationship hints (downloaded_by/referrer/downloaded_files)
+                relations = []
+                try:
+                    rel_endpoint = None
+                    if ioc_type in ["sha256", "md5"]:
+                        rel_endpoint = f"{self.base_url}/files/{ioc_value}/relationships/downloaded_by"
+                    elif ioc_type == "url":
+                        rel_endpoint = f"{self.base_url}/urls/{ioc_value}/relationships/downloaded_files"
+                    elif ioc_type == "domain":
+                        rel_endpoint = f"{self.base_url}/domains/{ioc_value}/relationships/downloaded_files"
+                    elif ioc_type == "ipv4":
+                        rel_endpoint = f"{self.base_url}/ip_addresses/{ioc_value}/relationships/downloaded_files"
+                    if rel_endpoint:
+                        rel_resp = await self._make_request(rel_endpoint, headers=self._get_headers())
+                        if rel_resp.status_code == 200:
+                            rel_json = rel_resp.json() or {}
+                            rel_count = len(rel_json.get("data", []) or [])
+                            if rel_count:
+                                label = "downloaded_by" if ioc_type in ["sha256", "md5"] else "downloaded_files"
+                                relations.append(f"{label}:{rel_count}")
+                except Exception:
+                    pass
+
                 # Build evidence
                 evidence_parts = []
                 if malicious > 0:
                     evidence_parts.append(f"{malicious} engines detected as malicious")
                 if suspicious > 0:
                     evidence_parts.append(f"{suspicious} engines detected as suspicious")
-                
+                if relations:
+                    evidence_parts.append("Relations: " + ", ".join(relations))
+
                 evidence = "; ".join(evidence_parts) if evidence_parts else "No detections"
-                
+
                 return {
                     "verdict": verdict,
                     "confidence": confidence,
@@ -133,7 +168,9 @@ class VirusTotalAdapter(BaseAdapter):
                     "family": family,
                     "evidence": evidence,
                     "http_status": response.status_code,
-                    "raw_json": raw_data
+                    "raw_json": raw_data,
+                    "first_seen": first_seen,
+                    "last_seen": last_seen
                 }
             
             elif response.status_code == 404:
