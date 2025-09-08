@@ -4,6 +4,7 @@ import { UploadPage } from './pages/UploadPage'
 import { SearchPage } from './pages/SearchPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { SettingsPage } from './pages/SettingsPage'
+import { AnalyticsPage } from './pages/AnalyticsPage'
 
 function App() {
   const [activeTab, setActiveTab] = useState('upload')
@@ -18,7 +19,7 @@ function App() {
       case 'dashboard':
         return <DashboardPage />
       case 'analytics':
-        return <DashboardPage /> // For now, reuse dashboard - can create separate analytics page later
+        return <AnalyticsPage />
       case 'settings':
         return <SettingsPage />
       case 'logs':

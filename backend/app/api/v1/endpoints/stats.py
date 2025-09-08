@@ -90,3 +90,43 @@ async def get_overview_stats(
         "providers_configured_count": len(configured),
         "providers_successful_count": providers_successful_count,
     }
+
+
+@router.get("/analytics")
+async def get_analytics(
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """Analytics data for charts: 7-day trend, verdict mix, pending counts, top sources."""
+    from datetime import datetime, timedelta
+    now = datetime.utcnow()
+    day_starts = [(now - timedelta(days=i)).date() for i in range(6, -1, -1)]
+
+    # 7-day IOC creation trend
+    trend: list[dict] = []
+    for d in day_starts:
+        d_start = datetime(d.year, d.month, d.day)
+        d_end = d_start + timedelta(days=1)
+        res = await db.execute(select(func.count(IOC.id)).where(IOC.created_at >= d_start, IOC.created_at < d_end))
+        trend.append({"date": d.isoformat(), "count": res.scalar() or 0})
+
+    # Verdict distribution from latest EnrichmentResults per IOC (simple count by verdict)
+    res = await db.execute(
+        select(EnrichmentResult.verdict, func.count(EnrichmentResult.id))
+        .group_by(EnrichmentResult.verdict)
+    )
+    verdicts = dict(res.all())
+
+    # Pending IOCs (no score yet)
+    res = await db.execute(select(func.count(IOC.id)).where(~IOC.id.in_(select(IOCScore.ioc_id))))
+    pending_count = res.scalar() or 0
+
+    # Top sources
+    res = await db.execute(select(IOC.source_platform, func.count(IOC.id)).group_by(IOC.source_platform).order_by(func.count(IOC.id).desc()))
+    sources = [{"source": k, "count": v} for k, v in res.all()]
+
+    return {
+        "trend_7d": trend,
+        "verdicts": verdicts,
+        "pending_iocs": pending_count,
+        "sources": sources,
+    }
