@@ -6,6 +6,7 @@ import csv
 import io
 import asyncio
 from typing import Any, List
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status, Request
 from slowapi import Limiter
@@ -176,20 +177,83 @@ async def upload_csv(
     await db.commit()
     await db.refresh(upload)
     
-    # Create IOCs
+    # Helpers
+    def _parse_dt(value: str | None) -> datetime | None:
+        if not value:
+            return None
+        try:
+            # Support UTC 'Z'
+            normalized = value.replace('Z', '+00:00')
+            return datetime.fromisoformat(normalized)
+        except Exception:
+            return None
+
+    # Create or update (deduplicate) IOCs
     for row in valid_iocs:
         cls = row.get("classification") or default_classification or 'unknown'
-        ioc = IOC(
-            value=row["ioc_value"],
-            type=IOCType(row["ioc_type"]),
-            classification=Classification(cls),
-            source_platform=row["source_platform"],
-            email_id=row.get("email_id") or None,
-            campaign_id=campaign_id or row.get("campaign_id") or None,
-            user_reported=(row.get("user_reported","" ).lower() == "true"),
-            notes=row.get("notes") or None
+        parsed_first_seen = _parse_dt(row.get("first_seen"))
+        parsed_last_seen = _parse_dt(row.get("last_seen"))
+
+        # Check for existing IOC by (value, type, source_platform)
+        existing_q = await db.execute(
+            select(IOC).where(
+                IOC.value == row["ioc_value"],
+                IOC.type == row["ioc_type"],
+                IOC.source_platform == row["source_platform"],
+            )
         )
-        db.add(ioc)
+        existing = existing_q.scalars().first()
+
+        if existing:
+            # Update first_seen/last_seen conservatively
+            if parsed_first_seen:
+                if not existing.first_seen or parsed_first_seen < existing.first_seen:
+                    existing.first_seen = parsed_first_seen
+            if parsed_last_seen:
+                if not existing.last_seen or parsed_last_seen > existing.last_seen:
+                    existing.last_seen = parsed_last_seen
+
+            # Upgrade classification if provided (and not 'unknown')
+            try:
+                new_cls = Classification(cls)
+                if new_cls != Classification.UNKNOWN:
+                    existing.classification = new_cls
+            except ValueError:
+                pass
+
+            # Merge notes
+            incoming_notes = row.get("notes")
+            if incoming_notes:
+                if existing.notes:
+                    existing.notes = f"{existing.notes}; {incoming_notes}"
+                else:
+                    existing.notes = incoming_notes
+
+            # Merge campaign/email if absent
+            if not existing.campaign_id and (campaign_id or row.get("campaign_id")):
+                existing.campaign_id = campaign_id or row.get("campaign_id")
+            if not existing.email_id and row.get("email_id"):
+                existing.email_id = row.get("email_id")
+
+            # user_reported: once true, keep true
+            if (row.get("user_reported", "").lower() == "true"):
+                existing.user_reported = True
+
+            db.add(existing)
+        else:
+            ioc = IOC(
+                value=row["ioc_value"],
+                type=IOCType(row["ioc_type"]),
+                classification=Classification(cls),
+                source_platform=row["source_platform"],
+                email_id=row.get("email_id") or None,
+                campaign_id=campaign_id or row.get("campaign_id") or None,
+                user_reported=(row.get("user_reported","" ).lower() == "true"),
+                first_seen=parsed_first_seen,
+                last_seen=parsed_last_seen,
+                notes=row.get("notes") or None
+            )
+            db.add(ioc)
     
     await db.commit()
     
