@@ -8,6 +8,9 @@ interface StatsData {
   ioc_types: Record<string, number>
   last_7d_iocs: number
   providers: Record<string, number>
+  providers_configured?: string[]
+  providers_configured_count?: number
+  providers_successful_count?: number
 }
 
 export function DashboardPage() {
@@ -106,7 +109,7 @@ export function DashboardPage() {
                 <div>
                   <p className="text-sm font-mono text-gray-500">Active Providers</p>
                   <p className="text-2xl font-mono font-bold text-gray-900">
-                    {Object.keys(stats?.providers || {}).length}
+                    {stats?.providers_configured_count ?? 0}
                   </p>
                 </div>
                 <CheckCircle className="h-8 w-8 text-gray-400" />
