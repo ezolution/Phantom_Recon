@@ -15,6 +15,9 @@ from app.models.upload import Upload
 from app.schemas.job import Job as JobSchema, JobSummary
 from app.services.enrichment_pipeline import EnrichmentPipeline
 from app.core.database import AsyncSessionLocal
+from sqlalchemy import select, update
+from datetime import datetime
+from app.models.upload import Upload
 
 router = APIRouter()
 
@@ -74,8 +77,71 @@ async def start_enrichment(
         job.status = JobStatus.QUEUED
         await db.commit()
     
-    # Run enrichment inline using a fresh AsyncSession to avoid closed-session/greenlet issues
+    # Run enrichment inline using pure SQL updates to avoid relationship lazy loads
     async with AsyncSessionLocal() as session:
+        # Set RUNNING
+        await session.execute(
+            update(Job)
+            .where(Job.id == job_id)
+            .values(status=JobStatus.RUNNING, started_at=datetime.utcnow(), processed_iocs=0, successful_iocs=0, failed_iocs=0)
+        )
+        await session.commit()
+
+        # Get upload.created_at for this job
+        res = await session.execute(
+            select(Upload.created_at).join(Job, Upload.id == Job.upload_id).where(Job.id == job_id)
+        )
+        upload_created_at = res.scalar_one_or_none()
+
+        if upload_created_at is None:
+            await session.execute(
+                update(Job).where(Job.id == job_id).values(status=JobStatus.ERROR, error_message="Upload not found", finished_at=datetime.utcnow())
+            )
+            await session.commit()
+            return {"message": "Enrichment job failed: upload not found"}
+
+        # Select IOCs to enrich
+        from app.models.ioc import IOC
+        res = await session.execute(select(IOC).where(IOC.created_at >= upload_created_at))
+        iocs = res.scalars().all()
+
         pipeline = EnrichmentPipeline()
-        await pipeline.process_job(job_id, session)
-    return {"message": "Enrichment job completed"}
+        successful = 0
+        failed = 0
+        processed = 0
+        try:
+            for ioc in iocs:
+                try:
+                    await pipeline.enrich_ioc(ioc, session)
+                    successful += 1
+                except Exception as e:
+                    failed += 1
+                finally:
+                    processed += 1
+                    await session.execute(
+                        update(Job).where(Job.id == job_id).values(processed_iocs=processed)
+                    )
+                    await session.commit()
+
+            await session.execute(
+                update(Job)
+                .where(Job.id == job_id)
+                .values(
+                    status=JobStatus.DONE,
+                    finished_at=datetime.utcnow(),
+                    total_iocs=len(iocs),
+                    successful_iocs=successful,
+                    failed_iocs=failed,
+                    error_message=None,
+                )
+            )
+            await session.commit()
+            return {"message": "Enrichment job completed"}
+        except Exception as e:
+            await session.execute(
+                update(Job)
+                .where(Job.id == job_id)
+                .values(status=JobStatus.ERROR, error_message=str(e), finished_at=datetime.utcnow())
+            )
+            await session.commit()
+            return {"message": "Enrichment job failed"}
