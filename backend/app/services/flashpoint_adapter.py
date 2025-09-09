@@ -171,6 +171,7 @@ class FlashpointAdapter(BaseAdapter):
             try:
                 page_size = 50
                 max_pages = 20  # scan up to 1000 items recent-first
+                v2_scan_attempted = False
                 for page_idx in range(max_pages):
                     params = {
                         "size": page_size,
@@ -182,6 +183,7 @@ class FlashpointAdapter(BaseAdapter):
                     resp = await self._make_request(list_url, headers=self._get_headers(), method="GET", params=params)  # type: ignore
                     if resp.status_code != 200:
                         break
+                    v2_scan_attempted = True
                     data = resp.json() or {}
                     items = data.get("items") or []
                     if not items:
@@ -217,6 +219,10 @@ class FlashpointAdapter(BaseAdapter):
                             "first_seen": first_seen,
                             "last_seen": last_seen,
                         }
+                # If we got here without returning, remember we scanned but found no match
+                v2_not_found_evidence = None
+                if v2_scan_attempted:
+                    v2_not_found_evidence = f"Not found in recent {page_size * max_pages} v2 indicators"
             except Exception:
                 pass
 
@@ -280,23 +286,35 @@ class FlashpointAdapter(BaseAdapter):
                         "raw_json": indicator
                     }
                 else:
+                    evidence = "Not found in Flashpoint intelligence"
+                    try:
+                        if v2_not_found_evidence:
+                            evidence = f"{evidence}; {v2_not_found_evidence}"
+                    except Exception:
+                        pass
                     return {
                         "verdict": "unknown",
                         "confidence": None,
                         "actor": None,
                         "family": None,
-                        "evidence": "Not found in Flashpoint intelligence",
+                        "evidence": evidence,
                         "http_status": last_resp.status_code,
                         "raw_json": None
                     }
             
             else:
+                evidence = f"API error: {last_resp.status_code if last_resp else 'unknown'}"
+                try:
+                    if v2_not_found_evidence:
+                        evidence = f"{evidence}; {v2_not_found_evidence}"
+                except Exception:
+                    pass
                 return {
                     "verdict": "unknown",
                     "confidence": None,
                     "actor": None,
                     "family": None,
-                    "evidence": f"API error: {last_resp.status_code if last_resp else 'unknown'}",
+                    "evidence": evidence,
                     "http_status": last_resp.status_code if last_resp else None,
                     "raw_json": None
                 }
