@@ -102,5 +102,35 @@ CSS=$(docker-compose exec nginx sh -lc 'curl -s http://frontend:80 | grep -o "/a
 docker-compose exec nginx sh -lc "curl -s http://frontend:80$CSS | grep -n 'flex-wrap:nowrap\|\\.flex-nowrap{\|\\.whitespace-nowrap{\|\\.flex{' | sed -n '1,60p' || true"
 ```
 
+## 11) Session notes – Flashpoint + IOC timestamps (2025-09)
+- Flashpoint integration
+  - Host: `https://api.flashpoint.io` (remove `FLASHPOINT_BASE_URL` override unless pointing there).
+  - v2 search limitations: use pagination scan of recent indicators instead of `q`/`value` params.
+    - Endpoint: `GET /technical-intelligence/v2/indicators?size=50&from=N&sort=last_seen_at:desc&include_total_count=false`.
+    - Scan up to 1000 recent items (20 pages) and match exact `value` client-side.
+  - Evidence when not found includes: “Not found in recent 1000 v2 indicators”.
+  - ES-style POST fallbacks remain (likely 404 on api.flashpoint.io) and are used after v2 scan.
+  - Verdict mapping prefers `score.value` (malicious/suspicious/benign) with normalized output.
+  - Provider results are de-duplicated: per IOC+provider we delete older rows before inserting latest.
+
+- IOC first/last seen (DB semantics)
+  - On first appearance (no timestamps provided): default both `first_seen` and `last_seen` to the upload time.
+  - On re-upload of the same IOC: keep `first_seen` unchanged; set `last_seen` to the new upload time.
+  - If CSV provides timestamps, they’re parsed (ISO, `Z` supported) but the re-upload rule above still applies.
+
+- UI updates
+  - IOC Details → Overview shows “IOC First Seen” and “IOC Last Seen” (IOC-level fields).
+  - Provider panels display provider `first_seen`/`last_seen` when available.
+  - Search filters added: `first_seen_from` and `last_seen_to` (datetime-local) wired to backend.
+
+- API changes
+  - `GET /api/v1/iocs/` now accepts `first_seen_from` and `last_seen_to` (ISO datetime strings) to filter IOC-level timestamps.
+  - Upload endpoint (`POST /api/v1/upload/`) sets defaults and advances `last_seen` on reappearance.
+
+- Deployment reminders
+  - After backend changes: `git pull && docker compose up -d --no-deps --build api`.
+  - After frontend changes: `docker compose up -d --no-deps --build frontend`.
+  - Upload via API may redirect; use trailing slash or `-L`.
+
 ---
 This file should be kept up to date as decisions evolve. Treat it as the single source of truth for future sessions.
