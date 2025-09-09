@@ -55,8 +55,8 @@ class BaseAdapter(ABC):
         cache_key = self._get_cache_key(ioc_value, ioc_type)
         BaseAdapter._local_cache[cache_key] = (time.time() + ttl, result)
     
-    async def _make_request(self, url: str, headers: Dict[str, str] = None, **kwargs) -> httpx.Response:
-        """Make HTTP request with retry logic"""
+    async def _make_request(self, url: str, headers: Dict[str, str] = None, method: str = "GET", **kwargs) -> httpx.Response:
+        """Make HTTP request with retry logic. Set method to 'GET' or 'POST'."""
         if headers is None:
             headers = {}
         
@@ -68,7 +68,10 @@ class BaseAdapter(ABC):
         for attempt in range(self.max_retries):
             try:
                 async with httpx.AsyncClient(timeout=self.timeout) as client:
-                    response = await client.get(url, headers=headers, **kwargs)
+                    if method.upper() == "POST":
+                        response = await client.post(url, headers=headers, **kwargs)
+                    else:
+                        response = await client.get(url, headers=headers, **kwargs)
                     return response
             except httpx.TimeoutException:
                 logger.warning(

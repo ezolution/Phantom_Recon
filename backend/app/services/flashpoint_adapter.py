@@ -117,6 +117,7 @@ class FlashpointAdapter(BaseAdapter):
             response = await self._make_request(
                 search_url,
                 headers=self._get_headers(),
+                method="POST",
                 json=payload
             )
             
