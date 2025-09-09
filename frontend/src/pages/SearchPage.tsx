@@ -41,6 +41,8 @@ interface IOC {
     verdict: string
     confidence?: number
     evidence?: string
+    first_seen?: string
+    last_seen?: string
   }>
   tags?: Array<{
     name: string
@@ -79,6 +81,17 @@ export function SearchPage() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
     toast.success('Copied to clipboard')
+  }
+
+  const formatDateTime = (iso?: string) => {
+    if (!iso) return undefined
+    try {
+      const d = new Date(iso)
+      if (Number.isNaN(d.getTime())) return iso
+      return d.toLocaleString()
+    } catch {
+      return iso
+    }
   }
 
   const getRiskColor = (riskBand: string) => {
@@ -405,6 +418,18 @@ export function SearchPage() {
                             <span className="text-xs text-white capitalize">{result.verdict}</span>
                           </div>
                         </div>
+                        {(result.first_seen || result.last_seen) && (
+                          <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 mb-1">
+                            <div>
+                              <span className="text-slate-400 mr-1">First seen:</span>
+                              <span>{formatDateTime(result.first_seen) || '-'}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-400 mr-1">Last seen:</span>
+                              <span>{formatDateTime(result.last_seen) || '-'}</span>
+                            </div>
+                          </div>
+                        )}
                         {result.confidence && (
                           <div className="text-xs text-slate-400 mb-1">
                             Confidence: {result.confidence}%
