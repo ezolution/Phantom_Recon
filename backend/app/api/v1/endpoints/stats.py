@@ -110,6 +110,37 @@ async def get_overview_stats(
     )
     unique_actors_7d = [row[0] for row in result.all() if row[0] is not None]
 
+    # Top actors/families per provider (by frequency)
+    result = await db.execute(
+        select(EnrichmentResult.provider, EnrichmentResult.actor, func.count(EnrichmentResult.id))
+        .where(EnrichmentResult.actor.is_not(None))
+        .group_by(EnrichmentResult.provider, EnrichmentResult.actor)
+    )
+    rows = result.all()
+    top_actors_by_provider: dict[str, list[dict]] = {}
+    for p, name, cnt in rows:
+        if not p:
+            continue
+        top_actors_by_provider.setdefault(p, []).append({"name": name, "count": int(cnt)})
+    for p, lst in top_actors_by_provider.items():
+        lst.sort(key=lambda x: x["count"], reverse=True)
+        top_actors_by_provider[p] = lst[:5]
+
+    result = await db.execute(
+        select(EnrichmentResult.provider, EnrichmentResult.family, func.count(EnrichmentResult.id))
+        .where(EnrichmentResult.family.is_not(None))
+        .group_by(EnrichmentResult.provider, EnrichmentResult.family)
+    )
+    rows = result.all()
+    top_families_by_provider: dict[str, list[dict]] = {}
+    for p, name, cnt in rows:
+        if not p:
+            continue
+        top_families_by_provider.setdefault(p, []).append({"name": name, "count": int(cnt)})
+    for p, lst in top_families_by_provider.items():
+        lst.sort(key=lambda x: x["count"], reverse=True)
+        top_families_by_provider[p] = lst[:5]
+
     return {
         "total_iocs": total_iocs,
         "risk_bands": risk_bands,
@@ -120,6 +151,10 @@ async def get_overview_stats(
         "providers_configured_count": len(configured),
         "providers_successful_count": providers_successful_count,
         "attribution_by_provider": attribution_by_provider,
+        "attribution_samples": {
+            "actors": top_actors_by_provider,
+            "families": top_families_by_provider,
+        },
         "unique_actors_7d": unique_actors_7d,
         "unique_actors_7d_count": len(unique_actors_7d),
     }

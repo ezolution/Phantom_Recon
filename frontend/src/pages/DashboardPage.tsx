@@ -14,6 +14,10 @@ interface StatsData {
   attribution_by_provider?: Record<string, { actors: number; families: number }>
   unique_actors_7d?: string[]
   unique_actors_7d_count?: number
+  attribution_samples?: {
+    actors: Record<string, { name: string; count: number }[]>
+    families: Record<string, { name: string; count: number }[]>
+  }
 }
 
 export function DashboardPage() {
@@ -215,6 +219,24 @@ export function DashboardPage() {
                   <p className="font-mono font-bold text-gray-900">{vals.actors}</p>
                   <p className="font-mono text-xs text-gray-500 mt-1">Families</p>
                   <p className="font-mono font-bold text-gray-900">{vals.families}</p>
+                  {(stats?.attribution_samples?.actors?.[provider]?.length || 0) > 0 && (
+                    <div className="mt-2 text-xs text-gray-500">
+                      <span className="font-mono">Top actors: </span>
+                      <span className="font-mono">
+                        {stats.attribution_samples!.actors[provider].slice(0,3).map(a => a.name).join(', ')}
+                        {((stats.attribution_samples!.actors[provider].length || 0) > 3) ? ', …' : ''}
+                      </span>
+                    </div>
+                  )}
+                  {(stats?.attribution_samples?.families?.[provider]?.length || 0) > 0 && (
+                    <div className="mt-1 text-xs text-gray-500">
+                      <span className="font-mono">Top families: </span>
+                      <span className="font-mono">
+                        {stats.attribution_samples!.families[provider].slice(0,3).map(f => f.name).join(', ')}
+                        {((stats.attribution_samples!.families[provider].length || 0) > 3) ? ', …' : ''}
+                      </span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
