@@ -219,24 +219,30 @@ export function DashboardPage() {
                   <p className="font-mono font-bold text-gray-900">{vals.actors}</p>
                   <p className="font-mono text-xs text-gray-500 mt-1">Families</p>
                   <p className="font-mono font-bold text-gray-900">{vals.families}</p>
-                  {(stats?.attribution_samples?.actors?.[provider]?.length || 0) > 0 && (
-                    <div className="mt-2 text-xs text-gray-500">
-                      <span className="font-mono">Top actors: </span>
-                      <span className="font-mono">
-                        {stats.attribution_samples!.actors[provider].slice(0,3).map(a => a.name).join(', ')}
-                        {((stats.attribution_samples!.actors[provider].length || 0) > 3) ? ', …' : ''}
-                      </span>
-                    </div>
-                  )}
-                  {(stats?.attribution_samples?.families?.[provider]?.length || 0) > 0 && (
-                    <div className="mt-1 text-xs text-gray-500">
-                      <span className="font-mono">Top families: </span>
-                      <span className="font-mono">
-                        {stats.attribution_samples!.families[provider].slice(0,3).map(f => f.name).join(', ')}
-                        {((stats.attribution_samples!.families[provider].length || 0) > 3) ? ', …' : ''}
-                      </span>
-                    </div>
-                  )}
+                  {(() => {
+                    const list = stats?.attribution_samples?.actors?.[provider] ?? []
+                    return list.length > 0 ? (
+                      <div className="mt-2 text-xs text-gray-500">
+                        <span className="font-mono">Top actors: </span>
+                        <span className="font-mono">
+                          {list.slice(0,3).map(a => a.name).join(', ')}
+                          {list.length > 3 ? ', …' : ''}
+                        </span>
+                      </div>
+                    ) : null
+                  })()}
+                  {(() => {
+                    const list = stats?.attribution_samples?.families?.[provider] ?? []
+                    return list.length > 0 ? (
+                      <div className="mt-1 text-xs text-gray-500">
+                        <span className="font-mono">Top families: </span>
+                        <span className="font-mono">
+                          {list.slice(0,3).map(f => f.name).join(', ')}
+                          {list.length > 3 ? ', …' : ''}
+                        </span>
+                      </div>
+                    ) : null
+                  })()}
                 </div>
               ))}
             </div>
