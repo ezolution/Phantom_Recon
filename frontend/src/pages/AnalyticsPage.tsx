@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Activity, BarChart2, PieChart, LineChart } from 'lucide-react'
+import { Activity, BarChart2, PieChart, LineChart, Target, Users, Shield } from 'lucide-react'
 import { api } from '../lib/api'
 
 type AnalyticsData = {
@@ -7,6 +7,14 @@ type AnalyticsData = {
   risk_bands: Record<string, number>
   pending_iocs: number
   sources: { source: string; count: number }[]
+  targeting_signal?: number
+  unique_actors_48h?: number
+  clusters_recent?: {
+    by_campaign_72h: { campaign_id: string; count: number }[]
+    by_source_72h: { source: string; count: number }[]
+  }
+  top_actors_7d?: { name: string; count: number }[]
+  top_families_7d?: { name: string; count: number }[]
 }
 
 export function AnalyticsPage() {
@@ -49,6 +57,31 @@ export function AnalyticsPage() {
               <p className="text-3xl font-mono font-bold text-gray-900">{data?.pending_iocs ?? 0}</p>
             </div>
 
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-mono text-gray-500">Targeting Signal</p>
+                <Target className="h-5 w-5 text-gray-400" />
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="flex-1 h-3 bg-gray-200 rounded">
+                  <div className="h-3 bg-red-500 rounded" style={{ width: `${Math.min(100, data?.targeting_signal ?? 0)}%` }} />
+                </div>
+                <div className="w-16 text-right font-mono font-bold text-gray-900">{Math.min(100, data?.targeting_signal ?? 0)}%</div>
+              </div>
+              <div className="text-xs text-gray-500 mt-2 font-mono">Higher means unusual activity clusters, recent actors, and campaign surges</div>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-mono text-gray-500">Unique Actors (48h)</p>
+                <Users className="h-5 w-5 text-gray-400" />
+              </div>
+              <p className="text-3xl font-mono font-bold text-gray-900">{data?.unique_actors_48h ?? 0}</p>
+            </div>
+
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm md:col-span-2">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-mono text-gray-500">IOC Trend (7 days)</p>
@@ -70,6 +103,39 @@ export function AnalyticsPage() {
                 {(!data || (data.trend_7d?.length || 0) === 0) && (
                   <div className="text-gray-400 font-mono">No data</div>
                 )}
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-mono text-gray-500">Recent Clusters (72h)</p>
+                <Shield className="h-5 w-5 text-gray-400" />
+              </div>
+              <div>
+                <p className="text-xs font-mono text-gray-500 mb-2">By Campaign</p>
+                <div className="space-y-2 mb-4">
+                  {data?.clusters_recent?.by_campaign_72h?.map((c) => (
+                    <div key={c.campaign_id} className="flex items-center justify-between">
+                      <span className="font-mono text-sm text-gray-700">{c.campaign_id}</span>
+                      <span className="font-mono font-bold text-gray-900">{c.count}</span>
+                    </div>
+                  ))}
+                  {(!data || (data?.clusters_recent?.by_campaign_72h?.length || 0) === 0) && (
+                    <div className="text-gray-400 font-mono">No data</div>
+                  )}
+                </div>
+                <p className="text-xs font-mono text-gray-500 mb-2">By Source</p>
+                <div className="space-y-2">
+                  {data?.clusters_recent?.by_source_72h?.map((s) => (
+                    <div key={s.source} className="flex items-center justify-between">
+                      <span className="font-mono text-sm text-gray-700">{s.source || '-'}</span>
+                      <span className="font-mono font-bold text-gray-900">{s.count}</span>
+                    </div>
+                  ))}
+                  {(!data || (data?.clusters_recent?.by_source_72h?.length || 0) === 0) && (
+                    <div className="text-gray-400 font-mono">No data</div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -106,6 +172,44 @@ export function AnalyticsPage() {
                   </div>
                 ))}
                 {(!data || data.sources?.length === 0) && (
+                  <div className="text-gray-400 font-mono">No data</div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-mono text-gray-500">Top Actors (7d)</p>
+                <Users className="h-5 w-5 text-gray-400" />
+              </div>
+              <div className="space-y-2">
+                {data?.top_actors_7d?.map((a) => (
+                  <div key={a.name} className="flex items-center justify-between">
+                    <span className="font-mono text-sm text-gray-700">{a.name}</span>
+                    <span className="font-mono font-bold text-gray-900">{a.count}</span>
+                  </div>
+                ))}
+                {(!data || (data.top_actors_7d?.length || 0) === 0) && (
+                  <div className="text-gray-400 font-mono">No data</div>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-mono text-gray-500">Top Families (7d)</p>
+                <Shield className="h-5 w-5 text-gray-400" />
+              </div>
+              <div className="space-y-2">
+                {data?.top_families_7d?.map((a) => (
+                  <div key={a.name} className="flex items-center justify-between">
+                    <span className="font-mono text-sm text-gray-700">{a.name}</span>
+                    <span className="font-mono font-bold text-gray-900">{a.count}</span>
+                  </div>
+                ))}
+                {(!data || (data.top_families_7d?.length || 0) === 0) && (
                   <div className="text-gray-400 font-mono">No data</div>
                 )}
               </div>

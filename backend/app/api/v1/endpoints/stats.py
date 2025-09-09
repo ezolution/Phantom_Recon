@@ -164,7 +164,9 @@ async def get_overview_stats(
 async def get_analytics(
     db: AsyncSession = Depends(get_db),
 ) -> Any:
-    """Analytics data for charts: 7-day trend, verdict mix, pending counts, top sources."""
+    """Analytics data for charts: 7-day trend, verdict mix, pending counts, top sources,
+    recent clustering and targeting signal, top actors/families.
+    """
     from datetime import datetime, timedelta
     now = datetime.utcnow()
     day_starts = [(now - timedelta(days=i)).date() for i in range(6, -1, -1)]
@@ -187,13 +189,99 @@ async def get_analytics(
     res = await db.execute(select(func.count(IOC.id)).where(~IOC.id.in_(select(IOCScore.ioc_id))))
     pending_count = res.scalar() or 0
 
-    # Top sources
+    # Top sources (all-time)
     res = await db.execute(select(IOC.source_platform, func.count(IOC.id)).group_by(IOC.source_platform).order_by(func.count(IOC.id).desc()))
     sources = [{"source": k, "count": v} for k, v in res.all()]
+
+    # Recent clustering windows
+    last_72h = now - timedelta(hours=72)
+    last_48h = now - timedelta(hours=48)
+    last_7d = now - timedelta(days=7)
+
+    # Clusters by campaign in last 72h
+    res = await db.execute(
+        select(IOC.campaign_id, func.count(IOC.id))
+        .where(IOC.campaign_id.is_not(None))
+        .where(IOC.created_at >= last_72h)
+        .group_by(IOC.campaign_id)
+        .order_by(func.count(IOC.id).desc())
+    )
+    by_campaign_72h_rows = res.all()
+    by_campaign_72h = [
+        {"campaign_id": cid, "count": int(cnt)} for cid, cnt in by_campaign_72h_rows[:5]
+    ]
+    top_campaign_count = int(by_campaign_72h[0]["count"]) if by_campaign_72h else 0
+
+    # Clusters by source in last 72h
+    res = await db.execute(
+        select(IOC.source_platform, func.count(IOC.id))
+        .where(IOC.created_at >= last_72h)
+        .group_by(IOC.source_platform)
+        .order_by(func.count(IOC.id).desc())
+    )
+    by_source_72h = [
+        {"source": src, "count": int(cnt)} for src, cnt in res.all()[:5]
+    ]
+
+    # Unique actors last 48h
+    res = await db.execute(
+        select(func.count(func.distinct(EnrichmentResult.actor)))
+        .where(EnrichmentResult.actor.is_not(None))
+        .where(EnrichmentResult.queried_at >= last_48h)
+    )
+    unique_actors_48h = int(res.scalar() or 0)
+
+    # Top actors/families last 7d
+    res = await db.execute(
+        select(EnrichmentResult.actor, func.count(EnrichmentResult.id))
+        .where(EnrichmentResult.actor.is_not(None))
+        .where(EnrichmentResult.queried_at >= last_7d)
+        .group_by(EnrichmentResult.actor)
+        .order_by(func.count(EnrichmentResult.id).desc())
+    )
+    top_actors_7d = [
+        {"name": name, "count": int(cnt)} for name, cnt in res.all()[:10]
+    ]
+
+    res = await db.execute(
+        select(EnrichmentResult.family, func.count(EnrichmentResult.id))
+        .where(EnrichmentResult.family.is_not(None))
+        .where(EnrichmentResult.queried_at >= last_7d)
+        .group_by(EnrichmentResult.family)
+        .order_by(func.count(EnrichmentResult.id).desc())
+    )
+    top_families_7d = [
+        {"name": name, "count": int(cnt)} for name, cnt in res.all()[:10]
+    ]
+
+    # Targeting signal (0-100): surge vs baseline + unique actors + campaign clustering
+    today_count = trend[-1]["count"] if trend else 0
+    prev_days = [d["count"] for d in trend[:-1]] if len(trend) > 1 else []
+    prev_avg = (sum(prev_days) / len(prev_days)) if prev_days else 0
+    surge_component = 0
+    if prev_avg > 0:
+        ratio = today_count / prev_avg
+        surge_component = min(60, int(ratio * 20))  # 3x -> 60
+    elif today_count > 0:
+        surge_component = 40  # first activity after no baseline
+
+    actors_component = min(20, unique_actors_48h * 5)  # up to 20
+    cluster_component = 0
+    if top_campaign_count > 3:
+        cluster_component = min(20, (top_campaign_count - 3) * 5)
+    targeting_signal = min(100, surge_component + actors_component + cluster_component)
 
     return {
         "trend_7d": trend,
         "risk_bands": risk_bands,
         "pending_iocs": pending_count,
         "sources": sources,
+        "top_actors_7d": top_actors_7d,
+        "top_families_7d": top_families_7d,
+        "clusters_recent": {
+            "by_campaign_72h": by_campaign_72h,
+            "by_source_72h": by_source_72h,
+        },
+        "unique_actors_48h": unique_actors_48h,
+        "targeting_signal": targeting_signal,
     }
