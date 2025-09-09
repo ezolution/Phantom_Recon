@@ -19,6 +19,11 @@ export function AnalyticsPage() {
     refetchInterval: 5000,
   })
 
+  const maxTrend = Math.max(
+    1,
+    ...((data?.trend_7d || []).map(d => (d?.count ?? 0)))
+  )
+
   return (
     <div className="h-full flex flex-col bg-gray-100">
       <div className="bg-white border-b border-gray-200 px-8 py-6 shadow-sm">
@@ -50,13 +55,19 @@ export function AnalyticsPage() {
                 <LineChart className="h-5 w-5 text-gray-400" />
               </div>
               <div className="flex items-end space-x-3 h-32">
-                {data?.trend_7d?.map((d) => (
-                  <div key={d.date} className="flex-1 text-center">
-                    <div className="bg-emerald-500/70 mx-auto" style={{ height: `${Math.min(100, (d.count || 0) * 10)}%`, width: '16px' }}></div>
-                    <div className="text-[10px] text-gray-500 mt-1 font-mono">{d.date.slice(5)}</div>
-                  </div>
-                ))}
-                {(!data || data.trend_7d?.length === 0) && (
+                {data?.trend_7d?.map((d) => {
+                  const pct = Math.round(((d.count || 0) / maxTrend) * 100)
+                  const barPct = Math.max(5, pct) // ensure visible bar when count>0
+                  return (
+                    <div key={d.date} className="flex-1 text-center">
+                      <div className="h-24 flex items-end justify-center">
+                        <div className="bg-emerald-500/70 rounded" style={{ height: `${(d.count||0) === 0 ? 2 : barPct}%`, width: '16px' }} />
+                      </div>
+                      <div className="text-[10px] text-gray-500 mt-1 font-mono">{d.date.slice(5)}</div>
+                    </div>
+                  )
+                })}
+                {(!data || (data.trend_7d?.length || 0) === 0) && (
                   <div className="text-gray-400 font-mono">No data</div>
                 )}
               </div>
