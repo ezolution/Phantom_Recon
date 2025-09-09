@@ -6,7 +6,7 @@ from typing import Any, List
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_, func
+from sqlalchemy import select, and_, or_, func, exists
 from sqlalchemy.orm import selectinload
 
 # Removed authentication dependencies
@@ -23,11 +23,12 @@ router = APIRouter()
 async def search_iocs(
     q: str = Query(None, description="Search query"),
     type: str = Query(None, description="IOC type filter"),
-    risk_min: int = Query(None, ge=0, le=100, description="Minimum risk score"),
-    risk_max: int = Query(None, ge=0, le=100, description="Maximum risk score"),
-    provider: str = Query(None, description="Provider filter"),
-    actor: str = Query(None, description="Actor filter"),
-    family: str = Query(None, description="Family filter"),
+    risk_min: int = Query(None, ge=0, le=100, description="Minimum risk score (latest)"),
+    risk_max: int = Query(None, ge=0, le=100, description="Maximum risk score (latest)"),
+    risk_band: str = Query(None, description="Risk band (Low, Medium, High, Critical) for latest score"),
+    provider: str = Query(None, description="Provider filter (enrichment results)"),
+    actor: str = Query(None, description="Actor filter (substring, enrichment results)"),
+    family: str = Query(None, description="Family filter (substring, enrichment results)"),
     classification: str = Query(None, description="Classification filter"),
     source_platform: str = Query(None, description="Source platform filter"),
     first_seen_from: str = Query(None, description="IOC first_seen >= ISO datetime"),
@@ -74,6 +75,41 @@ async def search_iocs(
     if last_seen_to:
         conditions.append(IOC.last_seen.is_not(None))
         conditions.append(IOC.last_seen <= func.datetime(last_seen_to))
+
+    # Risk filters (based on latest IOCScore only)
+    if any(v is not None for v in [risk_min, risk_max, risk_band]):
+        # Correlated subquery to pick latest score per-IOC
+        latest_score_ts = (
+            select(func.max(IOCScore.computed_at))
+            .where(IOCScore.ioc_id == IOC.id)
+            .correlate(IOC)
+            .scalar_subquery()
+        )
+        score_exists = select(1).where(
+            and_(
+                IOCScore.ioc_id == IOC.id,
+                IOCScore.computed_at == latest_score_ts,
+            )
+        )
+        if risk_min is not None:
+            score_exists = score_exists.where(IOCScore.risk_score >= risk_min)
+        if risk_max is not None:
+            score_exists = score_exists.where(IOCScore.risk_score <= risk_max)
+        if risk_band is not None:
+            score_exists = score_exists.where(IOCScore.risk_band == risk_band)
+        conditions.append(exists(score_exists))
+
+    # Provider/actor/family filters (exists in enrichment results)
+    if any(v is not None and v != "" for v in [provider, actor, family]):
+        enr_exists = select(1).where(EnrichmentResult.ioc_id == IOC.id)
+        if provider:
+            enr_exists = enr_exists.where(EnrichmentResult.provider == provider)
+        if actor:
+            # substring/ci match
+            enr_exists = enr_exists.where(EnrichmentResult.actor.ilike(f"%{actor}%"))
+        if family:
+            enr_exists = enr_exists.where(EnrichmentResult.family.ilike(f"%{family}%"))
+        conditions.append(exists(enr_exists))
 
     if conditions:
         query = query.where(and_(*conditions))
