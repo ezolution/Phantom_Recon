@@ -11,6 +11,9 @@ interface StatsData {
   providers_configured?: string[]
   providers_configured_count?: number
   providers_successful_count?: number
+  attribution_by_provider?: Record<string, { actors: number; families: number }>
+  unique_actors_7d?: string[]
+  unique_actors_7d_count?: number
 }
 
 export function DashboardPage() {
@@ -196,21 +199,35 @@ export function DashboardPage() {
             </div>
           </div>
 
-          {/* Provider Status */}
+          {/* Attribution Insights */}
           <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
             <h3 className="text-lg font-mono font-bold text-gray-900 mb-4">
-              Provider Status
+              Attribution Insights
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {Object.entries(stats?.providers || {}).map(([provider, count]) => (
+              {Object.entries(stats?.attribution_by_provider || {}).map(([provider, vals]) => (
                 <div key={provider} className="text-center">
                   <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
                     <Shield className="h-6 w-6 text-gray-600" />
                   </div>
                   <p className="font-mono text-sm text-gray-600 capitalize">{provider}</p>
-                  <p className="font-mono font-bold text-gray-900">{count}</p>
+                  <p className="font-mono text-xs text-gray-500">Actors</p>
+                  <p className="font-mono font-bold text-gray-900">{vals.actors}</p>
+                  <p className="font-mono text-xs text-gray-500 mt-1">Families</p>
+                  <p className="font-mono font-bold text-gray-900">{vals.families}</p>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="font-mono text-sm text-gray-700">
+                Unique actors last 7 days: <span className="font-bold text-gray-900">{stats?.unique_actors_7d_count ?? 0}</span>
+              </p>
+              {stats?.unique_actors_7d && stats.unique_actors_7d.length > 0 && (
+                <p className="mt-2 text-xs font-mono text-gray-500 truncate">
+                  {stats.unique_actors_7d.slice(0, 10).join(', ')}{(stats.unique_actors_7d.length > 10) ? ', …' : ''}
+                </p>
+              )}
             </div>
           </div>
         </div>

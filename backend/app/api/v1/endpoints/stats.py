@@ -80,6 +80,36 @@ async def get_overview_stats(
         configured.append("recorded_future")
     # Note: OSINT requires no key; exclude from configured-by-env count
     
+    # Attribution by provider (distinct actors/families)
+    result = await db.execute(
+        select(EnrichmentResult.provider, func.count(func.distinct(EnrichmentResult.actor)))
+        .where(EnrichmentResult.actor.is_not(None))
+        .group_by(EnrichmentResult.provider)
+    )
+    actors_by_provider = dict(result.all())
+
+    result = await db.execute(
+        select(EnrichmentResult.provider, func.count(func.distinct(EnrichmentResult.family)))
+        .where(EnrichmentResult.family.is_not(None))
+        .group_by(EnrichmentResult.provider)
+    )
+    families_by_provider = dict(result.all())
+
+    attribution_by_provider = {}
+    for p in set(list(actors_by_provider.keys()) + list(families_by_provider.keys())):
+        attribution_by_provider[p] = {
+            "actors": int(actors_by_provider.get(p, 0) or 0),
+            "families": int(families_by_provider.get(p, 0) or 0),
+        }
+
+    # Unique actors in last 7 days
+    result = await db.execute(
+        select(func.distinct(EnrichmentResult.actor))
+        .where(EnrichmentResult.actor.is_not(None))
+        .where(EnrichmentResult.queried_at >= seven_days_ago)
+    )
+    unique_actors_7d = [row[0] for row in result.all() if row[0] is not None]
+
     return {
         "total_iocs": total_iocs,
         "risk_bands": risk_bands,
@@ -89,6 +119,9 @@ async def get_overview_stats(
         "providers_configured": configured,
         "providers_configured_count": len(configured),
         "providers_successful_count": providers_successful_count,
+        "attribution_by_provider": attribution_by_provider,
+        "unique_actors_7d": unique_actors_7d,
+        "unique_actors_7d_count": len(unique_actors_7d),
     }
 
 
