@@ -177,12 +177,11 @@ async def get_analytics(
         res = await db.execute(select(func.count(IOC.id)).where(IOC.created_at >= d_start, IOC.created_at < d_end))
         trend.append({"date": d.isoformat(), "count": res.scalar() or 0})
 
-    # Verdict distribution from latest EnrichmentResults per IOC (simple count by verdict)
+    # Risk band distribution from IOCScore (final scores)
     res = await db.execute(
-        select(EnrichmentResult.verdict, func.count(EnrichmentResult.id))
-        .group_by(EnrichmentResult.verdict)
+        select(IOCScore.risk_band, func.count(IOCScore.id)).group_by(IOCScore.risk_band)
     )
-    verdicts = dict(res.all())
+    risk_bands = dict(res.all())
 
     # Pending IOCs (no score yet)
     res = await db.execute(select(func.count(IOC.id)).where(~IOC.id.in_(select(IOCScore.ioc_id))))
@@ -194,7 +193,7 @@ async def get_analytics(
 
     return {
         "trend_7d": trend,
-        "verdicts": verdicts,
+        "risk_bands": risk_bands,
         "pending_iocs": pending_count,
         "sources": sources,
     }

@@ -4,7 +4,7 @@ import { api } from '../lib/api'
 
 type AnalyticsData = {
   trend_7d: { date: string; count: number }[]
-  verdicts: Record<string, number>
+  risk_bands: Record<string, number>
   pending_iocs: number
   sources: { source: string; count: number }[]
 }
@@ -77,17 +77,17 @@ export function AnalyticsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-mono text-gray-500">Verdict Distribution</p>
+                <p className="text-sm font-mono text-gray-500">Risk Band Distribution</p>
                 <PieChart className="h-5 w-5 text-gray-400" />
               </div>
               <div className="space-y-2">
-                {Object.entries(data?.verdicts || {}).map(([k, v]) => (
+                {Object.entries(data?.risk_bands || {}).map(([k, v]) => (
                   <div key={k} className="flex items-center justify-between">
                     <span className="font-mono text-sm capitalize text-gray-700">{k}</span>
                     <span className="font-mono font-bold text-gray-900">{v}</span>
                   </div>
                 ))}
-                {(!data || Object.keys(data?.verdicts || {}).length === 0) && (
+                {(!data || Object.keys(data?.risk_bands || {}).length === 0) && (
                   <div className="text-gray-400 font-mono">No data</div>
                 )}
               </div>
