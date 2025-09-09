@@ -101,8 +101,43 @@ class FlashpointAdapter(BaseAdapter):
             }
         
         try:
-            # Search for indicators
-            # Try multiple known routes until one works (Flashpoint deployments vary)
+            # 1) Preferred REST route from Ignite docs: /technical-intelligence/v2/indicators
+            try:
+                rest_url = f"{self.base_url}/technical-intelligence/v2/indicators"
+                params = {"ioc_value": ioc_value, "size": 1}
+                rest_resp = await self._make_request(rest_url, headers=self._get_headers(), method="GET", params=params)  # type: ignore
+                if rest_resp.status_code == 200:
+                    data = rest_resp.json() or {}
+                    items = data.get("items") or []
+                    if items:
+                        ind = items[0]
+                        verdict_raw = ind.get("score") or ind.get("risk_score") or ind.get("severity")
+                        verdict = self._extract_verdict({"risk_score": 80 if str(verdict_raw).lower()=="malicious" else 40 if str(verdict_raw).lower()=="suspicious" else 0})
+                        actor, family = self._extract_actors_families(ind)
+                        evidence_parts = []
+                        if ind.get("score"):
+                            evidence_parts.append(f"Score: {ind['score']}")
+                        if ind.get("created_at"):
+                            evidence_parts.append(f"Created: {ind['created_at']}")
+                        evidence = "; ".join(evidence_parts) or "Flashpoint intelligence available"
+                        first_seen = ind.get("first_scored_at") or ind.get("created_at")
+                        last_seen = ind.get("last_scored_at") or ind.get("updated_at")
+                        return {
+                            "verdict": verdict,
+                            "confidence": None,
+                            "actor": actor,
+                            "family": family,
+                            "evidence": evidence,
+                            "http_status": rest_resp.status_code,
+                            "raw_json": ind,
+                            "first_seen": first_seen,
+                            "last_seen": last_seen,
+                        }
+            except Exception:
+                pass
+
+            # 2) Fallback: ES-style search endpoints (deployment dependent)
+            # Try multiple known routes until one works
             routes = [
                 ("POST", f"{self.base_url}/intel/indicators/search"),
                 ("POST", f"{self.base_url}/indicators/search"),
