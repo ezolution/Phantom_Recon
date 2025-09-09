@@ -103,15 +103,27 @@ class FlashpointAdapter(BaseAdapter):
         try:
             # 1) Preferred REST route from Ignite docs: /technical-intelligence/v2/indicators
             try:
-                rest_candidates = [
-                    # v2 primary
+                # Construct q expressions likely supported by v2 search
+                q_expressions = []
+                if ioc_type == "sha256":
+                    q_expressions.append(f"hashes.sha256:{ioc_value}")
+                if ioc_type == "md5":
+                    q_expressions.append(f"hashes.md5:{ioc_value}")
+                # Generic value match for most types
+                q_expressions.append(f"value:{ioc_value}")
+
+                rest_candidates = []
+                # v2 primary using q expressions
+                for q in q_expressions:
+                    rest_candidates.append((f"{self.base_url}/technical-intelligence/v2/indicators", {"q": q, "size": 1}))
+                # also try simpler params in case deployment supports them
+                rest_candidates.extend([
                     (f"{self.base_url}/technical-intelligence/v2/indicators", {"value": ioc_value, "size": 1}),
                     (f"{self.base_url}/technical-intelligence/v2/indicators", {"ioc_value": ioc_value, "size": 1}),
-                    (f"{self.base_url}/technical-intelligence/v2/indicators", {"q": ioc_value, "size": 1}),
                     # v1 fallback (legacy params differ across deployments)
                     (f"{self.base_url}/technical-intelligence/v1/indicators", {"value": ioc_value, "size": 1}),
                     (f"{self.base_url}/technical-intelligence/v1/indicators", {"ioc_value": ioc_value, "size": 1}),
-                ]
+                ])
                 for rest_url, params in rest_candidates:
                     rest_resp = await self._make_request(rest_url, headers=self._get_headers(), method="GET", params=params)  # type: ignore
                     if rest_resp.status_code == 200:
