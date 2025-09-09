@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional
 
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update
+from sqlalchemy import select, update, delete
 
 from app.models.ioc import IOC, IOCScore, RiskBand
 from app.models.upload import Upload
@@ -106,6 +106,19 @@ class EnrichmentPipeline:
                         return None
 
                 raw_json_sanitized = _json_safe(enrichment_data.get("raw_json"))
+
+                # Dedupe: keep only the latest result per provider per IOC
+                try:
+                    await db.execute(
+                        delete(EnrichmentResult)
+                        .where(
+                            EnrichmentResult.ioc_id == ioc.id,
+                            EnrichmentResult.provider == provider_name,
+                        )
+                    )
+                except Exception:
+                    # best-effort; if delete fails, we still insert latest row
+                    pass
 
                 # Store enrichment result
                 enrichment_result = EnrichmentResult(
