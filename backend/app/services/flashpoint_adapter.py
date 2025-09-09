@@ -19,7 +19,8 @@ class FlashpointAdapter(BaseAdapter):
     def __init__(self):
         super().__init__("flashpoint")
         self.api_key = settings.FLASHPOINT_API_KEY
-        self.base_url = "https://fp.tools/api/v4"
+        # Prefer env override; default to fp.tools v4
+        self.base_url = settings.FLASHPOINT_BASE_URL or "https://fp.tools/api/v4"
         
         if not self.api_key:
             logger.warning("Flashpoint API key not configured")
@@ -101,7 +102,12 @@ class FlashpointAdapter(BaseAdapter):
         
         try:
             # Search for indicators
-            search_url = f"{self.base_url}/indicators/search"
+            # Try multiple known routes until one works (Flashpoint deployments vary)
+            routes = [
+                ("POST", f"{self.base_url}/intel/indicators/search"),
+                ("POST", f"{self.base_url}/indicators/search"),
+                ("POST", f"{self.base_url}/indicators/_search"),
+            ]
             payload = {
                 "query": {
                     "bool": {
@@ -113,16 +119,15 @@ class FlashpointAdapter(BaseAdapter):
                 },
                 "size": 1
             }
+            last_resp = None
+            for method, url in routes:
+                response = await self._make_request(url, headers=self._get_headers(), method=method, json=payload)
+                last_resp = response
+                if response.status_code != 404:
+                    break
             
-            response = await self._make_request(
-                search_url,
-                headers=self._get_headers(),
-                method="POST",
-                json=payload
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
+            if last_resp and last_resp.status_code == 200:
+                data = last_resp.json()
                 hits = data.get("hits", {}).get("hits", [])
                 
                 if hits:
@@ -152,7 +157,7 @@ class FlashpointAdapter(BaseAdapter):
                         "actor": actor,
                         "family": family,
                         "evidence": evidence,
-                        "http_status": response.status_code,
+                        "http_status": last_resp.status_code,
                         "raw_json": indicator
                     }
                 else:
@@ -162,7 +167,7 @@ class FlashpointAdapter(BaseAdapter):
                         "actor": None,
                         "family": None,
                         "evidence": "Not found in Flashpoint intelligence",
-                        "http_status": response.status_code,
+                        "http_status": last_resp.status_code,
                         "raw_json": None
                     }
             
@@ -172,8 +177,8 @@ class FlashpointAdapter(BaseAdapter):
                     "confidence": None,
                     "actor": None,
                     "family": None,
-                    "evidence": f"API error: {response.status_code}",
-                    "http_status": response.status_code,
+                    "evidence": f"API error: {last_resp.status_code if last_resp else 'unknown'}",
+                    "http_status": last_resp.status_code if last_resp else None,
                     "raw_json": None
                 }
                 

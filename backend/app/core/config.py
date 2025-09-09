@@ -44,6 +44,7 @@ class Settings(BaseSettings):
     CROWDSTRIKE_CLIENT_SECRET: Optional[str] = Field(default=None, env="CROWDSTRIKE_CLIENT_SECRET")
     FLASHPOINT_API_KEY: Optional[str] = Field(default=None, env="FLASHPOINT_API_KEY")
     RECORDED_FUTURE_API_KEY: Optional[str] = Field(default=None, env="RECORDED_FUTURE_API_KEY")
+    FLASHPOINT_BASE_URL: Optional[str] = Field(default=None, env="FLASHPOINT_BASE_URL")
     
     # Celery (using SQLite as broker - simplified)
     CELERY_BROKER_URL: str = Field(default="sqla+sqlite:///./celery.db", env="CELERY_BROKER_URL")
