@@ -243,7 +243,7 @@ export function SearchPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm font-mono">
               <thead>
-                <tr className="border-b border-slate-700">
+                <tr className="border-b border-gray-200">
                   <th className="text-left py-3 text-slate-300">IOC</th>
                   <th className="text-left py-3 text-slate-300">Type</th>
                   <th className="text-left py-3 text-slate-300">Risk</th>
@@ -255,19 +255,19 @@ export function SearchPage() {
               </thead>
               <tbody>
                 {iocs?.map((ioc) => (
-                  <tr key={ioc.id} className="border-b border-slate-800 hover:bg-slate-800/30">
+                  <tr key={ioc.id} className="border-b border-gray-200 hover:bg-gray-50">
                     <td className="py-3">
                       <div className="flex items-center space-x-2">
-                        <span className="text-white truncate max-w-xs">{ioc.value}</span>
+                        <span className="text-gray-900 truncate max-w-xs">{ioc.value}</span>
                         <button
                           onClick={() => copyToClipboard(ioc.value)}
-                          className="text-slate-400 hover:text-slate-200 transition-colors"
+                          className="text-gray-500 hover:text-gray-700 transition-colors"
                         >
                           <Copy className="h-3 w-3" />
                         </button>
                       </div>
                     </td>
-                    <td className="py-3 text-white capitalize">{ioc.type}</td>
+                    <td className="py-3 text-gray-900 capitalize">{ioc.type}</td>
                     <td className="py-3">
                       {ioc.latest_score ? (
                         <span className={`px-2 py-1 rounded text-xs font-bold ${getRiskColor(ioc.latest_score.risk_band)}`}>
@@ -294,8 +294,8 @@ export function SearchPage() {
                         )}
                       </div>
                     </td>
-                    <td className="py-3 text-white">{ioc.source_platform}</td>
-                    <td className="py-3 text-white">{ioc.campaign_id || '-'}</td>
+                    <td className="py-3 text-gray-900">{ioc.source_platform}</td>
+                    <td className="py-3 text-gray-900">{ioc.campaign_id || '-'}</td>
                     <td className="py-3">
                       <button
                         onClick={() => setSelectedIOC(ioc)}
