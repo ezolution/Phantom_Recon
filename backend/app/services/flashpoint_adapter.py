@@ -167,6 +167,59 @@ class FlashpointAdapter(BaseAdapter):
             except Exception:
                 pass
 
+            # 1b) Fallback within v2: page through latest indicators and match client-side
+            try:
+                page_size = 50
+                max_pages = 5  # scan up to 250 items recent-first
+                for page_idx in range(max_pages):
+                    params = {
+                        "size": page_size,
+                        "from": page_idx * page_size,
+                        "include_total_count": "false",
+                        "sort": "last_seen_at:desc",
+                    }
+                    list_url = f"{self.base_url}/technical-intelligence/v2/indicators"
+                    resp = await self._make_request(list_url, headers=self._get_headers(), method="GET", params=params)  # type: ignore
+                    if resp.status_code != 200:
+                        break
+                    data = resp.json() or {}
+                    items = data.get("items") or []
+                    if not items:
+                        break
+                    # Find exact value match
+                    matched = next((it for it in items if str(it.get("value")) == ioc_value), None)
+                    if matched:
+                        score_field = matched.get("score")
+                        if isinstance(score_field, dict):
+                            verdict_source = score_field.get("value")
+                        else:
+                            verdict_source = score_field or matched.get("severity")
+                        verdict = self._normalize_verdict(verdict_source) if isinstance(verdict_source, str) else self._extract_verdict({"risk_score": matched.get("risk_score", 0)})
+                        actor, family = self._extract_actors_families(matched)
+                        evidence_parts = []
+                        if isinstance(score_field, dict) and score_field.get("value"):
+                            evidence_parts.append(f"Score: {score_field['value']}")
+                        elif score_field:
+                            evidence_parts.append(f"Score: {score_field}")
+                        if matched.get("created_at"):
+                            evidence_parts.append(f"Created: {matched['created_at']}")
+                        evidence = "; ".join(evidence_parts) or "Flashpoint intelligence available"
+                        first_seen = matched.get("first_seen_at") or matched.get("first_scored_at") or matched.get("created_at")
+                        last_seen = matched.get("last_seen_at") or (score_field.get("last_scored_at") if isinstance(score_field, dict) else None) or matched.get("modified_at") or matched.get("updated_at")
+                        return {
+                            "verdict": verdict,
+                            "confidence": None,
+                            "actor": actor,
+                            "family": family,
+                            "evidence": evidence,
+                            "http_status": resp.status_code,
+                            "raw_json": matched,
+                            "first_seen": first_seen,
+                            "last_seen": last_seen,
+                        }
+            except Exception:
+                pass
+
             # 2) Fallback: ES-style search endpoints (deployment dependent)
             # Try multiple known routes until one works
             routes = [
