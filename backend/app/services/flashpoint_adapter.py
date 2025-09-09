@@ -170,7 +170,7 @@ class FlashpointAdapter(BaseAdapter):
             # 1b) Fallback within v2: page through latest indicators and match client-side
             try:
                 page_size = 50
-                max_pages = 5  # scan up to 250 items recent-first
+                max_pages = 20  # scan up to 1000 items recent-first
                 for page_idx in range(max_pages):
                     params = {
                         "size": page_size,
