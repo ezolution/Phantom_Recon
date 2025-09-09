@@ -205,13 +205,14 @@ async def upload_csv(
         existing = existing_q.scalars().first()
 
         if existing:
-            # Update first_seen/last_seen conservatively
-            if parsed_first_seen:
-                if not existing.first_seen or parsed_first_seen < existing.first_seen:
-                    existing.first_seen = parsed_first_seen
-            if parsed_last_seen:
-                if not existing.last_seen or parsed_last_seen > existing.last_seen:
-                    existing.last_seen = parsed_last_seen
+            # Business rule:
+            # - first_seen: keep original; do not change on subsequent uploads
+            # - last_seen: set to the upload timestamp for each reappearance
+            # (falls back to CSV-provided timestamps if needed)
+            if existing.first_seen is None:
+                existing.first_seen = parsed_first_seen or upload.created_at
+            # Always move last_seen forward to this upload time
+            existing.last_seen = upload.created_at
 
             # Upgrade classification if provided (and not 'unknown')
             try:
@@ -249,8 +250,8 @@ async def upload_csv(
                 email_id=row.get("email_id") or None,
                 campaign_id=campaign_id or row.get("campaign_id") or None,
                 user_reported=(row.get("user_reported","" ).lower() == "true"),
-                first_seen=parsed_first_seen,
-                last_seen=parsed_last_seen,
+                first_seen=parsed_first_seen or upload.created_at,
+                last_seen=parsed_last_seen or upload.created_at,
                 notes=row.get("notes") or None
             )
             db.add(ioc)
