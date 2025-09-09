@@ -57,11 +57,13 @@ export function SearchPage() {
   const [selectedProvider] = useState('')
   const [selectedClassification, setSelectedClassification] = useState('')
   const [selectedSource, setSelectedSource] = useState('')
+  const [firstSeenFrom, setFirstSeenFrom] = useState('')
+  const [lastSeenTo, setLastSeenTo] = useState('')
   const [page] = useState(1)
   const [selectedIOC, setSelectedIOC] = useState<IOC | null>(null)
 
   const { data: iocs, isLoading } = useQuery<IOC[]>({
-    queryKey: ['iocs', searchQuery, selectedType, selectedRisk, selectedProvider, selectedClassification, selectedSource, page],
+    queryKey: ['iocs', searchQuery, selectedType, selectedRisk, selectedProvider, selectedClassification, selectedSource, firstSeenFrom, lastSeenTo, page],
     queryFn: async () => {
       const params = new URLSearchParams()
       if (searchQuery) params.append('q', searchQuery)
@@ -70,6 +72,8 @@ export function SearchPage() {
       if (selectedProvider) params.append('provider', selectedProvider)
       if (selectedClassification) params.append('classification', selectedClassification)
       if (selectedSource) params.append('source_platform', selectedSource)
+      if (firstSeenFrom) params.append('first_seen_from', firstSeenFrom)
+      if (lastSeenTo) params.append('last_seen_to', lastSeenTo)
       params.append('page', page.toString())
       params.append('page_size', '50')
 
@@ -228,6 +232,30 @@ export function SearchPage() {
               <option value="Abnormal">Abnormal</option>
             </select>
           </div>
+          {/* First Seen From */}
+          <div>
+            <label className="block text-sm font-mono text-gray-700 mb-2">
+              First Seen From
+            </label>
+            <input
+              type="datetime-local"
+              value={firstSeenFrom}
+              onChange={(e) => setFirstSeenFrom(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            />
+          </div>
+          {/* Last Seen To */}
+          <div>
+            <label className="block text-sm font-mono text-gray-700 mb-2">
+              Last Seen To
+            </label>
+            <input
+              type="datetime-local"
+              value={lastSeenTo}
+              onChange={(e) => setLastSeenTo(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+            />
+          </div>
         </div>
 
         {/* Action Buttons */}
@@ -372,6 +400,18 @@ export function SearchPage() {
                         <span className="text-slate-400">Source:</span>
                         <span className="text-white">{selectedIOC.source_platform}</span>
                       </div>
+                      {(selectedIOC.first_seen || selectedIOC.last_seen) && (
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex justify-between">
+                            <span className="text-slate-400">IOC First Seen:</span>
+                            <span className="text-white">{formatDateTime(selectedIOC.first_seen) || '-'}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-slate-400">IOC Last Seen:</span>
+                            <span className="text-white">{formatDateTime(selectedIOC.last_seen) || '-'}</span>
+                          </div>
+                        </div>
+                      )}
                       {selectedIOC.campaign_id && (
                         <div className="flex justify-between">
                           <span className="text-slate-400">Campaign:</span>
