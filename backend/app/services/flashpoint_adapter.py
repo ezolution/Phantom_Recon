@@ -19,8 +19,8 @@ class FlashpointAdapter(BaseAdapter):
     def __init__(self):
         super().__init__("flashpoint")
         self.api_key = settings.FLASHPOINT_API_KEY
-        # Prefer env override; default to fp.tools v4
-        self.base_url = settings.FLASHPOINT_BASE_URL or "https://fp.tools/api/v4"
+        # Prefer env override; default to public API host
+        self.base_url = settings.FLASHPOINT_BASE_URL or "https://api.flashpoint.io"
         
         if not self.api_key:
             logger.warning("Flashpoint API key not configured")
@@ -103,36 +103,55 @@ class FlashpointAdapter(BaseAdapter):
         try:
             # 1) Preferred REST route from Ignite docs: /technical-intelligence/v2/indicators
             try:
-                rest_url = f"{self.base_url}/technical-intelligence/v2/indicators"
-                params = {"ioc_value": ioc_value, "size": 1}
-                rest_resp = await self._make_request(rest_url, headers=self._get_headers(), method="GET", params=params)  # type: ignore
-                if rest_resp.status_code == 200:
-                    data = rest_resp.json() or {}
-                    items = data.get("items") or []
-                    if items:
-                        ind = items[0]
-                        verdict_raw = ind.get("score") or ind.get("risk_score") or ind.get("severity")
-                        verdict = self._extract_verdict({"risk_score": 80 if str(verdict_raw).lower()=="malicious" else 40 if str(verdict_raw).lower()=="suspicious" else 0})
-                        actor, family = self._extract_actors_families(ind)
-                        evidence_parts = []
-                        if ind.get("score"):
-                            evidence_parts.append(f"Score: {ind['score']}")
-                        if ind.get("created_at"):
-                            evidence_parts.append(f"Created: {ind['created_at']}")
-                        evidence = "; ".join(evidence_parts) or "Flashpoint intelligence available"
-                        first_seen = ind.get("first_scored_at") or ind.get("created_at")
-                        last_seen = ind.get("last_scored_at") or ind.get("updated_at")
-                        return {
-                            "verdict": verdict,
-                            "confidence": None,
-                            "actor": actor,
-                            "family": family,
-                            "evidence": evidence,
-                            "http_status": rest_resp.status_code,
-                            "raw_json": ind,
-                            "first_seen": first_seen,
-                            "last_seen": last_seen,
-                        }
+                rest_candidates = [
+                    # v2 primary
+                    (f"{self.base_url}/technical-intelligence/v2/indicators", {"value": ioc_value, "size": 1}),
+                    (f"{self.base_url}/technical-intelligence/v2/indicators", {"ioc_value": ioc_value, "size": 1}),
+                    (f"{self.base_url}/technical-intelligence/v2/indicators", {"q": ioc_value, "size": 1}),
+                    # v1 fallback (legacy params differ across deployments)
+                    (f"{self.base_url}/technical-intelligence/v1/indicators", {"value": ioc_value, "size": 1}),
+                    (f"{self.base_url}/technical-intelligence/v1/indicators", {"ioc_value": ioc_value, "size": 1}),
+                ]
+                for rest_url, params in rest_candidates:
+                    rest_resp = await self._make_request(rest_url, headers=self._get_headers(), method="GET", params=params)  # type: ignore
+                    if rest_resp.status_code == 200:
+                        data = rest_resp.json() or {}
+                        items = data.get("items") or []
+                        if items:
+                            # Prefer exact value match if present
+                            ind = next((it for it in items if it.get("value") == ioc_value), items[0])
+                            score_field = ind.get("score")
+                            if isinstance(score_field, dict):
+                                verdict_source = score_field.get("value")
+                            else:
+                                verdict_source = score_field or ind.get("severity")
+                            # Normalize string verdicts; fallback to numeric risk score mapping
+                            if isinstance(verdict_source, str):
+                                verdict = self._normalize_verdict(verdict_source)
+                            else:
+                                verdict = self._extract_verdict({"risk_score": ind.get("risk_score", 0)})
+                            actor, family = self._extract_actors_families(ind)
+                            evidence_parts = []
+                            if isinstance(score_field, dict) and score_field.get("value"):
+                                evidence_parts.append(f"Score: {score_field['value']}")
+                            elif score_field:
+                                evidence_parts.append(f"Score: {score_field}")
+                            if ind.get("created_at"):
+                                evidence_parts.append(f"Created: {ind['created_at']}")
+                            evidence = "; ".join(evidence_parts) or "Flashpoint intelligence available"
+                            first_seen = ind.get("first_seen_at") or ind.get("first_scored_at") or ind.get("created_at")
+                            last_seen = ind.get("last_seen_at") or (score_field.get("last_scored_at") if isinstance(score_field, dict) else None) or ind.get("modified_at") or ind.get("updated_at")
+                            return {
+                                "verdict": verdict,
+                                "confidence": None,
+                                "actor": actor,
+                                "family": family,
+                                "evidence": evidence,
+                                "http_status": rest_resp.status_code,
+                                "raw_json": ind,
+                                "first_seen": first_seen,
+                                "last_seen": last_seen,
+                            }
             except Exception:
                 pass
 
