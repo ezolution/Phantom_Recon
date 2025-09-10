@@ -203,12 +203,25 @@ async def search_iocs(
     result = await db.execute(query)
     iocs = result.scalars().all()
     
-    # Populate latest_score from most recent IOCScore (if present)
+    # Populate latest_score and sanitize legacy enrichment raw_json values
     for ioc in iocs:
         try:
             if hasattr(ioc, "scores") and ioc.scores:
                 latest = max(ioc.scores, key=lambda s: getattr(s, "computed_at", None) or getattr(s, "id", 0))
                 setattr(ioc, "latest_score", latest)
+            # Coerce raw_json strings to dicts to satisfy response schema
+            if hasattr(ioc, "enrichment_results") and ioc.enrichment_results:
+                import json as _json
+                for r in ioc.enrichment_results:
+                    if isinstance(getattr(r, "raw_json", None), str):
+                        try:
+                            parsed = _json.loads(r.raw_json)
+                            if isinstance(parsed, (dict, list)):
+                                r.raw_json = parsed  # type: ignore
+                            else:
+                                r.raw_json = None  # type: ignore
+                        except Exception:
+                            r.raw_json = None  # type: ignore
         except Exception:
             # best-effort; ignore if something unexpected
             pass
@@ -240,11 +253,23 @@ async def get_ioc_details(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="IOC not found"
         )
-    # Attach most recent score for details view
+    # Attach most recent score and sanitize legacy raw_json for details view
     try:
         if hasattr(ioc, "scores") and ioc.scores:
             latest = max(ioc.scores, key=lambda s: getattr(s, "computed_at", None) or getattr(s, "id", 0))
             setattr(ioc, "latest_score", latest)
+        if hasattr(ioc, "enrichment_results") and ioc.enrichment_results:
+            import json as _json
+            for r in ioc.enrichment_results:
+                if isinstance(getattr(r, "raw_json", None), str):
+                    try:
+                        parsed = _json.loads(r.raw_json)
+                        if isinstance(parsed, (dict, list)):
+                            r.raw_json = parsed  # type: ignore
+                        else:
+                            r.raw_json = None  # type: ignore
+                    except Exception:
+                        r.raw_json = None  # type: ignore
     except Exception:
         pass
     return ioc
