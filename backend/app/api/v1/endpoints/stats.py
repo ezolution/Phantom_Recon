@@ -13,8 +13,46 @@ from app.core.database import get_db
 from app.core.config import settings
 from app.models.ioc import IOC, IOCScore, RiskBand
 from app.models.enrichment import EnrichmentResult
+from app.services.virustotal_adapter import VirusTotalAdapter
+from app.services.urlscan_adapter import URLScanAdapter
+from app.services.osint_adapter import OSINTAdapter
+from app.services.crowdstrike_adapter import CrowdStrikeAdapter
+from app.services.flashpoint_adapter import FlashpointAdapter
+from app.services.recorded_future_adapter import RecordedFutureAdapter
 
 router = APIRouter()
+@router.get("/provider-status")
+async def provider_status() -> Any:
+    """Return provider readiness and configuration status."""
+    adapters = {
+        "virustotal": VirusTotalAdapter(),
+        "urlscan": URLScanAdapter(),
+        "osint": OSINTAdapter(),
+        "crowdstrike": CrowdStrikeAdapter(),
+        "flashpoint": FlashpointAdapter(),
+        "recorded_future": RecordedFutureAdapter(),
+    }
+    status: dict[str, dict] = {}
+    for name, adapter in adapters.items():
+        ready = True
+        reason = None
+        # Simple readiness heuristic based on presence of API keys when required
+        if name == "virustotal" and not settings.VIRUSTOTAL_API_KEY:
+            ready, reason = False, "API key missing"
+        if name == "urlscan" and not settings.URLSCAN_API_KEY:
+            ready, reason = False, "API key missing"
+        if name == "crowdstrike" and not (settings.CROWDSTRIKE_CLIENT_ID and settings.CROWDSTRIKE_CLIENT_SECRET):
+            ready, reason = False, "Client credentials missing"
+        if name == "flashpoint" and not settings.FLASHPOINT_API_KEY:
+            ready, reason = False, "API key missing"
+        if name == "recorded_future" and not settings.RECORDED_FUTURE_API_KEY:
+            ready, reason = False, "API key missing"
+        status[name] = {
+            "ready": ready,
+            "reason": reason,
+        }
+    return status
+
 
 
 @router.get("/overview")

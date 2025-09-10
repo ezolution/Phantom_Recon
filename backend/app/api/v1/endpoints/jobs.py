@@ -2,9 +2,9 @@
 Job endpoints
 """
 
-from typing import Any
+from typing import Any, List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -22,6 +22,24 @@ from app.models.upload import Upload
 
 router = APIRouter()
 
+
+@router.get("/", response_model=List[JobSummary])
+async def list_jobs(
+    limit: int = Query(20, ge=1, le=100, description="Max number of recent jobs to return"),
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    """List recent jobs with progress metrics."""
+    result = await db.execute(
+        select(Job).order_by(Job.id.desc()).limit(limit)
+    )
+    jobs = result.scalars().all()
+    summaries: List[JobSummary] = []
+    for job in jobs:
+        pct = 0.0
+        if job.total_iocs > 0:
+            pct = (job.processed_iocs / job.total_iocs) * 100
+        summaries.append(JobSummary(job=job, progress_percentage=pct))
+    return summaries
 
 @router.get("/latest", response_model=JobSummary)
 async def get_latest_job(

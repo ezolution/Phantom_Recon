@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Shield, TrendingUp, AlertTriangle, CheckCircle, Fingerprint, Activity, Clock } from 'lucide-react'
+import { Shield, TrendingUp, AlertTriangle, CheckCircle, Fingerprint, Activity, Clock, Play } from 'lucide-react'
 import { api } from '../lib/api'
 
 interface StatsData {
@@ -164,7 +164,16 @@ export function DashboardPage() {
                     {latestJob.job.error_message ? ` · ${latestJob.job.error_message}` : ''}
                   </p>
                 </div>
-                <Activity className="h-8 w-8 text-gray-400" />
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={async () => { await api.post(`/jobs/${latestJob.job.id}/enrich`) }}
+                    className="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center space-x-2"
+                  >
+                    <Play className="h-4 w-4" />
+                    <span className="text-sm">Re-run</span>
+                  </button>
+                  <Activity className="h-8 w-8 text-gray-400" />
+                </div>
               </div>
             </div>
           )}

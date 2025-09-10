@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { Settings, Database, Shield, Bell, Save } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { Settings, Database, Shield, Bell, Save, CheckCircle2, XCircle } from 'lucide-react'
+import { api } from '../lib/api'
 
 export function SettingsPage() {
   const [settings, setSettings] = useState({
@@ -128,6 +130,9 @@ export function SettingsPage() {
         </div>
       </div>
 
+      {/* Provider Status */}
+      <ProviderStatusCard />
+
       {/* Save Button */}
       <div className="flex justify-end">
         <button
@@ -139,6 +144,46 @@ export function SettingsPage() {
         </button>
       </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function ProviderStatusCard() {
+  const { data, isLoading } = useQuery<{[k: string]: { ready: boolean; reason?: string } }>({
+    queryKey: ['provider-status'],
+    queryFn: async () => (await api.get('/stats/provider-status')).data,
+    refetchInterval: 10000,
+  })
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+      <h3 className="text-lg font-mono font-semibold text-gray-900 mb-4 flex items-center">
+        <Shield className="h-5 w-5 mr-2 text-emerald-500" />
+        Provider Status
+      </h3>
+      {isLoading && <div className="text-sm text-gray-500 font-mono">Checking providers…</div>}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {Object.entries(data || {}).map(([name, s]) => (
+          <div key={name} className="flex items-center justify-between p-3 border border-gray-200 rounded-md">
+            <span className="font-mono text-sm text-gray-700 capitalize">{name.replace('_',' ')}</span>
+            <div className="flex items-center space-x-2">
+              {s.ready ? (
+                <>
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                  <span className="text-xs text-gray-600 font-mono">Ready</span>
+                </>
+              ) : (
+                <>
+                  <XCircle className="h-4 w-4 text-red-500" />
+                  <span className="text-xs text-red-600 font-mono">{s.reason || 'Unavailable'}</span>
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+        {(!data || Object.keys(data).length === 0) && !isLoading && (
+          <div className="text-sm text-gray-500 font-mono">No providers</div>
+        )}
       </div>
     </div>
   )
