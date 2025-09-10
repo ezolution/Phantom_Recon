@@ -111,13 +111,13 @@ export function AnalyticsPage() {
                 <p className="text-sm font-mono text-gray-500">Recent Clusters (72h)</p>
                 <Shield className="h-5 w-5 text-gray-400" />
               </div>
-              <div>
+              <div className="space-y-2 max-h-64 overflow-auto pr-1">
                 <p className="text-xs font-mono text-gray-500 mb-2">By Campaign</p>
                 <div className="space-y-2 mb-4">
                   {data?.clusters_recent?.by_campaign_72h?.map((c) => (
-                    <div key={c.campaign_id} className="flex items-center justify-between">
-                      <span className="font-mono text-sm text-gray-700">{c.campaign_id}</span>
-                      <span className="font-mono font-bold text-gray-900">{c.count}</span>
+                    <div key={c.campaign_id} className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-sm text-gray-700 truncate max-w-[85%]" title={c.campaign_id}>{c.campaign_id}</span>
+                      <span className="font-mono text-xs bg-gray-100 text-gray-900 px-2 py-0.5 rounded w-8 text-center shrink-0">{c.count}</span>
                     </div>
                   ))}
                   {(!data || (data?.clusters_recent?.by_campaign_72h?.length || 0) === 0) && (
@@ -127,9 +127,9 @@ export function AnalyticsPage() {
                 <p className="text-xs font-mono text-gray-500 mb-2">By Source</p>
                 <div className="space-y-2">
                   {data?.clusters_recent?.by_source_72h?.map((s) => (
-                    <div key={s.source} className="flex items-center justify-between">
-                      <span className="font-mono text-sm text-gray-700">{s.source || '-'}</span>
-                      <span className="font-mono font-bold text-gray-900">{s.count}</span>
+                    <div key={s.source} className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-sm text-gray-700 truncate max-w-[85%]" title={s.source}>{s.source || '-'}</span>
+                      <span className="font-mono text-xs bg-gray-100 text-gray-900 px-2 py-0.5 rounded w-8 text-center shrink-0">{s.count}</span>
                     </div>
                   ))}
                   {(!data || (data?.clusters_recent?.by_source_72h?.length || 0) === 0) && (
