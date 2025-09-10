@@ -172,6 +172,12 @@ export function DashboardPage() {
                     <Play className="h-4 w-4" />
                     <span className="text-sm">Re-run</span>
                   </button>
+                  <button
+                    onClick={async ()=>{ await api.post('/stats/cache/clear'); }}
+                    className="px-3 py-2 bg-gray-800 text-white rounded-md hover:bg-black transition-colors text-sm"
+                  >
+                    Clear Cache
+                  </button>
                   <Activity className="h-8 w-8 text-gray-400" />
                 </div>
               </div>

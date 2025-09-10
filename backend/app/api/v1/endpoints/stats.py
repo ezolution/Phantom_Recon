@@ -19,6 +19,7 @@ from app.services.osint_adapter import OSINTAdapter
 from app.services.crowdstrike_adapter import CrowdStrikeAdapter
 from app.services.flashpoint_adapter import FlashpointAdapter
 from app.services.recorded_future_adapter import RecordedFutureAdapter
+from app.services.base_adapter import BaseAdapter
 
 router = APIRouter()
 @router.get("/provider-status")
@@ -53,6 +54,18 @@ async def provider_status() -> Any:
         }
     return status
 
+
+@router.post("/cache/ttl")
+async def set_cache_ttl(positive_ttl_seconds: int = 86400, negative_ttl_seconds: int = 21600) -> Any:
+    """Set global cache TTLs for provider adapters (seconds)."""
+    BaseAdapter.set_cache_ttls(positive_ttl_seconds, negative_ttl_seconds)
+    return {"ok": True, "positive_ttl_seconds": positive_ttl_seconds, "negative_ttl_seconds": negative_ttl_seconds}
+
+@router.post("/cache/clear")
+async def clear_cache() -> Any:
+    """Clear in-process adapter cache (best-effort)."""
+    removed = BaseAdapter.clear_cache()
+    return {"ok": True, "removed": removed}
 
 
 @router.get("/overview")

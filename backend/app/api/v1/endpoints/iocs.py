@@ -15,8 +15,89 @@ from app.models.ioc import IOC, IOCScore
 from app.models.enrichment import EnrichmentResult
 from app.schemas.ioc import IOC as IOCSchema, IOCWithDetails, IOCSearch
 from app.schemas.enrichment import EnrichmentResult as EnrichmentResultSchema
+from app.models.upload import Upload
+from app.services.enrichment_pipeline import EnrichmentPipeline
+from sqlalchemy import update
 
 router = APIRouter()
+@router.get("/campaigns")
+async def get_campaigns(
+    db: AsyncSession = Depends(get_db),
+):
+    """List campaigns with IOC counts and last activity."""
+    # Count IOCs per campaign (non-null)
+    result = await db.execute(
+        select(IOC.campaign_id, func.count(IOC.id), func.max(IOC.last_seen))
+        .where(IOC.campaign_id.is_not(None))
+        .group_by(IOC.campaign_id)
+        .order_by(func.count(IOC.id).desc())
+    )
+    rows = result.all()
+    campaigns = [
+        {"campaign_id": cid, "ioc_count": int(cnt), "last_seen": last.isoformat() if last else None}
+        for cid, cnt, last in rows
+    ]
+    return {"campaigns": campaigns}
+
+@router.get("/campaigns/{campaign_id}")
+async def get_campaign_details(
+    campaign_id: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """IOC aggregation and simple timeline for a campaign."""
+    # IOCs
+    res = await db.execute(
+        select(IOC).options(selectinload(IOC.enrichment_results), selectinload(IOC.scores))
+        .where(IOC.campaign_id == campaign_id)
+        .order_by(IOC.created_at.desc())
+    )
+    iocs = res.scalars().all()
+
+    # Timeline (per day)
+    res = await db.execute(
+        select(func.date(IOC.created_at), func.count(IOC.id))
+        .where(IOC.campaign_id == campaign_id)
+        .group_by(func.date(IOC.created_at))
+        .order_by(func.date(IOC.created_at))
+    )
+    timeline = [{"date": d, "count": int(c)} for d, c in res.all()]
+
+    return {
+        "campaign_id": campaign_id,
+        "ioc_count": len(iocs),
+        "timeline": timeline,
+        "iocs": iocs,
+    }
+
+
+@router.post("/{ioc_id}/re-enrich")
+async def re_enrich_ioc(
+    ioc_id: int,
+    db: AsyncSession = Depends(get_db),
+):
+    """Re-run enrichment for a single IOC and recompute scores."""
+    # Load IOC
+    res = await db.execute(select(IOC).where(IOC.id == ioc_id))
+    ioc = res.scalar_one_or_none()
+    if not ioc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="IOC not found")
+
+    pipeline = EnrichmentPipeline()
+    # Enrich with all providers and store results (pipeline handles dedupe)
+    enrichment_results = await pipeline.enrich_ioc(ioc, db)
+
+    # Recompute scores
+    risk_score = pipeline.calculate_risk_score(enrichment_results)
+    attribution_score = pipeline.calculate_attribution_score(enrichment_results)
+    risk_band = pipeline.get_risk_band(risk_score)
+    db.add(IOCScore(
+        ioc_id=ioc.id,
+        risk_score=risk_score,
+        attribution_score=attribution_score,
+        risk_band=risk_band,
+    ))
+    await db.commit()
+    return {"ok": True, "risk_score": risk_score, "attribution_score": attribution_score, "risk_band": risk_band}
 
 
 @router.get("/", response_model=List[IOCWithDetails])

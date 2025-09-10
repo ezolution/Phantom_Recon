@@ -338,13 +338,21 @@ export function SearchPage() {
                     <td className="py-3 text-gray-900 truncate whitespace-nowrap max-w-[160px]">{ioc.source_platform}</td>
                     <td className="py-3 text-gray-900 truncate whitespace-nowrap max-w-[240px]">{ioc.campaign_id || '-'}</td>
                     <td className="py-3">
-                      <button
-                        onClick={() => setSelectedIOC(ioc)}
-                        className="btn-secondary text-xs"
-                      >
-                        <Eye className="h-3 w-3 mr-1" />
-                        View
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => setSelectedIOC(ioc)}
+                          className="btn-secondary text-xs"
+                        >
+                          <Eye className="h-3 w-3 mr-1" />
+                          View
+                        </button>
+                        <button
+                          onClick={async ()=>{ await api.post(`/iocs/${ioc.id}/re-enrich`); toast.success('Re-enrichment started'); }}
+                          className="px-2 py-1 bg-red-600 text-white rounded text-xs hover:bg-red-700"
+                        >
+                          Re-enrich
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

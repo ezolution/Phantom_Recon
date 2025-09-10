@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Settings, Database, Shield, Bell, Save, CheckCircle2, XCircle } from 'lucide-react'
+import { Settings, Database, Shield, Bell, Save, CheckCircle2, XCircle, RefreshCw, Clock } from 'lucide-react'
 import { api } from '../lib/api'
 
 export function SettingsPage() {
@@ -155,6 +155,8 @@ function ProviderStatusCard() {
     queryFn: async () => (await api.get('/stats/provider-status')).data,
     refetchInterval: 10000,
   })
+  const [posTtl, setPosTtl] = useState(86400)
+  const [negTtl, setNegTtl] = useState(21600)
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
       <h3 className="text-lg font-mono font-semibold text-gray-900 mb-4 flex items-center">
@@ -184,6 +186,41 @@ function ProviderStatusCard() {
         {(!data || Object.keys(data).length === 0) && !isLoading && (
           <div className="text-sm text-gray-500 font-mono">No providers</div>
         )}
+      </div>
+
+      {/* Cache controls */}
+      <div className="mt-6 p-4 bg-gray-50 border border-gray-200 rounded-md">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center space-x-2">
+            <Clock className="h-4 w-4 text-gray-500" />
+            <span className="text-sm font-mono text-gray-700">Cache TTL</span>
+          </div>
+          <button
+            onClick={async () => { await api.post('/stats/cache/clear'); window.alert('Cache cleared'); }}
+            className="px-3 py-1.5 bg-gray-800 text-white rounded-md text-xs flex items-center space-x-1 hover:bg-black"
+          >
+            <RefreshCw className="h-3 w-3" />
+            <span>Clear Cache</span>
+          </button>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-mono text-gray-600 mb-1">Positive TTL (seconds)</label>
+            <input type="number" value={posTtl} onChange={e=>setPosTtl(parseInt(e.target.value||'0'))} className="w-full px-3 py-2 border border-gray-300 rounded" min={60} max={604800} />
+          </div>
+          <div>
+            <label className="block text-xs font-mono text-gray-600 mb-1">Negative TTL (seconds)</label>
+            <input type="number" value={negTtl} onChange={e=>setNegTtl(parseInt(e.target.value||'0'))} className="w-full px-3 py-2 border border-gray-300 rounded" min={30} max={86400} />
+          </div>
+        </div>
+        <div className="mt-3 text-right">
+          <button
+            onClick={async ()=>{ await api.post('/stats/cache/ttl', undefined, { params: { positive_ttl_seconds: posTtl, negative_ttl_seconds: negTtl } }); window.alert('TTL updated'); }}
+            className="px-3 py-1.5 bg-red-600 text-white rounded-md text-xs hover:bg-red-700"
+          >
+            Update TTL
+          </button>
+        </div>
       </div>
     </div>
   )

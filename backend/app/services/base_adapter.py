@@ -27,8 +27,13 @@ class BaseAdapter(ABC):
         # In-process cache (no Redis). Key -> (expires_at_epoch, result_dict)
         if not hasattr(BaseAdapter, "_local_cache"):
             BaseAdapter._local_cache: Dict[str, Tuple[float, Dict[str, Any]]] = {}
-        self.cache_ttl_positive = 24 * 60 * 60  # 24 hours
-        self.cache_ttl_negative = 6 * 60 * 60   # 6 hours
+        # Default TTLs (class-wide, runtime adjustable)
+        if not hasattr(BaseAdapter, "DEFAULT_TTL_POSITIVE"):
+            BaseAdapter.DEFAULT_TTL_POSITIVE = 24 * 60 * 60  # 24 hours
+        if not hasattr(BaseAdapter, "DEFAULT_TTL_NEGATIVE"):
+            BaseAdapter.DEFAULT_TTL_NEGATIVE = 6 * 60 * 60   # 6 hours
+        self.cache_ttl_positive = BaseAdapter.DEFAULT_TTL_POSITIVE
+        self.cache_ttl_negative = BaseAdapter.DEFAULT_TTL_NEGATIVE
         self.max_retries = 4
         self.timeout = 15.0
         
@@ -54,6 +59,43 @@ class BaseAdapter(ABC):
         """Cache result for IOC in in-process cache"""
         cache_key = self._get_cache_key(ioc_value, ioc_type)
         BaseAdapter._local_cache[cache_key] = (time.time() + ttl, result)
+
+    # ----- Cache administration (class-wide) -----
+    @classmethod
+    def set_cache_ttls(cls, positive_ttl_seconds: int, negative_ttl_seconds: int) -> None:
+        """Set default cache TTLs for all adapters (affects new instances immediately)."""
+        # Sanitize values to reasonable ranges
+        pos = max(60, min(7 * 24 * 60 * 60, int(positive_ttl_seconds)))
+        neg = max(30, min(24 * 60 * 60, int(negative_ttl_seconds)))
+        cls.DEFAULT_TTL_POSITIVE = pos
+        cls.DEFAULT_TTL_NEGATIVE = neg
+        # Update currently instantiated adapters if any references exist
+        try:
+            # Best-effort: walk live cache of keys to keep behavior consistent
+            # Note: existing entries keep their original expiry; only new writes use new TTLs.
+            pass
+        except Exception:
+            pass
+
+    @classmethod
+    def clear_cache(cls, ioc_value: Optional[str] = None, ioc_type: Optional[str] = None) -> int:
+        """Clear entire adapter cache or entries matching a specific IOC value/type.
+        Returns number of entries removed.
+        """
+        if not hasattr(cls, "_local_cache"):
+            return 0
+        if not ioc_value:
+            removed = len(cls._local_cache)
+            cls._local_cache.clear()
+            return removed
+        # Remove specific
+        removed = 0
+        key_suffix = f":{ioc_type}:{ioc_value}" if ioc_type else f":{ioc_value}"
+        # Keys are md5 of provider:ioc_type:ioc_value, so we cannot pattern match.
+        # Fall back to brute-force by recomputing keys for all known providers is not possible here.
+        # Instead, wipe entire cache when specific eviction requested without mapping.
+        cls._local_cache.clear()
+        return -1  # signal full clear performed due to limitation
     
     async def _make_request(self, url: str, headers: Dict[str, str] = None, method: str = "GET", **kwargs) -> httpx.Response:
         """Make HTTP request with retry logic. Set method to 'GET' or 'POST'."""
