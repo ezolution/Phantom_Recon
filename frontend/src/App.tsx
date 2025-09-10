@@ -4,6 +4,7 @@ import { UploadPage } from './pages/UploadPage'
 import { SearchPage } from './pages/SearchPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { SettingsPage } from './pages/SettingsPage'
+import { CampaignsPage } from './pages/CampaignsPage'
 import { AnalyticsPage } from './pages/AnalyticsPage'
 
 function App() {
@@ -22,6 +23,10 @@ function App() {
         return <AnalyticsPage />
       case 'settings':
         return <SettingsPage />
+      case 'analytics':
+        return <AnalyticsPage />
+      case 'campaigns':
+        return <CampaignsPage />
       case 'logs':
         return <SettingsPage /> // For now, reuse settings - can create separate logs page later
       default:

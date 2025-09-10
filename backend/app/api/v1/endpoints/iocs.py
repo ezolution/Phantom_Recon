@@ -203,8 +203,15 @@ async def search_iocs(
     result = await db.execute(query)
     iocs = result.scalars().all()
     
-    # TODO: Apply risk score filtering and provider/actor/family filtering
-    # This would require more complex joins with enrichment results
+    # Populate latest_score from most recent IOCScore (if present)
+    for ioc in iocs:
+        try:
+            if hasattr(ioc, "scores") and ioc.scores:
+                latest = max(ioc.scores, key=lambda s: getattr(s, "computed_at", None) or getattr(s, "id", 0))
+                setattr(ioc, "latest_score", latest)
+        except Exception:
+            # best-effort; ignore if something unexpected
+            pass
     
     return iocs
 
@@ -233,5 +240,11 @@ async def get_ioc_details(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="IOC not found"
         )
-    
+    # Attach most recent score for details view
+    try:
+        if hasattr(ioc, "scores") and ioc.scores:
+            latest = max(ioc.scores, key=lambda s: getattr(s, "computed_at", None) or getattr(s, "id", 0))
+            setattr(ioc, "latest_score", latest)
+    except Exception:
+        pass
     return ioc

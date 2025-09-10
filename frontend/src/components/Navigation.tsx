@@ -99,7 +99,8 @@ const navigationSections = [
     title: 'Analytics',
     items: [
       { id: 'dashboard', label: 'Dashboard', icon: BarChart3, description: 'System overview' },
-      { id: 'analytics', label: 'Analytics', icon: Activity, description: 'Threat analysis', badge: 'New' }
+      { id: 'analytics', label: 'Analytics', icon: Activity, description: 'Threat analysis' },
+      { id: 'campaigns', label: 'Campaigns', icon: Bookmark, description: 'Aggregations' }
     ]
   },
   {
