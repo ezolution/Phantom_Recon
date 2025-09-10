@@ -86,6 +86,15 @@ class EnrichmentPipeline:
                         return value
                     except TypeError:
                         pass
+                    # Strings that look like JSON -> parse to dict to satisfy schema
+                    if isinstance(value, str):
+                        try:
+                            parsed = json.loads(value)
+                            # Only accept dict/list; otherwise drop
+                            if isinstance(parsed, (dict, list)):
+                                return parsed
+                        except Exception:
+                            return None
                     # dicts
                     if isinstance(value, dict):
                         return {k: _json_safe(v) for k, v in value.items()}
