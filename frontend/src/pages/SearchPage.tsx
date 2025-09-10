@@ -282,16 +282,16 @@ export function SearchPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm font-mono">
+            <table className="w-full text-sm font-mono table-fixed">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 text-slate-300">IOC</th>
-                  <th className="text-left py-3 text-slate-300">Type</th>
-                  <th className="text-left py-3 text-slate-300">Risk</th>
-                  <th className="text-left py-3 text-slate-300">Verdicts</th>
-                  <th className="text-left py-3 text-slate-300">Source</th>
-                  <th className="text-left py-3 text-slate-300">Campaign</th>
-                  <th className="text-left py-3 text-slate-300">Actions</th>
+                  <th className="text-left py-3 text-slate-300 w-64">IOC</th>
+                  <th className="text-left py-3 text-slate-300 w-24">Type</th>
+                  <th className="text-left py-3 text-slate-300 w-24">Risk</th>
+                  <th className="text-left py-3 text-slate-300 w-28">Verdicts</th>
+                  <th className="text-left py-3 text-slate-300 w-40">Source</th>
+                  <th className="text-left py-3 text-slate-300 w-64">Campaign</th>
+                  <th className="text-left py-3 text-slate-300 w-24">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -299,7 +299,7 @@ export function SearchPage() {
                   <tr key={ioc.id} className="border-b border-gray-200 hover:bg-gray-50">
                     <td className="py-3">
                       <div className="flex items-center space-x-2">
-                        <span className="text-gray-900 truncate max-w-xs">{ioc.value}</span>
+                        <span className="text-gray-900 truncate max-w-[220px] break-all">{ioc.value}</span>
                         <button
                           onClick={() => copyToClipboard(ioc.value)}
                           className="text-gray-500 hover:text-gray-700 transition-colors"
@@ -308,7 +308,7 @@ export function SearchPage() {
                         </button>
                       </div>
                     </td>
-                    <td className="py-3 text-gray-900 capitalize">{ioc.type}</td>
+                    <td className="py-3 text-gray-900 capitalize whitespace-nowrap">{ioc.type}</td>
                     <td className="py-3">
                       {ioc.latest_score ? (
                         <span className={`px-2 py-1 rounded text-xs font-bold ${getRiskColor(ioc.latest_score.risk_band)}`}>
@@ -335,8 +335,8 @@ export function SearchPage() {
                         )}
                       </div>
                     </td>
-                    <td className="py-3 text-gray-900">{ioc.source_platform}</td>
-                    <td className="py-3 text-gray-900">{ioc.campaign_id || '-'}</td>
+                    <td className="py-3 text-gray-900 truncate whitespace-nowrap max-w-[160px]">{ioc.source_platform}</td>
+                    <td className="py-3 text-gray-900 truncate whitespace-nowrap max-w-[240px]">{ioc.campaign_id || '-'}</td>
                     <td className="py-3">
                       <button
                         onClick={() => setSelectedIOC(ioc)}
@@ -386,7 +386,7 @@ export function SearchPage() {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-slate-400">Value:</span>
-                        <span className="text-white font-mono">{selectedIOC.value}</span>
+                        <span className="text-white font-mono break-all">{selectedIOC.value}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400">Type:</span>
@@ -398,7 +398,7 @@ export function SearchPage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-400">Source:</span>
-                        <span className="text-white">{selectedIOC.source_platform}</span>
+                        <span className="text-white truncate whitespace-nowrap max-w-[60%]">{selectedIOC.source_platform}</span>
                       </div>
                       {(selectedIOC.first_seen || selectedIOC.last_seen) && (
                         <div className="grid grid-cols-2 gap-2">
@@ -415,7 +415,7 @@ export function SearchPage() {
                       {selectedIOC.campaign_id && (
                         <div className="flex justify-between">
                           <span className="text-slate-400">Campaign:</span>
-                          <span className="text-white">{selectedIOC.campaign_id}</span>
+                          <span className="text-white break-words max-w-[60%] text-right">{selectedIOC.campaign_id}</span>
                         </div>
                       )}
                     </div>
@@ -476,7 +476,7 @@ export function SearchPage() {
                           </div>
                         )}
                         {result.evidence && (
-                          <div className="text-xs text-slate-300">
+                          <div className="text-xs text-slate-300 break-words">
                             {result.evidence}
                           </div>
                         )}
