@@ -17,6 +17,14 @@ type AnalyticsData = {
   top_families_7d?: { name: string; count: number }[]
 }
 
+type HeatmapData = {
+  dates: string[]
+  actors: string[]
+  sources: string[]
+  entries: { date: string; actor: string; source: string; count: number }[]
+  window_days: number
+}
+
 export function AnalyticsPage() {
   const { data, isLoading } = useQuery<AnalyticsData>({
     queryKey: ['stats', 'analytics'],
@@ -25,6 +33,12 @@ export function AnalyticsPage() {
       return res.data
     },
     refetchInterval: 5000,
+  })
+
+  const { data: heatmap } = useQuery<HeatmapData>({
+    queryKey: ['stats', 'heatmap'],
+    queryFn: async () => (await api.get('/stats/heatmap?days=14&top_actors=10&top_sources=5')).data,
+    refetchInterval: 10000,
   })
 
   const maxTrend = Math.max(
@@ -141,6 +155,47 @@ export function AnalyticsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Actor x Source x Time Heatmap */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-mono text-gray-500">Actor x Source Heatmap (14d)</p>
+                <BarChart2 className="h-5 w-5 text-gray-400" />
+              </div>
+              {!heatmap || heatmap.actors.length === 0 ? (
+                <div className="text-gray-400 font-mono">No data</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-[11px] font-mono">
+                    <thead>
+                      <tr>
+                        <th className="text-left py-1 pr-2 text-gray-500">Actor \ Source</th>
+                        {heatmap.sources.map((s) => (
+                          <th key={s} className="text-left py-1 px-2 text-gray-700">{s}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {heatmap.actors.map((a) => (
+                        <tr key={a} className="border-t border-gray-100">
+                          <td className="py-1 pr-2 text-gray-800 truncate max-w-[200px]" title={a}>{a}</td>
+                          {heatmap.sources.map((s) => {
+                            // sum counts for this actor+source over dates
+                            const total = (heatmap.entries || []).filter(e => e.actor===a && e.source===s).reduce((acc, e)=>acc+e.count, 0)
+                            const intensity = Math.min(100, total * 10) // simple scale
+                            return (
+                              <td key={s} className="py-1 px-2">
+                                <div className="w-8 h-4 rounded" style={{ backgroundColor: `rgba(16,185,129,${0.15 + Math.min(0.85, intensity/100)})` }} title={`${total} hits`} />
+                              </td>
+                            )
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-sm font-mono text-gray-500">Risk Band Distribution</p>

@@ -5,6 +5,7 @@ Statistics endpoints
 from typing import Any, Dict, List
 
 from fastapi import APIRouter, Depends
+from fastapi import Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 
@@ -335,4 +336,74 @@ async def get_analytics(
         },
         "unique_actors_48h": unique_actors_48h,
         "targeting_signal": targeting_signal,
+    }
+
+
+@router.get("/heatmap")
+async def get_actor_source_time_heatmap(
+    days: int = Query(14, ge=1, le=90),
+    top_actors: int = Query(10, ge=1, le=50),
+    top_sources: int = Query(5, ge=1, le=50),
+    db: AsyncSession = Depends(get_db),
+):
+    """Actor vs Source over Time heatmap data.
+    Returns the top N actors and sources within the window and a matrix of counts per day.
+    """
+    from datetime import datetime, timedelta
+
+    now = datetime.utcnow()
+    window_start = now - timedelta(days=days)
+
+    # Raw grouped counts: date, actor, source, count
+    # We attribute by EnrichmentResult.actor (not null) and IOC.source_platform
+    raw = await db.execute(
+        select(
+            func.date(IOC.created_at).label("d"),
+            EnrichmentResult.actor.label("actor"),
+            IOC.source_platform.label("source"),
+            func.count(IOC.id).label("cnt"),
+        )
+        .join(EnrichmentResult, EnrichmentResult.ioc_id == IOC.id)
+        .where(IOC.created_at >= window_start)
+        .where(EnrichmentResult.actor.is_not(None))
+        .group_by(func.date(IOC.created_at), EnrichmentResult.actor, IOC.source_platform)
+    )
+    rows = raw.fetchall()
+
+    # Totals per actor and per source (to select top lists)
+    actor_totals: dict[str, int] = {}
+    source_totals: dict[str, int] = {}
+    for d, actor, source, cnt in rows:
+        if actor:
+            actor_totals[actor] = actor_totals.get(actor, 0) + int(cnt)
+        if source:
+            source_totals[source] = source_totals.get(source, 0) + int(cnt)
+
+    actors_sorted = sorted(actor_totals.items(), key=lambda x: x[1], reverse=True)[:top_actors]
+    sources_sorted = sorted(source_totals.items(), key=lambda x: x[1], reverse=True)[:top_sources]
+    actors = [a for a, _ in actors_sorted]
+    sources = [s for s, _ in sources_sorted]
+
+    # Build date axis
+    dates = [(now - timedelta(days=i)).date().isoformat() for i in range(days - 1, -1, -1)]
+
+    # Matrix entries filtered to top actors/sources
+    entries = []
+    for d, actor, source, cnt in rows:
+        if actor in actors and source in sources:
+            entries.append({
+                "date": str(d),
+                "actor": actor,
+                "source": source,
+                "count": int(cnt),
+            })
+
+    return {
+        "dates": dates,
+        "actors": actors,
+        "sources": sources,
+        "entries": entries,
+        "actor_totals": actor_totals,
+        "source_totals": source_totals,
+        "window_days": days,
     }
