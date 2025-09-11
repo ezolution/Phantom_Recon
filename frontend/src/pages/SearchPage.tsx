@@ -43,6 +43,7 @@ interface IOC {
     evidence?: string
     first_seen?: string
     last_seen?: string
+    raw_json?: any
   }>
   tags?: Array<{
     name: string
@@ -486,6 +487,25 @@ export function SearchPage() {
                         {result.evidence && (
                           <div className="text-xs text-slate-300 break-words">
                             {result.evidence}
+                          </div>
+                        )}
+                        {result.provider === 'forensic' && result.raw_json && (
+                          <div className="mt-1 text-[11px] text-slate-300 space-y-1">
+                            {result.raw_json.registrar && (
+                              <div>Registrar: <span className="text-white">{result.raw_json.registrar}</span></div>
+                            )}
+                            {result.raw_json.registered_on && (
+                              <div>Registered: <span className="text-white">{formatDateTime(result.raw_json.registered_on)}</span></div>
+                            )}
+                            {(result.raw_json.asn || result.raw_json.org) && (
+                              <div>ASN/Org: <span className="text-white">{result.raw_json.asn || '-'} / {result.raw_json.org || '-'}</span></div>
+                            )}
+                            {(result.raw_json.country || result.raw_json.city) && (
+                              <div>Geo: <span className="text-white">{result.raw_json.country || '-'}{result.raw_json.city ? ', ' + result.raw_json.city : ''}</span></div>
+                            )}
+                            {result.raw_json.rdns && (
+                              <div>rDNS: <span className="text-white break-all">{result.raw_json.rdns}</span></div>
+                            )}
                           </div>
                         )}
                       </div>

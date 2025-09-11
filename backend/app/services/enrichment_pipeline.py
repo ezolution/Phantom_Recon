@@ -20,6 +20,7 @@ from app.services.osint_adapter import OSINTAdapter
 from app.services.crowdstrike_adapter import CrowdStrikeAdapter
 from app.services.flashpoint_adapter import FlashpointAdapter
 from app.services.recorded_future_adapter import RecordedFutureAdapter
+from app.services.forensic_adapter import ForensicAdapter
 
 logger = structlog.get_logger(__name__)
 
@@ -34,7 +35,8 @@ class EnrichmentPipeline:
             "osint": OSINTAdapter(),
             "crowdstrike": CrowdStrikeAdapter(),
             "flashpoint": FlashpointAdapter(),
-            "recorded_future": RecordedFutureAdapter()
+            "recorded_future": RecordedFutureAdapter(),
+            "forensic": ForensicAdapter(),
         }
     
     async def enrich_ioc(self, ioc: IOC, db: AsyncSession) -> Dict[str, Any]:
