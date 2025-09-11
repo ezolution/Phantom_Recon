@@ -407,3 +407,85 @@ async def get_actor_source_time_heatmap(
         "source_totals": source_totals,
         "window_days": days,
     }
+
+
+@router.get("/trending")
+async def get_trending(
+    days: int = Query(30, ge=1, le=180),
+    top_actors: int = Query(5, ge=1, le=20),
+    top_campaigns: int = Query(5, ge=1, le=20),
+    db: AsyncSession = Depends(get_db),
+):
+    """Return time-series trending for actors and campaigns.
+    Output: { dates: [...], actor_series: [{name, data[]}], campaign_series: [{name, data[]}]} where
+    data[i] corresponds to dates[i].
+    """
+    from datetime import datetime, timedelta
+
+    now = datetime.utcnow()
+    window_start = now - timedelta(days=days)
+    date_axis = [(now - timedelta(days=i)).date() for i in range(days - 1, 0, -1)] + [now.date()]
+    date_strs = [d.isoformat() for d in date_axis]
+
+    # Actor daily counts
+    actor_rows = await db.execute(
+        select(
+            func.date(IOC.created_at).label("d"),
+            EnrichmentResult.actor.label("actor"),
+            func.count(IOC.id).label("cnt"),
+        )
+        .join(EnrichmentResult, EnrichmentResult.ioc_id == IOC.id)
+        .where(IOC.created_at >= window_start)
+        .where(EnrichmentResult.actor.is_not(None))
+        .group_by(func.date(IOC.created_at), EnrichmentResult.actor)
+    )
+    arows = actor_rows.fetchall()
+    actor_totals: dict[str, int] = {}
+    for d, a, cnt in arows:
+        if a:
+            actor_totals[a] = actor_totals.get(a, 0) + int(cnt)
+    top_actor_names = [n for n, _ in sorted(actor_totals.items(), key=lambda x: x[1], reverse=True)[:top_actors]]
+
+    # Build actor series
+    actor_counts: dict[str, dict[str, int]] = {a: {} for a in top_actor_names}
+    for d, a, cnt in arows:
+        if a in actor_counts:
+            actor_counts[a][str(d)] = int(cnt)
+    actor_series = [
+        {"name": a, "data": [actor_counts[a].get(ds, 0) for ds in date_strs]}
+        for a in top_actor_names
+    ]
+
+    # Campaign daily counts
+    camp_rows = await db.execute(
+        select(
+            func.date(IOC.created_at).label("d"),
+            IOC.campaign_id.label("cid"),
+            func.count(IOC.id).label("cnt"),
+        )
+        .where(IOC.created_at >= window_start)
+        .where(IOC.campaign_id.is_not(None))
+        .group_by(func.date(IOC.created_at), IOC.campaign_id)
+    )
+    crows = camp_rows.fetchall()
+    camp_totals: dict[str, int] = {}
+    for d, cid, cnt in crows:
+        if cid:
+            camp_totals[cid] = camp_totals.get(cid, 0) + int(cnt)
+    top_campaign_ids = [n for n, _ in sorted(camp_totals.items(), key=lambda x: x[1], reverse=True)[:top_campaigns]]
+
+    camp_counts: dict[str, dict[str, int]] = {c: {} for c in top_campaign_ids}
+    for d, cid, cnt in crows:
+        if cid in camp_counts:
+            camp_counts[cid][str(d)] = int(cnt)
+    campaign_series = [
+        {"name": c, "data": [camp_counts[c].get(ds, 0) for ds in date_strs]}
+        for c in top_campaign_ids
+    ]
+
+    return {
+        "dates": date_strs,
+        "actor_series": actor_series,
+        "campaign_series": campaign_series,
+        "window_days": days,
+    }

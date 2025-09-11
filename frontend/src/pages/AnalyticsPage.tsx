@@ -25,6 +25,12 @@ type HeatmapData = {
   window_days: number
 }
 
+type TrendingData = {
+  dates: string[]
+  actor_series: { name: string; data: number[] }[]
+  campaign_series: { name: string; data: number[] }[]
+}
+
 export function AnalyticsPage() {
   const { data, isLoading } = useQuery<AnalyticsData>({
     queryKey: ['stats', 'analytics'],
@@ -38,6 +44,12 @@ export function AnalyticsPage() {
   const { data: heatmap } = useQuery<HeatmapData>({
     queryKey: ['stats', 'heatmap'],
     queryFn: async () => (await api.get('/stats/heatmap?days=14&top_actors=10&top_sources=5')).data,
+    refetchInterval: 10000,
+  })
+
+  const { data: trending } = useQuery<TrendingData>({
+    queryKey: ['stats', 'trending'],
+    queryFn: async () => (await api.get('/stats/trending?days=30&top_actors=5&top_campaigns=5')).data,
     refetchInterval: 10000,
   })
 
@@ -155,6 +167,54 @@ export function AnalyticsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Trending (30d) */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-mono text-gray-500">Actor Trending (30d)</p>
+                <LineChart className="h-5 w-5 text-gray-400" />
+              </div>
+              {!trending || trending.actor_series.length === 0 ? (
+                <div className="text-gray-400 font-mono">No data</div>
+              ) : (
+                <div className="space-y-2">
+                  {trending.actor_series.map((s, idx) => (
+                    <div key={idx}>
+                      <div className="text-xs text-gray-700 font-mono mb-1 truncate" title={s.name}>{s.name}</div>
+                      <div className="flex items-end h-16 space-x-1">
+                        {s.data.map((v, i) => {
+                          const pct = trending.dates.length ? Math.min(100, Math.round((v / Math.max(1, Math.max(...s.data))) * 100)) : 0
+                          return <div key={i} className="bg-emerald-500/70" style={{ width: '4px', height: `${Math.max(2, pct)}%` }} />
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-mono text-gray-500">Campaign Trending (30d)</p>
+                <LineChart className="h-5 w-5 text-gray-400" />
+              </div>
+              {!trending || trending.campaign_series.length === 0 ? (
+                <div className="text-gray-400 font-mono">No data</div>
+              ) : (
+                <div className="space-y-2">
+                  {trending.campaign_series.map((s, idx) => (
+                    <div key={idx}>
+                      <div className="text-xs text-gray-700 font-mono mb-1 truncate" title={s.name}>{s.name}</div>
+                      <div className="flex items-end h-16 space-x-1">
+                        {s.data.map((v, i) => {
+                          const pct = trending.dates.length ? Math.min(100, Math.round((v / Math.max(1, Math.max(...s.data))) * 100)) : 0
+                          return <div key={i} className="bg-sky-500/70" style={{ width: '4px', height: `${Math.max(2, pct)}%` }} />
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
             {/* Actor x Source x Time Heatmap */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-3">
