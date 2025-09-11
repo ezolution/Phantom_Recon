@@ -87,7 +87,15 @@ interface SidebarProps {
   isOpen: boolean
 }
 
-const navigationSections = [
+type NavItem = {
+  id: string
+  label: string
+  icon: any
+  description: string
+  badge?: string
+}
+
+const navigationSections: { title: string; items: NavItem[] }[] = [
   {
     title: 'Core Operations',
     items: [
