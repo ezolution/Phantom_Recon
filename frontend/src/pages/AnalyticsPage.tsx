@@ -191,30 +191,6 @@ export function AnalyticsPage() {
                 </div>
               )}
             </div>
-
-            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-mono text-gray-500">Campaign Trending (30d)</p>
-                <LineChart className="h-5 w-5 text-gray-400" />
-              </div>
-              {!trending || trending.campaign_series.length === 0 ? (
-                <div className="text-gray-400 font-mono">No data</div>
-              ) : (
-                <div className="space-y-2">
-                  {trending.campaign_series.map((s, idx) => (
-                    <div key={idx}>
-                      <div className="text-xs text-gray-700 font-mono mb-1 truncate" title={s.name}>{s.name}</div>
-                      <div className="flex items-end h-16 space-x-1">
-                        {s.data.map((v, i) => {
-                          const pct = trending.dates.length ? Math.min(100, Math.round((v / Math.max(1, Math.max(...s.data))) * 100)) : 0
-                          return <div key={i} className="bg-sky-500/70" style={{ width: '4px', height: `${Math.max(2, pct)}%` }} />
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
             {/* Actor x Source x Time Heatmap */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-3">
