@@ -427,6 +427,40 @@ export function SearchPage() {
                           <span className="text-white break-words max-w-[60%] text-right">{selectedIOC.campaign_id}</span>
                         </div>
                       )}
+                      {/* Forensic summary inline */}
+                      {(() => {
+                        const forensic = selectedIOC.enrichment_results?.find(r => r.provider === 'forensic' && r.raw_json)
+                        if (!forensic || !forensic.raw_json) return null
+                        const f = forensic.raw_json as any
+                        const hasDomainBits = !!(f.registrar || f.registered_on || f.registrar_age_days)
+                        const hasIpBits = !!(f.asn || f.org || f.country || f.city || f.rdns)
+                        if (!hasDomainBits && !hasIpBits) return null
+                        return (
+                          <div className="mt-2 pt-2 border-t border-slate-700">
+                            <div className="text-xs uppercase tracking-wide text-slate-400 mb-1">Forensics</div>
+                            <div className="space-y-1">
+                              {f.registrar && (
+                                <div className="flex justify-between"><span className="text-slate-400">Registrar:</span><span className="text-white">{f.registrar}</span></div>
+                              )}
+                              {f.registered_on && (
+                                <div className="flex justify-between"><span className="text-slate-400">Registered:</span><span className="text-white">{formatDateTime(f.registered_on)}</span></div>
+                              )}
+                              {typeof f.registrar_age_days === 'number' && (
+                                <div className="flex justify-between"><span className="text-slate-400">Domain Age:</span><span className="text-white">{f.registrar_age_days} days</span></div>
+                              )}
+                              {(f.asn || f.org) && (
+                                <div className="flex justify-between"><span className="text-slate-400">ASN/Org:</span><span className="text-white">{f.asn || '-'} / {f.org || '-'}</span></div>
+                              )}
+                              {(f.country || f.city) && (
+                                <div className="flex justify-between"><span className="text-slate-400">Geo:</span><span className="text-white">{f.country || '-'}{f.city ? ', ' + f.city : ''}</span></div>
+                              )}
+                              {f.rdns && (
+                                <div className="flex justify-between"><span className="text-slate-400">rDNS:</span><span className="text-white break-all max-w-[60%] text-right">{f.rdns}</span></div>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })()}
                     </div>
                   </div>
 
